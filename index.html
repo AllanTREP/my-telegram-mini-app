@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -108,7 +108,7 @@
             <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Overview</h2>
             <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
                 TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Stake TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.
-                <br><br>Join our community
+                <br><br>Join our community!
             </p>
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Overview.png?raw=true" alt="TREP Ecosystem Overview" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
             <p class="text-sm" style="color: var(--tg-theme-hint-color, #666);">
@@ -366,36 +366,62 @@
             showCustomMessageBox('Wallet Connect', 'Connecting to wallet... (This functionality requires a blockchain library like Web3.js/Ethers.js and smart contract integration.)');
             walletStatus.innerText = 'Attempting to connect wallet...';
             // Placeholder for actual wallet connection logic
-            // In a real app, you would use a library like Web3Modal or WalletConnect
-            // to connect to MetaMask, Trust Wallet, etc.
-            // Example (conceptual):
+            // In a real app, you would use a library like @solana/web3.js or @solana/wallet-adapter
+            // to connect to Solana wallets (Phantom, Solflare, etc.).
+            // Example (conceptual for Solana):
             /*
-            if (window.ethereum) {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const walletAddress = accounts[0];
-                    walletStatus.innerText = `Wallet Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
-                    showCustomMessageBox('Success', 'Wallet connected! Now you can implement token burning.');
+            async function connectSolanaWallet() {
+                if (window.solana && window.solana.isPhantom) { // Check for Phantom wallet
+                    try {
+                        const resp = await window.solana.connect();
+                        const walletAddress = resp.publicKey.toString();
+                        walletStatus.innerText = `Wallet Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
+                        showCustomMessageBox('Success', 'Solana wallet connected! Now you can implement token burning.');
 
-                    // Placeholder for token burning logic
-                    // const contractAddress = "YOUR_TREP_TOKEN_CONTRACT_ADDRESS";
-                    // const contractABI = YOUR_TREP_TOKEN_CONTRACT_ABI;
-                    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    // const signer = provider.getSigner();
-                    // const tokenContract = new ethers.Contract(contractAddress, contractABI, signer);
-                    // const amountToBurn = ethers.utils.parseUnits("100000", 18); // Assuming 18 decimals
-                    // await tokenContract.burn(amountToBurn);
-                    // showCustomMessageBox('Success', '100,000 TREP tokens burned!');
+                        // --- Token Burning Logic Placeholder ---
+                        // This part requires more setup:
+                        // 1. Solana Web3.js library: <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+                        // 2. SPL Token library: <script src="https://unpkg.com/@solana/spl-token@latest/lib/index.iife.min.js"></script>
+                        // 3. Your TREP token's Mint Address on Solana
+                        // 4. Your wallet's associated token account address for TREP
 
-                } catch (error) {
-                    console.error("Wallet connection failed:", error);
-                    showCustomMessageBox('Error', 'Failed to connect wallet. See console for details.');
-                    walletStatus.innerText = 'Wallet connection failed.';
+                        // Example (conceptual, requires actual setup and error handling):
+                        // const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta')); // Or 'devnet', 'testnet'
+                        // const trepMintAddress = new solanaWeb3.PublicKey("YOUR_TREP_TOKEN_MINT_ADDRESS");
+                        // const ownerPublicKey = new solanaWeb3.PublicKey(walletAddress);
+                        // const amountToBurn = 100000 * (10 ** YOUR_TREP_TOKEN_DECIMALS); // Adjust decimals
+
+                        // const associatedTokenAccount = await splToken.getAssociatedTokenAddress(
+                        //     trepMintAddress,
+                        //     ownerPublicKey
+                        // );
+
+                        // const transaction = new solanaWeb3.Transaction().add(
+                        //     splToken.createBurnInstruction(
+                        //         associatedTokenAccount, // Source
+                        //         trepMintAddress, // Mint
+                        //         ownerPublicKey, // Owner
+                        //         amountToBurn, // Amount
+                        //         [] // Signers
+                        //     )
+                        // );
+
+                        // const signature = await window.solana.signAndSendTransaction(transaction);
+                        // await connection.confirmTransaction(signature, 'confirmed');
+                        // showCustomMessageBox('Success', '100,000 TREP tokens burned!');
+                        // ------------------------------------
+
+                    } catch (error) {
+                        console.error("Solana wallet connection failed:", error);
+                        showCustomMessageBox('Error', 'Failed to connect Solana wallet. Ensure Phantom/Solflare is installed and unlocked.');
+                        walletStatus.innerText = 'Solana wallet connection failed.';
+                    }
+                } else {
+                    showCustomMessageBox('Info', 'Please install a Solana wallet extension like Phantom or Solflare.');
+                    walletStatus.innerText = 'No Solana wallet detected.';
                 }
-            } else {
-                showCustomMessageBox('Info', 'Please install MetaMask or another Web3 wallet extension.');
-                walletStatus.innerText = 'No Web3 wallet detected.';
             }
+            connectSolanaWallet();
             */
         };
 
