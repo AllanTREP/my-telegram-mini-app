@@ -103,16 +103,27 @@
 
         // --- Send Data Functionality ---
         sendDataButton.onclick = function() {
-            const message = messageInput.value.trim();
-            if (message) {
-                Telegram.WebApp.sendData(message); // Send the data to the bot
-                infoText.innerText = `Sent: "${message}" to the bot!`;
-                messageInput.value = ''; // Clear input field
-                Telegram.WebApp.close(); // Optionally close the app after sending
-            } else {
-                alert('Please type a message to send.');
-            }
+    const message = messageInput.value.trim();
+    if (message) {
+        // Create a JavaScript object with structured data
+        const dataToSend = {
+            type: 'user_message',
+            text: message,
+            timestamp: new Date().toISOString(),
+            user_id: Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : 'unknown'
         };
+
+        // Convert the JavaScript object to a JSON string
+        const jsonString = JSON.stringify(dataToSend);
+
+        Telegram.WebApp.sendData(jsonString); // Send the JSON string to the bot
+        infoText.innerText = `Sent JSON data: ${jsonString} to the bot!`;
+        messageInput.value = ''; // Clear input field
+        Telegram.WebApp.close(); // Optionally close the app after sending
+    } else {
+        alert('Please type a message to send.');
+    }
+};
 
         // --- Existing SDK Features (from previous step) ---
         document.getElementById('expandButton').onclick = function() {
