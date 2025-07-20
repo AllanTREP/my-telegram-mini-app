@@ -76,7 +76,7 @@
          style="background-color: var(--tg-theme-secondary-bg-color, #ffffff);">
 
         <!-- Logo -->
-        <img id="appLogo" src="https://placehold.co/100x100/0088cc/ffffff?text=LOGO" alt="App Logo" class="w-24 h-24 rounded-full mb-4 object-cover">
+        <img id="appLogo" src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover">
 
         <!-- Welcome Message -->
         <h1 class="text-3xl font-bold mb-3 text-center"
@@ -109,7 +109,7 @@
             <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
                 This section provides a general overview of the TREP ecosystem and what you can find in this Mini App.
             </p>
-            <img src="https://placehold.co/300x150/0088cc/ffffff?text=Overview+Image" alt="Overview" class="w-full rounded-lg mb-4 object-cover">
+            <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Overview.png?raw=true" alt="TREP Ecosystem Overview" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
             <p class="text-sm" style="color: var(--tg-theme-hint-color, #666);">
                 Learn more about our mission and features.
             </p>
@@ -291,6 +291,424 @@
         };
 
         // --- SDK Features (now in SDK Features tab) ---
+        // Note: The 'Send Data' tab from previous versions is now part of the 'SDK Features' section,
+        // specifically the 'Send Data' button within tab1Content.
+        // The previous 'SDK Features' content has been moved to tab3Content.
+        document.getElementById('expandButton').onclick = function() {
+            Telegram.WebApp.expand();
+            sdkInfoText.innerText = 'App expanded to full screen (if not already).';
+        };
+
+        document.getElementById('closeButton').onclick = function() {
+            Telegram.WebApp.close();
+            sdkInfoText.innerText = 'App is closing...';
+        };
+
+        document.getElementById('checkStatusButton').onclick = function() {
+            if (Telegram.WebApp.isExpanded) {
+                sdkInfoText.innerText = 'The mini app is currently expanded!';
+            } else {
+                sdkInfoText.innerText = 'The mini app is NOT expanded (it\'s in compact mode).';
+            }
+        };
+
+        // Main Button (still active globally)
+        Telegram.WebApp.MainButton.setText("Press Me: Main Button!");
+        Telegram.WebApp.MainButton.show();
+        Telegram.WebApp.MainButton.onClick(function() {
+            showCustomMessageBox('Main Button', 'Main Button was clicked!');
+            // Example: send a fixed data when main button is clicked
+            Telegram.WebApp.sendData('main_button_pressed');
+            infoText.innerText = 'Main Button pressed! Data sent to bot.';
+        });
+
+        // --- Display User Data (now in App Info tab and general info) ---
+        if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            infoText.innerHTML = `Hello, ${user.first_name || 'User'}!`;
+            if (user.language_code) {
+                infoText.innerHTML += `<br>Your language: ${user.language_code}`;
+            }
+
+            // Populate app info tab
+            appInfoText.innerHTML = `
+                <p><strong>User ID:</strong> ${user.id || 'N/A'}</p>
+                <p><strong>First Name:</strong> ${user.first_name || 'N/A'}</p>
+                <p><strong>Last Name:</strong> ${user.last_name || 'N/A'}</p>
+                <p><strong>Username:</strong> ${user.username ? `@${user.username}` : 'N/A'}</p>
+                <p><strong>Language Code:</strong> ${user.language_code || 'N/A'}</p>
+                <p><strong>Is Premium:</strong> ${user.is_premium ? 'Yes' : 'No'}</p>
+                <p><strong>Allows Write To PM:</strong> ${user.allows_write_to_pm ? 'Yes' : 'No'}</p>
+            `;
+        } else {
+            infoText.innerHTML += `<br>User data not available for display.`;
+            appInfoText.innerHTML = `<p>User data not available. Launch the Mini App from Telegram to see user-specific info.</p>`;
+        }
+
+        // --- Wallet Connection Logic (Placeholder in Access tab) ---
+        document.getElementById('connectWalletButton').onclick = function() {
+            showCustomMessageBox('Wallet Connect', 'Connecting to wallet... (This functionality requires a blockchain library like Web3.js/Ethers.js and smart contract integration.)');
+            walletStatus.innerText = 'Attempting to connect wallet...';
+            // Placeholder for actual wallet connection logic
+            // In a real app, you would use a library like Web3Modal or WalletConnect
+            // to connect to MetaMask, Trust Wallet, etc.
+            // Example (conceptual):
+            /*
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const walletAddress = accounts[0];
+                    walletStatus.innerText = `Wallet Connected: ${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
+                    showCustomMessageBox('Success', 'Wallet connected! Now you can implement token burning.');
+
+                    // Placeholder for token burning logic
+                    // const contractAddress = "YOUR_TREP_TOKEN_CONTRACT_ADDRESS";
+                    // const contractABI = YOUR_TREP_TOKEN_CONTRACT_ABI;
+                    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    // const signer = provider.getSigner();
+                    // const tokenContract = new ethers.Contract(contractAddress, contractABI, signer);
+                    // const amountToBurn = ethers.utils.parseUnits("100000", 18); // Assuming 18 decimals
+                    // await tokenContract.burn(amountToBurn);
+                    // showCustomMessageBox('Success', '100,000 TREP tokens burned!');
+
+                } catch (error) {
+                    console.error("Wallet connection failed:", error);
+                    showCustomMessageBox('Error', 'Failed to connect wallet. See console for details.');
+                    walletStatus.innerText = 'Wallet connection failed.';
+                }
+            } else {
+                showCustomMessageBox('Info', 'Please install MetaMask or another Web3 wallet extension.');
+                walletStatus.innerText = 'No Web3 wallet detected.';
+            }
+            */
+        };
+
+
+        // Adapt to Telegram's Theme
+        Telegram.WebApp.onEvent('themeChanged', function() {
+            document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color);
+            document.documentElement.style.setProperty('--tg-theme-text-color', Telegram.WebApp.themeParams.text_color);
+            document.documentElement.style.setProperty('--tg-theme-hint-color', Telegram.WebApp.themeParams.hint_color);
+            document.documentElement.style.setProperty('--tg-theme-link-color', Telegram.WebApp.themeParams.link_color);
+            document.documentElement.style.setProperty('--tg-theme-button-color', Telegram.WebApp.themeParams.button_color);
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', Telegram.WebApp.themeParams.button_text_color);
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', Telegram.WebApp.themeParams.secondary_bg_color);
+        });
+        // Apply theme on load
+        if (Telegram.WebApp.themeParams) {
+            document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color);
+            document.documentElement.style.setProperty('--tg-theme-text-color', Telegram.WebApp.themeParams.text_color);
+            document.documentElement.style.setProperty('--tg-theme-hint-color', Telegram.WebApp.themeParams.hint_color);
+            document.documentElement.style.setProperty('--tg-theme-link-color', Telegram.WebApp.themeParams.link_color);
+            document.documentElement.style.setProperty('--tg-theme-button-color', Telegram.WebApp.themeParams.button_color);
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', Telegram.WebApp.themeParams.button_text_color);
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', Telegram.WebApp.themeParams.secondary_bg_color);
+        }
+    </script>
+</body>
+</html>
+```
+
+The overview picture is too big. Can you resize it and make it smaller, please?I will update the "Updated Telegram Mini App with Custom Logo and Overview Pic" Canvas to resize the overview picture.
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TREP Mini App</title>
+    <!-- Tailwind CSS CDN for easy styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and general body setup */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--tg-theme-bg-color, #f0f2f5); /* Fallback background */
+            color: var(--tg-theme-text-color, #333); /* Fallback text color */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transitions */
+        }
+        /* Style for the custom message box */
+        .message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .message-box {
+            background: var(--tg-theme-secondary-bg-color, white);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            color: var(--tg-theme-text-color, #333);
+        }
+        .message-box h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .message-box p {
+            margin-bottom: 1.5rem;
+        }
+        .message-box button {
+            background-color: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .message-box button:hover {
+            filter: brightness(90%);
+        }
+        /* Specific styles for tab buttons to handle active/inactive states */
+        .tab-button.active {
+            background-color: var(--tg-theme-button-color, #0088cc) !important;
+            color: var(--tg-theme-button-text-color, white) !important;
+        }
+        .tab-button:not(.active) {
+            background-color: var(--tg-theme-secondary-bg-color, #e0e0e0) !important;
+            color: var(--tg-theme-text-color, #333) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Main App Container -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center"
+         id="app-container"
+         style="background-color: var(--tg-theme-secondary-bg-color, #ffffff);">
+
+        <!-- Logo -->
+        <img id="appLogo" src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover">
+
+        <!-- Welcome Message -->
+        <h1 class="text-3xl font-bold mb-3 text-center"
+            style="color: var(--tg-theme-link-color, #0088cc);">
+            Welcome to TREP Mini App!
+        </h1>
+        <p class="text-center mb-6" style="color: var(--tg-theme-text-color, #333);">
+            Your gateway to exclusive deals, real-time stats, and community access.
+        </p>
+
+        <!-- Tab Navigation -->
+        <div class="flex justify-center flex-wrap mb-6 w-full space-x-2">
+            <button id="overviewTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200">
+                Overview
+            </button>
+            <button id="statsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200">
+                Real-time Stats
+            </button>
+            <button id="dealsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200">
+                Deals
+            </button>
+            <button id="accessTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200">
+                Access
+            </button>
+        </div>
+
+        <!-- Tab Content: Overview -->
+        <div id="overviewTabContent" class="tab-content w-full hidden">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Overview</h2>
+            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+                This section provides a general overview of the TREP ecosystem and what you can find in this Mini App.
+            </p>
+            <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Overview.png?raw=true" alt="TREP Ecosystem Overview" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
+            <p class="text-sm" style="color: var(--tg-theme-hint-color, #666);">
+                Learn more about our mission and features.
+            </p>
+        </div>
+
+        <!-- Tab Content: Real-time Stats -->
+        <div id="statsTabContent" class="tab-content w-full hidden">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Real-time Stats</h2>
+            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+                Here you will find real-time statistics related to TREP tokens and the ecosystem.
+            </p>
+            <div id="statsDisplay" class="bg-gray-100 p-4 rounded-lg text-left" style="background-color: var(--tg-theme-bg-color, #f9f9f9); color: var(--tg-theme-text-color, #333);">
+                <p><strong>Current TREP Price:</strong> Loading...</p>
+                <p><strong>Total Supply:</strong> Loading...</p>
+                <p><strong>Market Cap:</strong> Loading...</p>
+                <p class="text-xs mt-2" style="color: var(--tg-theme-hint-color, #666);">
+                    (Data requires a backend connection for real-time updates)
+                </p>
+            </div>
+        </div>
+
+        <!-- Tab Content: Deals -->
+        <div id="dealsTabContent" class="tab-content w-full hidden">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Public Deals</h2>
+            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+                Discover public deals and opportunities.
+            </p>
+            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3" style="background-color: var(--tg-theme-bg-color, #f9f9f9); color: var(--tg-theme-text-color, #333);">
+                <h3 class="font-semibold text-lg">Deal: Exclusive Discount on Tech Gadgets</h3>
+                <p class="text-sm">Get 20% off on selected electronics for a limited time!</p>
+                <img src="https://placehold.co/250x100/0088cc/ffffff?text=Deal+Image" alt="Deal 1" class="w-full rounded-lg my-2 object-cover">
+                <a href="https://example.com/public-deal-finder" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">
+                    Visit Public Deal Finder
+                </a>
+            </div>
+            <div class="deal-item bg-gray-100 p-4 rounded-lg" style="background-color: var(--tg-theme-bg-color, #f9f9f9); color: var(--tg-theme-text-color, #333);">
+                <h3 class="font-semibold text-lg">Community Channel: Intrepid Public</h3>
+                <p class="text-sm">Join our public channel for updates and discussions.</p>
+                <a href="https://t.me/intrepid_public_channel" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">
+                    Join Intrepid Public Channel
+                </a>
+            </div>
+        </div>
+
+        <!-- Tab Content: Access -->
+        <div id="accessTabContent" class="tab-content w-full hidden">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Gain Full Access</h2>
+            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+                Burn 100,000 TREP tokens to unlock the **Private TREP Mini App Store** and access exclusive deals, remedies, PDFs, clothes, and much more!
+            </p>
+            <button id="connectWalletButton"
+                    class="w-full py-3 rounded-lg font-bold text-white transition-colors duration-200 mb-4"
+                    style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);">
+                Connect Wallet & Burn 100,000 TREP
+            </button>
+            <p id="walletStatus" class="text-sm text-center" style="color: var(--tg-theme-hint-color, #666);">
+                Wallet not connected.
+            </p>
+            <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);">
+                (Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)
+            </p>
+        </div>
+
+        <!-- General Info Text at the bottom of the main container -->
+        <p id="infoText" class="mt-6 text-sm text-gray-600 text-center w-full"
+           style="color: var(--tg-theme-hint-color, #666);">
+            Hello, User!
+        </p>
+
+    </div>
+
+    <!-- Custom Message Box HTML -->
+    <div id="customMessageBoxOverlay" class="message-box-overlay hidden">
+        <div class="message-box">
+            <h3 id="messageBoxTitle">Alert</h3>
+            <p id="messageBoxContent">This is a custom message.</p>
+            <button id="messageBoxOkButton">OK</button>
+        </div>
+    </div>
+
+    <!-- Telegram Mini Apps SDK Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <script>
+        // Function to show custom message box instead of alert()
+        function showCustomMessageBox(title, message) {
+            const overlay = document.getElementById('customMessageBoxOverlay');
+            const msgBoxTitle = document.getElementById('messageBoxTitle');
+            const msgBoxContent = document.getElementById('messageBoxContent');
+            const msgBoxOkButton = document.getElementById('messageBoxOkButton');
+
+            msgBoxTitle.innerText = title;
+            msgBoxContent.innerText = message;
+            overlay.classList.remove('hidden');
+
+            msgBoxOkButton.onclick = () => {
+                overlay.classList.add('hidden');
+            };
+        }
+
+        // Override window.alert for a custom experience
+        window.alert = function(message) {
+            showCustomMessageBox('Alert', message);
+        };
+
+        Telegram.WebApp.ready();
+
+        // Get references to elements
+        const messageInput = document.getElementById('messageInput');
+        const sendDataButton = document.getElementById('sendDataButton');
+        const infoText = document.getElementById('infoText');
+        const appInfoText = document.getElementById('appInfoText');
+        const sdkInfoText = document.getElementById('sdkInfoText');
+        const walletStatus = document.getElementById('walletStatus');
+
+        // Tab Buttons
+        const overviewTabButton = document.getElementById('overviewTabButton');
+        const statsTabButton = document.getElementById('statsTabButton');
+        const dealsTabButton = document.getElementById('dealsTabButton');
+        const accessTabButton = document.getElementById('accessTabButton');
+
+        // Tab Contents
+        const overviewTabContent = document.getElementById('overviewTabContent');
+        const statsTabContent = document.getElementById('statsTabContent');
+        const dealsTabContent = document.getElementById('dealsTabContent');
+        const accessTabContent = document.getElementById('accessTabContent');
+
+        // --- Tab Switching Logic ---
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show the selected tab content
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Add active class to the corresponding tab button
+            const activeButton = document.getElementById(tabId.replace('Content', 'Button'));
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+        }
+
+        // Event listeners for tab buttons
+        overviewTabButton.onclick = () => showTab('overviewTabContent');
+        statsTabButton.onclick = () => showTab('statsTabContent');
+        dealsTabButton.onclick = () => showTab('dealsTabContent');
+        accessTabButton.onclick = () => showTab('accessTabContent');
+
+        // Show the Overview tab by default on load
+        showTab('overviewTabContent');
+
+        // --- Send Data Functionality (example, not directly tied to a tab in this version) ---
+        // This is still here for reference, but the 'Send Data' tab now handles its own button
+        // The previous 'Send Data' button (id="sendDataButton") is now within tab1Content
+        sendDataButton.onclick = function() {
+            const message = messageInput.value.trim();
+            if (message) {
+                const dataToSend = {
+                    type: 'user_message',
+                    text: message,
+                    timestamp: new Date().toISOString(),
+                    user_id: Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : 'unknown'
+                };
+                const jsonString = JSON.stringify(dataToSend);
+
+                Telegram.WebApp.sendData(jsonString);
+                infoText.innerText = `Sent JSON data: ${jsonString} to the bot!`;
+                messageInput.value = '';
+                // Telegram.WebApp.close(); // Optionally close the app after sending
+            } else {
+                showCustomMessageBox('Input Required', 'Please type a message to send.');
+            }
+        };
+
+        // --- SDK Features (now in SDK Features tab) ---
+        // Note: The 'Send Data' tab from previous versions is now part of the 'SDK Features' section,
+        // specifically the 'Send Data' button within tab1Content.
+        // The previous 'SDK Features' content has been moved to tab3Content.
         document.getElementById('expandButton').onclick = function() {
             Telegram.WebApp.expand();
             sdkInfoText.innerText = 'App expanded to full screen (if not already).';
