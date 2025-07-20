@@ -414,7 +414,7 @@
                     } catch (error) {
                         console.error("Solana wallet connection failed:", error);
                         showCustomMessageBox('Error', 'Failed to connect Solana wallet. Ensure Phantom/Solflare is installed and unlocked.');
-                        walletStatus.innerText = 'Solana wallet failed.';
+                        walletStatus.innerText = 'Solana wallet connection failed.';
                     }
                 } else {
                     showCustomMessageBox('Info', 'Please install a Solana wallet extension like Phantom or Solflare.');
