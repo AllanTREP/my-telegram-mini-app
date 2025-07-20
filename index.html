@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Enhanced Mini App</title>
+    <title>Mini App: Send Data</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,48 +13,60 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: var(--tg-theme-bg-color, #f0f2f5); /* Use Telegram theme color if available */
-            color: var(--tg-theme-text-color, #333); /* Use Telegram theme color if available */
+            background-color: var(--tg-theme-bg-color, #f0f2f5);
+            color: var(--tg-theme-text-color, #333);
             padding: 20px;
             box-sizing: border-box;
         }
         .container {
-            background-color: var(--tg-theme-secondary-bg-color, #ffffff); /* Use Telegram theme color if available */
+            background-color: var(--tg-theme-secondary-bg-color, #ffffff);
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
             margin-bottom: 20px;
-            max-width: 90%; /* Responsive width */
+            max-width: 90%;
         }
         h1 {
-            color: var(--tg-theme-link-color, #0088cc); /* Use Telegram theme color if available */
+            color: var(--tg-theme-link-color, #0088cc);
             margin-bottom: 20px;
         }
         p {
             font-size: 1.1em;
+            margin-bottom: 15px;
         }
         .button-group {
             display: flex;
-            flex-wrap: wrap; /* Allow buttons to wrap */
-            gap: 10px; /* Space between buttons */
+            flex-wrap: wrap;
+            gap: 10px;
             justify-content: center;
             margin-top: 10px;
+            margin-bottom: 20px; /* Space before input */
         }
         button {
-            background-color: var(--tg-theme-button-color, #0088cc); /* Use Telegram theme color if available */
-            color: var(--tg-theme-button-text-color, white); /* Use Telegram theme color if available */
+            background-color: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, white);
             padding: 12px 25px;
             border: none;
             border-radius: 8px;
             font-size: 1em;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            flex-grow: 1; /* Allow buttons to grow */
-            max-width: 200px; /* Max width for single button */
+            flex-grow: 1;
+            max-width: 200px;
         }
         button:hover {
-            filter: brightness(90%); /* Simple hover effect */
+            filter: brightness(90%);
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            border-radius: 5px;
+            width: calc(100% - 22px); /* Full width minus padding/border */
+            margin-bottom: 15px;
+            font-size: 1em;
+            background-color: var(--tg-theme-bg-color, white);
+            color: var(--tg-theme-text-color, black);
         }
         #infoText {
             margin-top: 20px;
@@ -65,8 +77,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to Your Mini App!</h1>
-        <p>Explore some interactions below.</p>
+        <h1>Send Data to Bot</h1>
+        <p>Type a message and send it to your bot.</p>
+
+        <input type="text" id="messageInput" placeholder="Your message here...">
+        <button id="sendDataButton">Send Message to Bot</button>
     </div>
 
     <div class="button-group">
@@ -80,27 +95,36 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <script>
-        // Initialize the SDK - always call this first!
         Telegram.WebApp.ready();
 
-        // Access the text element
         const infoText = document.getElementById('infoText');
+        const messageInput = document.getElementById('messageInput');
+        const sendDataButton = document.getElementById('sendDataButton');
 
-        // --- Basic Interaction with Telegram Client ---
+        // --- Send Data Functionality ---
+        sendDataButton.onclick = function() {
+            const message = messageInput.value.trim();
+            if (message) {
+                Telegram.WebApp.sendData(message); // Send the data to the bot
+                infoText.innerText = `Sent: "${message}" to the bot!`;
+                messageInput.value = ''; // Clear input field
+                Telegram.WebApp.close(); // Optionally close the app after sending
+            } else {
+                alert('Please type a message to send.');
+            }
+        };
 
-        // Expand the Mini App to full screen
+        // --- Existing SDK Features (from previous step) ---
         document.getElementById('expandButton').onclick = function() {
             Telegram.WebApp.expand();
             infoText.innerText = 'App expanded to full screen (if not already).';
         };
 
-        // Close the Mini App
         document.getElementById('closeButton').onclick = function() {
             Telegram.WebApp.close();
             infoText.innerText = 'App is closing...';
         };
 
-        // Check if the app is expanded (from previous step)
         document.getElementById('checkStatusButton').onclick = function() {
             if (Telegram.WebApp.isExpanded) {
                 infoText.innerText = 'The mini app is currently expanded!';
@@ -109,26 +133,17 @@
             }
         };
 
-        // --- Using Telegram's Built-in Main Button ---
-        // This button appears at the very bottom of the mini app window.
-
-        // 1. Set the text for the Main Button
+        // Main Button (still active)
         Telegram.WebApp.MainButton.setText("Press Me: Main Button!");
-
-        // 2. Show the Main Button
         Telegram.WebApp.MainButton.show();
-
-        // 3. Add an event listener for when the Main Button is clicked
         Telegram.WebApp.MainButton.onClick(function() {
             alert('Main Button was clicked!');
-            // You could send data to your bot here, for example:
-            // Telegram.WebApp.sendData('main_button_pressed');
+            // Example: send a fixed data when main button is clicked
+            Telegram.WebApp.sendData('main_button_pressed');
+            infoText.innerText = 'Main Button pressed! Data sent to bot.';
         });
 
-        // --- Getting User Data (More Advanced, but useful to know) ---
-        // Telegram.WebApp.initDataUnsafe contains user information,
-        // but it should be validated on your server for security in real apps.
-        // For now, let's just display some basic info if available.
+        // Display User Data
         if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
             const user = Telegram.WebApp.initDataUnsafe.user;
             infoText.innerHTML += `<br>Hello, ${user.first_name || 'User'}!`;
@@ -139,14 +154,18 @@
             infoText.innerHTML += `<br>User data not available for display.`;
         }
 
-        // --- Adapting to Telegram's Theme (Optional but nice touch) ---
-        // Listen for theme changes (e.g., user switches to dark mode)
+        // Adapt to Telegram's Theme
         Telegram.WebApp.onEvent('themeChanged', function() {
-            document.body.style.backgroundColor = Telegram.WebApp.themeParams.bg_color;
-            document.body.style.color = Telegram.WebApp.themeParams.text_color;
-            // You would typically update all your CSS variables here
+            // This updates CSS variables when theme changes
+            document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color);
+            document.documentElement.style.setProperty('--tg-theme-text-color', Telegram.WebApp.themeParams.text_color);
+            document.documentElement.style.setProperty('--tg-theme-hint-color', Telegram.WebApp.themeParams.hint_color);
+            document.documentElement.style.setProperty('--tg-theme-link-color', Telegram.WebApp.themeParams.link_color);
+            document.documentElement.style.setProperty('--tg-theme-button-color', Telegram.WebApp.themeParams.button_color);
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', Telegram.WebApp.themeParams.button_text_color);
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', Telegram.WebApp.themeParams.secondary_bg_color);
         });
-        // Also apply theme on load
+        // Apply theme on load
         if (Telegram.WebApp.themeParams) {
             document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color);
             document.documentElement.style.setProperty('--tg-theme-text-color', Telegram.WebApp.themeParams.text_color);
@@ -156,7 +175,6 @@
             document.documentElement.style.setProperty('--tg-theme-button-text-color', Telegram.WebApp.themeParams.button_text_color);
             document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', Telegram.WebApp.themeParams.secondary_bg_color);
         }
-
     </script>
 </body>
 </html>
