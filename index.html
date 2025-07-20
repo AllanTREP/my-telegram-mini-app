@@ -41,7 +41,7 @@
             gap: 10px;
             justify-content: center;
             margin-top: 10px;
-            margin-bottom: 20px; /* Space before input */
+            margin-bottom: 20px;
         }
         button {
             background-color: var(--tg-theme-button-color, #0088cc);
@@ -62,7 +62,7 @@
             padding: 10px;
             border: 1px solid var(--tg-theme-hint-color, #ccc);
             border-radius: 5px;
-            width: calc(100% - 22px); /* Full width minus padding/border */
+            width: calc(100% - 22px);
             margin-bottom: 15px;
             font-size: 1em;
             background-color: var(--tg-theme-bg-color, white);
@@ -95,37 +95,47 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <script>
+        // Ensure WebApp is initialized before using its functions
         Telegram.WebApp.ready();
 
-        const infoText = document.getElementById('infoText');
+        // Get references to your elements
         const messageInput = document.getElementById('messageInput');
         const sendDataButton = document.getElementById('sendDataButton');
+        const infoText = document.getElementById('infoText');
 
         // --- Send Data Functionality ---
         sendDataButton.onclick = function() {
-    const message = messageInput.value.trim();
-    if (message) {
-        // Create a JavaScript object with structured data
-        const dataToSend = {
-            type: 'user_message',
-            text: message,
-            timestamp: new Date().toISOString(),
-            user_id: Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : 'unknown'
+            const message = messageInput.value.trim(); // Get the raw text input
+
+            if (message) {
+                // Create a JavaScript object with structured data
+                const dataToSend = {
+                    type: 'user_message',
+                    text: message,
+                    timestamp: new Date().toISOString(),
+                    user_id: Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : 'unknown'
+                };
+
+                // Convert the JavaScript object to a JSON string
+                const jsonString = JSON.stringify(dataToSend);
+
+                // Send the JSON string to the bot
+                Telegram.WebApp.sendData(jsonString);
+
+                // Update info text (for user feedback)
+                infoText.innerText = `Sent JSON data: ${jsonString} to the bot!`;
+
+                // Clear input field
+                messageInput.value = '';
+
+                // Optionally close the app after sending
+                // Telegram.WebApp.close();
+            } else {
+                alert('Please type a message to send.');
+            }
         };
 
-        // Convert the JavaScript object to a JSON string
-        const jsonString = JSON.stringify(dataToSend);
-
-        Telegram.WebApp.sendData(jsonString); // Send the JSON string to the bot
-        infoText.innerText = `Sent JSON data: ${jsonString} to the bot!`;
-        messageInput.value = ''; // Clear input field
-        Telegram.WebApp.close(); // Optionally close the app after sending
-    } else {
-        alert('Please type a message to send.');
-    }
-};
-
-        // --- Existing SDK Features (from previous step) ---
+        // --- Existing SDK Features ---
         document.getElementById('expandButton').onclick = function() {
             Telegram.WebApp.expand();
             infoText.innerText = 'App expanded to full screen (if not already).';
@@ -144,12 +154,11 @@
             }
         };
 
-        // Main Button (still active)
+        // Main Button
         Telegram.WebApp.MainButton.setText("Press Me: Main Button!");
         Telegram.WebApp.MainButton.show();
         Telegram.WebApp.MainButton.onClick(function() {
             alert('Main Button was clicked!');
-            // Example: send a fixed data when main button is clicked
             Telegram.WebApp.sendData('main_button_pressed');
             infoText.innerText = 'Main Button pressed! Data sent to bot.';
         });
@@ -167,7 +176,6 @@
 
         // Adapt to Telegram's Theme
         Telegram.WebApp.onEvent('themeChanged', function() {
-            // This updates CSS variables when theme changes
             document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color);
             document.documentElement.style.setProperty('--tg-theme-text-color', Telegram.WebApp.themeParams.text_color);
             document.documentElement.style.setProperty('--tg-theme-hint-color', Telegram.WebApp.themeParams.hint_color);
@@ -176,6 +184,7 @@
             document.documentElement.style.setProperty('--tg-theme-button-text-color', Telegram.WebApp.themeParams.button_text_color);
             document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', Telegram.WebApp.themeParams.secondary_bg_color);
         });
+
         // Apply theme on load
         if (Telegram.WebApp.themeParams) {
             document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color);
