@@ -10,7 +10,7 @@
         /* Custom CSS Variables for App Theme */
         :root {
             --app-main-bg: #FFFFFF; /* Light mode main background */
-            --app-secondary-bg: #F9FF9; /* Light mode secondary background (for statsDisplay, deal-item) */
+            --app-secondary-bg: #F9F9F9; /* Light mode secondary background (for statsDisplay, deal-item) */
             --app-text-color: #333333; /* Light mode general text color */
         }
 
@@ -918,7 +918,7 @@
         const gameZoneSelection = document.getElementById('gameZoneSelection');
         const gamePlayArea = document.getElementById('gamePlayArea');
         const backToZonesButton = document.getElementById('backToZonesButton');
-        const currentZoneTitle = document.getElementById('currentZoneTitle');
+        const currentZoneTitle = document = document.getElementById('currentZoneTitle');
         const zoneImageContainer = document.getElementById('zoneImageContainer');
         const gamePrompt = document.getElementById('gamePrompt');
         const gameFeedback = document.getElementById('gameFeedback');
@@ -1246,6 +1246,7 @@
                 spotTheDifferenceGame.classList.add('hidden');
                 gamePlayArea.classList.remove('hidden'); // Go back to the zone exploration screen
                 resetSpotTheDifferenceGame(); // Reset puzzle state (but not index)
+            });
 
             // Add event listener for next puzzle button
             nextPuzzleButton.addEventListener('click', () => {
