@@ -83,7 +83,7 @@
         }
         .quick-link-button.active {
             background-color: var(--tg-theme-link-color, #0088cc) !important; /* Active quick link color */
-            transform: scale(1.1); /* Slightly larger when active */
+            animation: pop 0.3s ease-out forwards; /* Apply pop animation */
         }
 
         /* Fade-in animation for tab content */
@@ -93,6 +93,13 @@
         }
         .fade-in-tab {
             animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Pop animation for active quick links */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.1); } /* End slightly larger than normal */
         }
     </style>
 </head>
@@ -329,9 +336,12 @@
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active');
             });
-            // Remove active class from all quick link buttons
+            // Remove active class from all quick link buttons and reset animation
             document.querySelectorAll('.quick-link-button').forEach(button => {
                 button.classList.remove('active');
+                button.style.animation = 'none'; // Reset animation
+                void button.offsetWidth; // Trigger reflow to restart animation
+                button.style.animation = null; // Remove inline style
             });
 
 
