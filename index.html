@@ -3,17 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TREP Mini App</title>
+    <title data-i18n="appTitle">TREP Mini App</title>
     <!-- Tailwind CSS CDN for easy styling and responsiveness -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for Inter font and general body setup */
+        /* Custom CSS Variables for App Theme */
+        :root {
+            --app-main-bg: #FFFFFF; /* Light mode main background */
+            --app-secondary-bg: #F9F9F9; /* Light mode secondary background (for statsDisplay, deal-item) */
+            --app-text-color: #333333; /* Light mode general text color */
+        }
+
+        /* Dark Mode overrides */
+        body.dark-mode {
+            --app-main-bg: #2C2C2C; /* Dark mode main background */
+            --app-secondary-bg: #3A3A3A; /* Dark mode secondary background */
+            --app-text-color: #E0E0E0; /* Dark mode general text color */
+        }
+
+        /* General Body Setup */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--tg-theme-bg-color, #FF8C69); /* Fallback background set to pink-orange */
             color: var(--tg-theme-text-color, white); /* Fallback text color for contrast */
             transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transitions */
         }
+
+        /* Main App Container background and text now use custom variables */
+        #app-container {
+            background-color: var(--app-main-bg) !important; /* Use custom variable */
+            color: var(--app-text-color); /* Use custom variable */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Tab Content backgrounds */
+        .tab-content p, .tab-content h2 {
+            color: var(--app-text-color); /* Ensure text color adapts */
+        }
+        #statsDisplay, .deal-item {
+            background-color: var(--app-secondary-bg) !important; /* Use custom variable */
+            color: var(--app-text-color) !important; /* Use custom variable */
+        }
+
         /* Specific styles for tab buttons to handle active/inactive states */
         .tab-button.active {
             background-color: var(--tg-theme-button-color, #ADD8E6) !important; /* Active tab changed to very light blue */
@@ -23,6 +54,7 @@
         .tab-button:not(.active) {
             color: var(--tg-theme-text-color, #333) !important;
         }
+
         /* Onboarding screen styles */
         .onboarding-overlay {
             position: fixed;
@@ -61,6 +93,7 @@
         .onboarding-button:hover {
             filter: brightness(90%);
         }
+
         /* Quick links styling */
         .quick-link-button {
             background-color: var(--tg-theme-button-color, #0088cc);
@@ -101,6 +134,22 @@
             50% { transform: scale(1.2); }
             100% { transform: scale(1.1); } /* End slightly larger than normal */
         }
+
+        /* Toggle Button Styling (Theme & Language) */
+        .toggle-button {
+            background-color: var(--tg-theme-secondary-bg-color, #e0e0e0);
+            color: var(--tg-theme-text-color, #333);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 0.5rem 0.75rem; /* Adjusted padding */
+            border-radius: 0.5rem; /* Rounded corners */
+            font-size: 1rem; /* Standard font size */
+            font-weight: bold;
+        }
+        .toggle-button:hover {
+            filter: brightness(90%);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -109,75 +158,86 @@
     <div id="onboardingScreen" class="onboarding-overlay hidden">
         <div class="onboarding-content">
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover mx-auto">
-            <h2 class="text-2xl font-bold mb-3" style="color: var(--tg-theme-link-color, #0088cc);">Welcome to TREP Mini App!</h2>
-            <p class="mb-6" style="color: var(--tg-theme-text-color, #333);">
+            <h2 class="text-2xl font-bold mb-3" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="onboardingWelcome">Welcome to TREP Mini App!</h2>
+            <p class="mb-6" style="color: var(--tg-theme-text-color, #333);" data-i18n="onboardingDescription">
                 Your ultimate companion for exclusive deals, real-time market insights, and community connections within the TREP ecosystem.
             </p>
-            <button id="startJourneyButton" class="onboarding-button">
+            <button id="startJourneyButton" class="onboarding-button" data-i18n="startJourneyButton">
                 Start Your Journey
             </button>
         </div>
     </div>
 
     <!-- Main App Container -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center hidden"
-         id="app-container"
-         style="background-color: lightgreen !important;"> <!-- Main container background set to lightgreen with !important -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center relative hidden"
+         id="app-container">
+
+        <!-- Top Right Buttons Container -->
+        <div class="absolute top-4 right-4 flex space-x-2">
+            <!-- Language Toggle Button -->
+            <button id="languageToggleButton" class="toggle-button">
+                ES
+            </button>
+            <!-- Theme Toggle Button -->
+            <button id="themeToggleButton" class="toggle-button text-2xl">
+                ☀️
+            </button>
+        </div>
 
         <!-- Logo -->
         <img id="appLogo" src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover">
 
         <!-- Welcome Message -->
         <h1 class="text-3xl font-bold mb-3 text-center"
-            style="color: var(--tg-theme-link-color, #0088cc);">
+            style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="mainWelcome">
             Welcome to TREP Mini App!
         </h1>
-        <p class="text-center mb-6" style="color: var(--tg-theme-text-color, #333);">
+        <p class="text-center mb-6" style="color: var(--app-text-color);" data-i18n="mainDescription">
             Your gateway to exclusive deals, real-time stats, and community access.
         </p>
 
         <!-- Tab Navigation -->
         <div class="flex justify-center flex-wrap mb-6 w-full space-x-2">
             <button id="overviewTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    style="background-color: lightblue;">
+                    style="background-color: lightblue;" data-i18n="overviewTab">
                 Overview
             </button>
             <button id="statsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    style="background-color: lightblue;">
+                    style="background-color: lightblue;" data-i18n="trenksTab">
                 Trenks
             </button>
             <button id="dealsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    style="background-color: lightblue;">
+                    style="background-color: lightblue;" data-i18n="dealsTab">
                 Deals
             </button>
             <button id="accessTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    style="background-color: lightblue;">
+                    style="background-color: lightblue;" data-i18n="accessTab">
                 Access
             </button>
         </div>
 
         <!-- Tab Content: Overview -->
         <div id="overviewTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Overview</h2>
-            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="overviewHeading">Overview</h2>
+            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="overviewContent">
                 TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Stake TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.
                 <br><br>Join our community!
             </p>
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Overview.png?raw=true" alt="TREP Ecosystem Overview" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
-            <p class="text-sm" style="color: var(--tg-theme-hint-color, #666);">
+            <p class="text-sm" style="color: var(--tg-theme-hint-color, #666);" data-i18n="overviewLearnMore">
                 Learn more about our mission and features.
             </p>
         </div>
 
         <!-- Tab Content: Trenks (formerly Real-time Stats) -->
         <div id="statsTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Trenks</h2>
-            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="trenksHeading">Trenks</h2>
+            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="trenksDescription">
                 Here you will find important links related to TREP tokens, community, and social media.
             </p>
-            <div id="statsDisplay" class="bg-gray-100 p-4 rounded-lg text-left flex flex-wrap justify-center items-start gap-4" style="background-color: var(--tg-theme-bg-color, #f9f9f9); color: var(--tg-theme-text-color, #333);">
+            <div id="statsDisplay" class="bg-gray-100 p-4 rounded-lg text-left flex flex-wrap justify-center items-start gap-4">
                 <div class="flex-1 min-w-[200px]">
-                    <p><strong>Check TREP on:</strong></p>
+                    <p data-i18n="checkTrepOn"><strong>Check TREP on:</strong></p>
                     <ul class="list-disc list-inside ml-4 mb-4">
                         <li><a href="https://dexscreener.com/solana/a6fmyrfluwn8xvfsnyqtsd2kpxht2b4lq4l8lkp11nnm" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dexscreener</a></li>
                         <li><a href="https://www.geckoterminal.com/solana/pools/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">GeckoTerminal (CoinGecko)</a></li>
@@ -185,12 +245,12 @@
                         <li><a href="https://solscan.io/token/Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Solscan</a></li>
                     </ul>
 
-                    <p><strong>Join our Socials:</strong></p>
+                    <p data-i18n="joinSocials"><strong>Join our Socials:</strong></p>
                     <ul class="list-disc list-inside ml-4 mb-4">
                         <li><a href="https://www.youtube.com/@Intrepid-TREPofficial" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">YouTube</a></li>
                         <li><a href="https://x.com/OffcialTrep" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">X (Twitter)</a></li>
                     </ul>
-                    <p><strong>Official Website:</strong></p>
+                    <p data-i18n="officialWebsite"><strong>Official Website:</strong></p>
                     <ul class="list-disc list-inside ml-4">
                         <li><a href="https://sites.google.com/view/intrepid-trep/home" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Intrepid TREP Website</a></li>
                     </ul>
@@ -201,22 +261,22 @@
 
         <!-- Tab Content: Deals -->
         <div id="dealsTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Public Deals</h2>
-            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="publicDealsHeading">Public Deals</h2>
+            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="publicDealsDescription">
                 Exclusive Discount on Tech Gadgets and more.
             </p>
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3" style="background-color: var(--tg-theme-bg-color, #f9f9f9); color: var(--tg-theme-text-color, #333);">
-                <h3 class="font-semibold text-lg">Deal: Exclusive Discount on Tech Gadgets</h3>
-                <p class="text-sm">Get 20% off on selected electronics for a limited time!</p>
+            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
+                <h3 class="font-semibold text-lg" data-i18n="dealItemHeading">Deal: Exclusive Discount on Tech Gadgets</h3>
+                <p class="text-sm" data-i18n="dealItemDescription">Get 20% off on selected electronics for a limited time!</p>
                 <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Unlock%20exclusive%20deals.png?raw=true" alt="Unlock Exclusive Deals" class="w-64 h-auto rounded-lg my-2 object-cover block mx-auto">
-                <a href="https://example.com/public-deal-finder" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">
+                <a href="https://example.com/public-deal-finder" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitPublicDealFinder">
                     Visit Public Deal Finder
                 </a>
             </div>
-            <div class="deal-item bg-gray-100 p-4 rounded-lg" style="background-color: var(--tg-theme-bg-color, #f9f9f9); color: var(--tg-theme-text-color, #333);">
-                <h3 class="font-semibold text-lg">Community Channel: Intrepid Public</h3>
-                <p class="text-sm">Join our public channel for updates and discussions.</p>
-                <a href="https://t.me/intrepid_public_channel" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">
+            <div class="deal-item bg-gray-100 p-4 rounded-lg">
+                <h3 class="font-semibold text-lg" data-i18n="communityChannelHeading">Community Channel: Intrepid Public</h3>
+                <p class="text-sm" data-i18n="communityChannelDescription">Join our public channel for updates and discussions.</p>
+                <a href="https://t.me/intrepid_public_channel" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="joinIntrepidPublicChannel">
                     Join Intrepid Public Channel
                 </a>
             </div>
@@ -224,27 +284,27 @@
 
         <!-- Tab Content: Access -->
         <div id="accessTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Gain Full Access</h2>
-            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="accessHeading">Gain Full Access</h2>
+            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="accessDescription1">
                 Gain lifetime access to the 'TREP Deal Finder - Full Access' channel by burning 100,000 $TREP tokens. You'll find exclusive deals, clothes, gadgets, oils & remedies, PDFs, news, videos, music, and much more.
             </p>
-            <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
+            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="accessDescription2">
                 Connect your Solana wallet to proceed with payment.
             </p>
-            <div class="bg-gray-100 p-4 rounded-lg mb-4 text-left" style="background-color: var(--tg-theme-bg-color, #f9f9f9); color: var(--tg-theme-text-color, #333);">
-                <h3 class="font-semibold text-lg" style="color: var(--tg-theme-link-color, #0088cc);">Early Holder Access</h3>
-                <p class="text-sm">Your gateway to token insights, community tools, and exclusive access.</p>
+            <div class="bg-gray-100 p-4 rounded-lg mb-4 text-left">
+                <h3 class="font-semibold text-lg" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="earlyHolderAccessHeading">Early Holder Access</h3>
+                <p class="text-sm" data-i18n="earlyHolderAccessDescription">Your gateway to token insights, community tools, and exclusive access.</p>
             </div>
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="Access Tab Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
             <button id="connectWalletButton"
                     class="w-full py-3 rounded-lg font-bold text-white transition-colors duration-200 mb-4"
-                    style="background-color: purple !important; color: white !important;"> <!-- Connect Wallet button color changed to purple with !important -->
+                    style="background-color: purple !important; color: white !important;" data-i18n="connectWalletButton">
                 Connect Wallet & Burn 100,000 TREP
             </button>
-            <p id="walletStatus" class="text-sm text-center" style="color: var(--tg-theme-hint-color, #666);">
+            <p id="walletStatus" class="text-sm text-center" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletStatus">
                 Wallet not connected.
             </p>
-            <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);">
+            <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletNote">
                 (Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)
             </p>
         </div>
@@ -280,12 +340,134 @@
     <script>
         Telegram.WebApp.ready();
 
+        // --- Language Data ---
+        const translations = {
+            en: {
+                appTitle: "TREP Mini App",
+                onboardingWelcome: "Welcome to TREP Mini App!",
+                onboardingDescription: "Your ultimate companion for exclusive deals, real-time market insights, and community connections within the TREP ecosystem.",
+                startJourneyButton: "Start Your Journey",
+                mainWelcome: "Welcome to TREP Mini App!",
+                mainDescription: "Your gateway to exclusive deals, real-time stats, and community access.",
+                overviewTab: "Overview",
+                trenksTab: "Trenks",
+                dealsTab: "Deals",
+                accessTab: "Access",
+                overviewHeading: "Overview",
+                overviewContent: "TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Stake TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.<br><br>Join our community!",
+                overviewLearnMore: "Learn more about our mission and features.",
+                trenksHeading: "Trenks",
+                trenksDescription: "Here you will find important links related to TREP tokens, community, and social media.",
+                checkTrepOn: "Check TREP on:",
+                joinSocials: "Join our Socials:",
+                officialWebsite: "Official Website:",
+                publicDealsHeading: "Public Deals",
+                publicDealsDescription: "Exclusive Discount on Tech Gadgets and more.",
+                dealItemHeading: "Deal: Exclusive Discount on Tech Gadgets",
+                dealItemDescription: "Get 20% off on selected electronics for a limited time!",
+                visitPublicDealFinder: "Visit Public Deal Finder",
+                communityChannelHeading: "Community Channel: Intrepid Public",
+                communityChannelDescription: "Join our public channel for updates and discussions.",
+                joinIntrepidPublicChannel: "Join Intrepid Public Channel",
+                accessHeading: "Gain Full Access",
+                accessDescription1: "Gain lifetime access to the 'TREP Deal Finder - Full Access' channel by burning 100,000 $TREP tokens. You'll find exclusive deals, clothes, gadgets, oils & remedies, PDFs, news, videos, music, and much more.",
+                accessDescription2: "Connect your Solana wallet to proceed with payment.",
+                earlyHolderAccessHeading: "Early Holder Access",
+                earlyHolderAccessDescription: "Your gateway to token insights, community tools, and exclusive access.",
+                connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
+                walletStatus: "Wallet not connected.",
+                walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
+                helloUser: "Hello, User!",
+                userDataNotAvailable: "User data not available for display.",
+                yourLanguage: "Your language:"
+            },
+            es: {
+                appTitle: "TREP Mini Aplicación",
+                onboardingWelcome: "¡Bienvenido a la Mini Aplicación TREP!",
+                onboardingDescription: "Tu compañero definitivo para ofertas exclusivas, información de mercado en tiempo real y conexiones comunitarias dentro del ecosistema TREP.",
+                startJourneyButton: "Comenzar tu Viaje",
+                mainWelcome: "¡Bienvenido a la Mini Aplicación TREP!",
+                mainDescription: "Tu puerta de entrada a ofertas exclusivas, estadísticas en tiempo real y acceso a la comunidad.",
+                overviewTab: "Resumen",
+                trenksTab: "Trenks",
+                dealsTab: "Ofertas",
+                accessTab: "Acceso",
+                overviewHeading: "Resumen",
+                overviewContent: "TREP es un token impulsado por la comunidad con utilidad real en el Descubrimiento de Ofertas y Señales de Mercado. Apuesta TREP para acceder a listados tempranos, análisis de inversores y paneles premium. Impulsado por bots, datos y una leal comunidad de Telegram — únete al futuro de la caza de alfa.",
+                overviewLearnMore: "Aprende más sobre nuestra misión y características.",
+                trenksHeading: "Trenks",
+                trenksDescription: "Aquí encontrarás enlaces importantes relacionados con los tokens TREP, la comunidad y las redes sociales.",
+                checkTrepOn: "Consulta TREP en:",
+                joinSocials: "Únete a nuestras Redes Sociales:",
+                officialWebsite: "Sitio Web Oficial:",
+                publicDealsHeading: "Ofertas Públicas",
+                publicDealsDescription: "Descuento exclusivo en gadgets tecnológicos y más.",
+                dealItemHeading: "Oferta: Descuento Exclusivo en Gadgets Tecnológicos",
+                dealItemDescription: "¡Obtén un 20% de descuento en productos electrónicos seleccionados por tiempo limitado!",
+                visitPublicDealFinder: "Visitar Buscador de Ofertas Públicas",
+                communityChannelHeading: "Canal de la Comunidad: Intrepid Public",
+                communityChannelDescription: "Únete a nuestro canal público para actualizaciones y discusiones.",
+                joinIntrepidPublicChannel: "Unirse al Canal Público Intrepid",
+                accessHeading: "Obtener Acceso Completo",
+                accessDescription1: "Obtén acceso de por vida al canal 'TREP Deal Finder - Acceso Completo' quemando 100,000 tokens $TREP. Encontrarás ofertas exclusivas, ropa, gadgets, aceites y remedios, PDFs, noticias, videos, música y mucho más.",
+                accessDescription2: "Conecta tu billetera de Solana para proceder con el pago.",
+                earlyHolderAccessHeading: "Acceso Anticipado para Titulares",
+                earlyHolderAccessDescription: "Tu puerta de entrada a la información de tokens, herramientas comunitarias y acceso exclusivo.",
+                connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
+                walletStatus: "Billetera no conectada.",
+                walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
+                helloUser: "¡Hola, Usuario!",
+                userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
+                yourLanguage: "Tu idioma:"
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('app_language') || 'en'; // Default to English
+
+        function updateContent() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    element.innerHTML = translations[currentLanguage][key];
+                }
+            });
+            // Update specific elements not covered by data-i18n easily (like title)
+            document.title = translations[currentLanguage].appTitle;
+
+            // Update infoText based on user data availability
+            if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+                const user = Telegram.WebApp.initDataUnsafe.user;
+                infoText.innerHTML = `${translations[currentLanguage].helloUser.replace('User', user.first_name || 'User')}!`;
+                if (user.language_code) {
+                    infoText.innerHTML += `<br>${translations[currentLanguage].yourLanguage} ${user.language_code}`;
+                }
+                // Update app info tab
+                appInfoText.innerHTML = `
+                    <p><strong>User ID:</strong> ${user.id || 'N/A'}</p>
+                    <p><strong>First Name:</strong> ${user.first_name || 'N/A'}</p>
+                    <p><strong>Last Name:</strong> ${user.last_name || 'N/A'}</p>
+                    <p><strong>Username:</strong> ${user.username ? `@${user.username}` : 'N/A'}</p>
+                    <p><strong>Language Code:</strong> ${user.language_code || 'N/A'}</p>
+                    <p><strong>Is Premium:</strong> ${user.is_premium ? 'Yes' : 'No'}</p>
+                    <p><strong>Allows Write To PM:</strong> ${user.allows_write_to_pm ? 'Yes' : 'No'}</p>
+                `;
+            } else {
+                infoText.innerHTML = translations[currentLanguage].helloUser + `<br>${translations[currentLanguage].userDataNotAvailable}`;
+                // This appInfoText element is not in the current HTML, but leaving the logic in case it's added back
+                // appInfoText.innerHTML = `<p>${translations[currentLanguage].userDataNotAvailable.replace('display.', 'display. Launch the Mini App from Telegram to see user-specific info.')}</p>`;
+            }
+        }
+
+        Telegram.WebApp.ready();
+
         // Get references to elements
         const onboardingScreen = document.getElementById('onboardingScreen');
         const startJourneyButton = document.getElementById('startJourneyButton');
         const appContainer = document.getElementById('app-container');
         const infoText = document.getElementById('infoText');
         const walletStatus = document.getElementById('walletStatus');
+        const themeToggleButton = document.getElementById('themeToggleButton');
+        const languageToggleButton = document.getElementById('languageToggleButton'); // New language toggle button
 
         // Tab Buttons (top navigation)
         const overviewTabButton = document.getElementById('overviewTabButton');
@@ -305,6 +487,48 @@
         const quickDeals = document.getElementById('quickDeals');
         const quickAccess = document.getElementById('quickAccess');
 
+        // --- Theme Toggle Logic ---
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggleButton.innerHTML = '☀️'; // Sun emoji for light mode toggle
+                localStorage.setItem('app_theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggleButton.innerHTML = '🌙'; // Moon emoji for dark mode toggle
+                localStorage.setItem('app_theme', 'light');
+            }
+        }
+
+        // Check for saved theme preference on load
+        const savedTheme = localStorage.getItem('app_theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            // Default to light mode if no preference is saved
+            applyTheme('light');
+        }
+
+        themeToggleButton.onclick = function() {
+            if (document.body.classList.contains('dark-mode')) {
+                applyTheme('light');
+            } else {
+                applyTheme('dark');
+            }
+        };
+
+        // --- Language Toggle Logic ---
+        languageToggleButton.onclick = function() {
+            currentLanguage = (currentLanguage === 'en') ? 'es' : 'en';
+            localStorage.setItem('app_language', currentLanguage);
+            languageToggleButton.textContent = (currentLanguage === 'en') ? 'ES' : 'EN';
+            updateContent(); // Update all text based on new language
+        };
+
+        // Set initial language button text
+        languageToggleButton.textContent = (currentLanguage === 'en') ? 'ES' : 'EN';
+
+
         // --- Onboarding Logic ---
         function checkOnboardingStatus() {
             const onboardingComplete = localStorage.getItem('onboarding_complete');
@@ -316,6 +540,7 @@
                 onboardingScreen.classList.remove('hidden');
                 appContainer.classList.add('hidden');
             }
+            updateContent(); // Update content after onboarding check
         }
 
         startJourneyButton.onclick = function() {
@@ -385,16 +610,26 @@
             infoText.innerText = 'Main Button pressed! Data sent to bot.';
         });
 
-        // --- Display User Data ---
+        // --- Display User Data (now in Tab 2 and general info) ---
+        // The appInfoText element is currently not in the HTML,
+        // so this part of the logic will not execute on the UI.
+        // It's kept here in case you re-introduce an app info tab.
+        /*
         if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
             const user = Telegram.WebApp.initDataUnsafe.user;
-            infoText.innerHTML = `Hello, ${user.first_name || 'User'}!`;
-            if (user.language_code) {
-                infoText.innerHTML += `<br>Your language: ${user.language_code}`;
-            }
+            appInfoText.innerHTML = `
+                <p><strong>User ID:</strong> ${user.id || 'N/A'}</p>
+                <p><strong>First Name:</strong> ${user.first_name || 'N/A'}</p>
+                <p><strong>Last Name:</strong> ${user.last_name || 'N/A'}</p>
+                <p><strong>Username:</strong> ${user.username ? `@${user.username}` : 'N/A'}</p>
+                <p><strong>Language Code:</strong> ${user.language_code || 'N/A'}</p>
+                <p><strong>Is Premium:</strong> ${user.is_premium ? 'Yes' : 'No'}</p>
+                <p><strong>Allows Write To PM:</strong> ${user.allows_write_to_pm ? 'Yes' : 'No'}</p>
+            `;
         } else {
-            infoText.innerHTML += `<br>User data not available for display.`;
+            appInfoText.innerHTML = `<p>User data not available. Launch the Mini App from Telegram to see user-specific info.</p>`;
         }
+        */
 
         // --- Wallet Connection Logic (Placeholder in Access tab) ---
         const connectWalletButton = document.getElementById('connectWalletButton');
@@ -407,7 +642,8 @@
             };
         }
 
-        // Adapt to Telegram's Theme
+        // Adapt to Telegram's Theme (This applies Telegram's theme params to the root,
+        // but our custom variables will override for specific elements like app-container)
         Telegram.WebApp.onEvent('themeChanged', function() {
             document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color);
             document.documentElement.style.setProperty('--tg-theme-text-color', Telegram.WebApp.themeParams.text_color);
@@ -428,8 +664,12 @@
             document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', Telegram.WebApp.themeParams.secondary_bg_color);
         }
 
-        // Initial check for onboarding status when the script loads
-        checkOnboardingStatus();
+        // Initial calls
+        checkOnboardingStatus(); // This will call updateContent() after checking onboarding
+        // If onboarding is already complete, updateContent() needs to be called directly
+        if (localStorage.getItem('onboarding_complete') === 'true') {
+            updateContent();
+        }
     </script>
 </body>
 </html>
