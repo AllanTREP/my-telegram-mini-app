@@ -127,7 +127,17 @@
                 <p class="text-sm">Your gateway to token insights, community tools, and exclusive access.</p>
             </div>
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="Access Tab Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
-            <!-- Wallet connection button and status elements removed -->
+            <button id="connectWalletButton"
+                    class="w-full py-3 rounded-lg font-bold text-white transition-colors duration-200 mb-4"
+                    style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);">
+                Connect Wallet & Burn 100,000 TREP
+            </button>
+            <p id="walletStatus" class="text-sm text-center" style="color: var(--tg-theme-hint-color, #666);">
+                Wallet not connected.
+            </p>
+            <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);">
+                (Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)
+            </p>
         </div>
 
         <!-- General Info Text at the bottom of the main container -->
@@ -146,6 +156,7 @@
 
         // Get references to elements (only those that exist in the HTML)
         const infoText = document.getElementById('infoText');
+        const walletStatus = document.getElementById('walletStatus'); // Re-added walletStatus reference
 
         // Tab Buttons
         const overviewTabButton = document.getElementById('overviewTabButton');
@@ -193,9 +204,7 @@
         Telegram.WebApp.MainButton.setText("Press Me: Main Button!");
         Telegram.WebApp.MainButton.show();
         Telegram.WebApp.MainButton.onClick(function() {
-            // This was previously a custom alert, now it will just log to console or do nothing visible
             console.log('Main Button was clicked!');
-            // Example: send a fixed data when main button is clicked
             Telegram.WebApp.sendData('main_button_pressed');
             infoText.innerText = 'Main Button pressed! Data sent to bot.';
         });
@@ -210,6 +219,22 @@
         } else {
             infoText.innerHTML += `<br>User data not available for display.`;
         }
+
+        // --- Wallet Connection Logic (Placeholder in Access tab) ---
+        // Re-added the event listener for the connectWalletButton
+        const connectWalletButton = document.getElementById('connectWalletButton');
+        if (connectWalletButton) {
+            connectWalletButton.onclick = function() {
+                console.log('Connect Wallet button clicked. (Functionality not implemented yet)');
+                if (walletStatus) {
+                    walletStatus.innerText = 'Attempting to connect wallet... (Placeholder)';
+                }
+                // Placeholder for actual wallet connection logic
+                // You would integrate Solana wallet libraries here (e.g., @solana/web3.js, @solana/wallet-adapter)
+                // and smart contract interaction for token burning.
+            };
+        }
+
 
         // Adapt to Telegram's Theme
         Telegram.WebApp.onEvent('themeChanged', function() {
