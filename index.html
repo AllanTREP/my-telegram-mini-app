@@ -261,6 +261,31 @@
             color: transparent;
             font-weight: bold;
         }
+
+        /* Flex container for Deals tab item with image */
+        .deal-item.with-image {
+            display: flex;
+            flex-direction: column; /* Default to column on small screens */
+            align-items: center;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) { /* On larger screens, arrange side-by-side */
+            .deal-item.with-image {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start; /* Align text to top */
+            }
+            .deal-item.with-image .deal-text-content {
+                flex: 1; /* Take remaining space */
+                text-align: left;
+            }
+            .deal-item.with-image img {
+                width: 40%; /* Adjust image width */
+                max-width: 200px; /* Max width for image */
+                margin-left: 1rem; /* Space between text and image */
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -385,13 +410,14 @@
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="publicDealsDescription">
                 Exclusive Discount on Tech Gadgets and more.
             </p>
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
-                <h3 class="font-semibold text-lg" data-i18n="dealItemHeading">Deal: Exclusive Discount on Tech Gadgets</h3>
-                <p class="text-sm" data-i18n="dealItemDescription">Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!</p>
-                <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Unlock%20exclusive%20deals.png?raw=true" alt="Unlock Exclusive Deals" class="w-64 h-auto rounded-lg my-2 object-cover block mx-auto">
-                <a href="https://t.me/theTREPstore" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitPublicDealFinder">
-                    Visit Public Deal Finder
-                </a>
+            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3 with-image">
+                <div class="deal-text-content">
+                    <h3 class="font-semibold text-lg" data-i18n="dealItemHeading">Unlock Exclusive Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!</h3>
+                    <a href="https://t.me/theTREPstore" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitPublicDealFinder">
+                        Visit Public Deal Finder
+                    </a>
+                </div>
+                <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Unlock%20exclusive%20deals.png?raw=true" alt="Unlock Exclusive Deals" class="w-64 h-auto rounded-lg my-2 object-cover">
             </div>
             <div class="deal-item bg-gray-100 p-4 rounded-lg">
                 <h3 class="font-semibold text-lg" data-i18n="communityChannelHeading">Community Channel: Intrepid Public</h3>
@@ -423,7 +449,7 @@
                 Connect Wallet & Burn 100,000 TREP
             </button>
             <!-- NEW: Changed text color to green for better visibility -->
-            <p id="walletStatus" class="text-sm text-center" style="color: #22C55E;" data-i18n="walletStatus">
+            <p id="walletStatus" class="text-sm text-center text-green-500 font-bold" data-i18n="walletStatus">
                 Wallet not connected.
             </p>
             <!-- NEW: Burn Address Note -->
@@ -621,8 +647,8 @@
                 officialWebsite: "Official Website:",
                 publicDealsHeading: "Public Deals",
                 publicDealsDescription: "Exclusive Discount on Tech Gadgets and more.",
-                dealItemHeading: "Deal: Exclusive Discount on Tech Gadgets",
-                dealItemDescription: "Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!",
+                dealItemHeading: "Unlock Exclusive Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!",
+                dealItemDescription: "Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!", // This will be replaced by the heading, but keeping for consistency if needed elsewhere
                 visitPublicDealFinder: "Visit Public Deal Finder",
                 communityChannelHeading: "Community Channel: Intrepid Public",
                 communityChannelDescription: "Join our public channel for updates and discussions.",
@@ -701,8 +727,8 @@
                 officialWebsite: "Sitio Web Oficial:",
                 publicDealsHeading: "Ofertas Públicas",
                 publicDealsDescription: "Descuento exclusivo en gadgets tecnológicos y más.",
-                dealItemHeading: "Oferta: Descuento Exclusivo en Gadgets Tecnológicos",
-                dealItemDescription: "Ofertas dentro: ¡Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!",
+                dealItemHeading: "¡Desbloquea Ofertas Exclusivas Dentro: Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!",
+                dealItemDescription: "Ofertas dentro: ¡Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!", // This will be replaced by the heading, but keeping for consistency if needed elsewhere
                 visitPublicDealFinder: "Visitar Buscador de Ofertas Públicas",
                 communityChannelHeading: "Canal de la Comunidad: Intrepid Public",
                 communityChannelDescription: "Únete a nuestro canal público para actualizaciones y discusiones.",
@@ -1062,7 +1088,7 @@
             const clickedHotspot = event.currentTarget;
             clickedHotspot.removeEventListener('click', handleHotspotClick); // Remove listener to prevent multiple clicks
             clickedHotspot.classList.remove('animate-pulse');
-            clickedHotspot.innerHTML = '🔍'; // Change to searching icon
+            clickedHotspot.innerHTML = '�'; // Change to searching icon
 
             gameFeedback.textContent = 'Searching...';
             rewardDisplay.classList.add('hidden');
@@ -1309,3 +1335,4 @@
     </script>
 </body>
 </html>
+�
