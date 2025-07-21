@@ -218,6 +218,10 @@
                     data-i18n="accessTab">
                 Access
             </button>
+            <button id="moreTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
+                    data-i18n="moreTab">
+                More
+            </button>
         </div>
 
         <!-- Tab Content: Overview -->
@@ -301,8 +305,8 @@
             </div>
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="Access Tab Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
             <button id="connectWalletButton"
-                    class="w-full py-3 rounded-lg font-bold text-white transition-colors duration-200 mb-4"
-                    style="background-color: purple !important; color: white !important;" data-i18n="connectWalletButton">
+                    class="w-full py-3 rounded-lg font-bold transition-colors duration-200 mb-4"
+                    style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="connectWalletButton">
                 Connect Wallet & Burn 100,000 TREP
             </button>
             <p id="walletStatus" class="text-sm text-center" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletStatus">
@@ -311,6 +315,21 @@
             <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletNote">
                 (Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)
             </p>
+        </div>
+
+        <!-- New Tab Content: More -->
+        <div id="moreTabContent" class="tab-content w-full hidden">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="moreHeading">More Crypto Info</h2>
+            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="moreDescription">
+                Explore trending cryptocurrencies and market insights.
+            </p>
+            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
+                <h3 class="font-semibold text-lg" data-i18n="dexscreenerGainersHeading">Dexscreener Gainers</h3>
+                <p class="text-sm" data-i18n="dexscreenerGainersDescription">See the top gaining cryptocurrencies on Dexscreener.</p>
+                <a href="https://dexscreener.com/gainers" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitDexscreenerGainers">
+                    Visit Dexscreener Gainers
+                </a>
+            </div>
         </div>
 
         <!-- General Info Text at the bottom of the main container -->
@@ -333,6 +352,9 @@
             </button>
             <button id="quickAccess" class="quick-link-button" data-tab-id="accessTabContent">
                 🔑
+            </button>
+            <button id="quickMore" class="quick-link-button" data-tab-id="moreTabContent">
+                💡
             </button>
         </div>
 
@@ -357,6 +379,7 @@
                 trenksTab: "Trenks",
                 dealsTab: "Deals",
                 accessTab: "Access",
+                moreTab: "More", // New translation
                 overviewHeading: "Overview",
                 overviewContent: "TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Stake TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.<br><br>Join our community!",
                 overviewLearnMore: "Learn more about our mission and features.",
@@ -381,6 +404,11 @@
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
                 walletStatus: "Wallet not connected.",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
+                moreHeading: "More Crypto Info", // New translation
+                moreDescription: "Explore trending cryptocurrencies and market insights.", // New translation
+                dexscreenerGainersHeading: "Dexscreener Gainers", // New translation
+                dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.", // New translation
+                visitDexscreenerGainers: "Visit Dexscreener Gainers", // New translation
                 helloUser: "Hello, User!",
                 userDataNotAvailable: "User data not available for display.",
                 yourLanguage: "Your language:"
@@ -396,6 +424,7 @@
                 trenksTab: "Trenks",
                 dealsTab: "Ofertas",
                 accessTab: "Acceso",
+                moreTab: "Más", // New translation
                 overviewHeading: "Resumen",
                 overviewContent: "TREP es un token impulsado por la comunidad con utilidad real en el Descubrimiento de Ofertas y Señales de Mercado. Apuesta TREP para acceder a listados tempranos, análisis de inversores y paneles premium. Impulsado por bots, datos y una leal comunidad de Telegram — únete al futuro de la caza de alfa.",
                 overviewLearnMore: "Aprende más sobre nuestra misión y características.",
@@ -420,6 +449,11 @@
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
                 walletStatus: "Billetera no conectada.",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
+                moreHeading: "Más Información Cripto", // New translation
+                moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.", // New translation
+                dexscreenerGainersHeading: "Ganadores de Dexscreener", // New translation
+                dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.", // New translation
+                visitDexscreenerGainers: "Visitar Ganadores de Dexscreener", // New translation
                 helloUser: "¡Hola, Usuario!",
                 userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
                 yourLanguage: "Tu idioma:"
@@ -445,23 +479,8 @@
                 if (user.language_code) {
                     infoText.innerHTML += `<br>${translations[currentLanguage].yourLanguage} ${user.language_code}`;
                 }
-                // The appInfoText element is not in the current HTML, so this part of the logic will not execute on the UI.
-                // It's kept here in case you re-introduce an app info tab.
-                /*
-                appInfoText.innerHTML = `
-                    <p><strong>User ID:</strong> ${user.id || 'N/A'}</p>
-                    <p><strong>First Name:</strong> ${user.first_name || 'N/A'}</p>
-                    <p><strong>Last Name:</strong> ${user.last_name || 'N/A'}</p>
-                    <p><strong>Username:</strong> ${user.username ? `@${user.username}` : 'N/A'}</p>
-                    <p><strong>Language Code:</strong> ${user.language_code || 'N/A'}</p>
-                    <p><strong>Is Premium:</strong> ${user.is_premium ? 'Yes' : 'No'}</p>
-                    <p><strong>Allows Write To PM:</strong> ${user.allows_write_to_pm ? 'Yes' : 'No'}</p>
-                `;
-                */
             } else {
                 infoText.innerHTML = translations[currentLanguage].helloUser + `<br>${translations[currentLanguage].userDataNotAvailable}`;
-                // This appInfoText element is not in the current HTML, but leaving the logic in case it's added back
-                // appInfoText.innerHTML = `<p>${translations[currentLanguage].userDataNotAvailable.replace('display.', 'display. Launch the Mini App from Telegram to see user-specific info.')}</p>`;
             }
         }
 
@@ -474,25 +493,28 @@
         const infoText = document.getElementById('infoText');
         const walletStatus = document.getElementById('walletStatus');
         const themeToggleButton = document.getElementById('themeToggleButton');
-        const languageToggleButton = document.getElementById('languageToggleButton'); // New language toggle button
+        const languageToggleButton = document.getElementById('languageToggleButton');
 
         // Tab Buttons (top navigation)
         const overviewTabButton = document.getElementById('overviewTabButton');
         const statsTabButton = document.getElementById('statsTabButton'); // Now Trenks
         const dealsTabButton = document.getElementById('dealsTabButton');
         const accessTabButton = document.getElementById('accessTabButton');
+        const moreTabButton = document.getElementById('moreTabButton'); // New tab button
 
         // Tab Contents
         const overviewTabContent = document.getElementById('overviewTabContent');
         const statsTabContent = document.getElementById('statsTabContent'); // Now Trenks content
         const dealsTabContent = document.getElementById('dealsTabContent');
         const accessTabContent = document.getElementById('accessTabContent');
+        const moreTabContent = document.getElementById('moreTabContent'); // New tab content
 
         // Quick Link Buttons (bottom navigation)
         const quickOverview = document.getElementById('quickOverview');
         const quickTrenks = document.getElementById('quickTrenks');
         const quickDeals = document.getElementById('quickDeals');
         const quickAccess = document.getElementById('quickAccess');
+        const quickMore = document.getElementById('quickMore'); // New quick link button
 
         // --- Theme Toggle Logic ---
         function applyTheme(theme) {
@@ -502,7 +524,7 @@
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
-                themeToggleButton.innerHTML = '�'; // Moon emoji for dark mode toggle
+                themeToggleButton.innerHTML = '🌙'; // Moon emoji for dark mode toggle
                 localStorage.setItem('app_theme', 'light');
             }
         }
@@ -600,12 +622,14 @@
         statsTabButton.onclick = () => showTab('statsTabContent');
         dealsTabButton.onclick = () => showTab('dealsTabContent');
         accessTabButton.onclick = () => showTab('accessTabContent');
+        moreTabButton.onclick = () => showTab('moreTabContent'); // New event listener
 
         // Event listeners for quick link buttons
         quickOverview.onclick = () => showTab('overviewTabContent');
         quickTrenks.onclick = () => showTab('statsTabContent');
         quickDeals.onclick = () => showTab('dealsTabContent');
         quickAccess.onclick = () => showTab('accessTabContent');
+        quickMore.onclick = () => showTab('moreTabContent'); // New event listener
 
 
         // --- Main Button (still active globally) ---
@@ -616,27 +640,6 @@
             Telegram.WebApp.sendData('main_button_pressed');
             infoText.innerText = 'Main Button pressed! Data sent to bot.';
         });
-
-        // --- Display User Data (now in Tab 2 and general info) ---
-        // The appInfoText element is currently not in the HTML,
-        // so this part of the logic will not execute on the UI.
-        // It's kept here in case you re-introduce an app info tab.
-        /*
-        if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            appInfoText.innerHTML = `
-                <p><strong>User ID:</strong> ${user.id || 'N/A'}</p>
-                <p><strong>First Name:</strong> ${user.first_name || 'N/A'}</p>
-                <p><strong>Last Name:</strong> ${user.last_name || 'N/A'}</p>
-                <p><strong>Username:</strong> ${user.username ? `@${user.username}` : 'N/A'}</p>
-                <p><strong>Language Code:</strong> ${user.language_code || 'N/A'}</p>
-                <p><strong>Is Premium:</strong> ${user.is_premium ? 'Yes' : 'No'}</p>
-                <p><strong>Allows Write To PM:</strong> ${user.allows_write_to_pm ? 'Yes' : 'No'}</p>
-            `;
-        } else {
-            appInfoText.innerHTML = `<p>User data not available. Launch the Mini App from Telegram to see user-specific info.</p>`;
-        }
-        */
 
         // --- Wallet Connection Logic (Placeholder in Access tab) ---
         const connectWalletButton = document.getElementById('connectWalletButton');
