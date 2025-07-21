@@ -30,7 +30,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--tg-theme-bg-color, #f0f2f5); /* Use Telegram background color */
+            background: #E0FFFF; /* Light Cyan background for the onboarding screen */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -60,6 +60,39 @@
         }
         .onboarding-button:hover {
             filter: brightness(90%);
+        }
+        /* Quick links styling */
+        .quick-link-button {
+            background-color: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, white);
+            width: 48px; /* Fixed width for icon-like appearance */
+            height: 48px; /* Fixed height for icon-like appearance */
+            border-radius: 50%; /* Make it circular */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem; /* Smaller font for text labels */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .quick-link-button:hover {
+            filter: brightness(90%);
+            transform: translateY(-2px); /* Slight lift on hover */
+        }
+        .quick-link-button.active {
+            background-color: var(--tg-theme-link-color, #0088cc) !important; /* Active quick link color */
+            transform: scale(1.1); /* Slightly larger when active */
+        }
+
+        /* Fade-in animation for tab content */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-tab {
+            animation: fadeIn 0.5s ease-out forwards;
         }
     </style>
 </head>
@@ -215,6 +248,23 @@
             Hello, User!
         </p>
 
+        <!-- Quick Links (Icons) Navigation -->
+        <div class="flex justify-around items-center w-full mt-6 p-3 bg-gray-100 rounded-lg shadow-inner"
+             style="background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);">
+            <button id="quickOverview" class="quick-link-button" data-tab-id="overviewTabContent">
+                🏠
+            </button>
+            <button id="quickTrenks" class="quick-link-button" data-tab-id="statsTabContent">
+                🔗
+            </button>
+            <button id="quickDeals" class="quick-link-button" data-tab-id="dealsTabContent">
+                💰
+            </button>
+            <button id="quickAccess" class="quick-link-button" data-tab-id="accessTabContent">
+                🔑
+            </button>
+        </div>
+
     </div>
 
     <!-- Telegram Mini Apps SDK Script -->
@@ -230,7 +280,7 @@
         const infoText = document.getElementById('infoText');
         const walletStatus = document.getElementById('walletStatus');
 
-        // Tab Buttons
+        // Tab Buttons (top navigation)
         const overviewTabButton = document.getElementById('overviewTabButton');
         const statsTabButton = document.getElementById('statsTabButton'); // Now Trenks
         const dealsTabButton = document.getElementById('dealsTabButton');
@@ -241,6 +291,12 @@
         const statsTabContent = document.getElementById('statsTabContent'); // Now Trenks content
         const dealsTabContent = document.getElementById('dealsTabContent');
         const accessTabContent = document.getElementById('accessTabContent');
+
+        // Quick Link Buttons (bottom navigation)
+        const quickOverview = document.getElementById('quickOverview');
+        const quickTrenks = document.getElementById('quickTrenks');
+        const quickDeals = document.getElementById('quickDeals');
+        const quickAccess = document.getElementById('quickAccess');
 
         // --- Onboarding Logic ---
         function checkOnboardingStatus() {
@@ -262,32 +318,53 @@
             showTab('overviewTabContent'); // Show default tab after onboarding
         };
 
-        // --- Tab Switching Logic ---
+        // --- Tab Switching Logic (for both top and quick links) ---
         function showTab(tabId) {
-            // Hide all tab contents
+            // Hide all tab contents and remove fade-in class
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');
+                content.classList.remove('fade-in-tab'); // Remove class to ensure animation replays
             });
-            // Remove active class from all tab buttons
+            // Remove active class from all top tab buttons
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active');
             });
+            // Remove active class from all quick link buttons
+            document.querySelectorAll('.quick-link-button').forEach(button => {
+                button.classList.remove('active');
+            });
 
-            // Show the selected tab content
-            document.getElementById(tabId).classList.remove('hidden');
 
-            // Add active class to the corresponding tab button
-            const activeButton = document.getElementById(tabId.replace('Content', 'Button'));
-            if (activeButton) {
-                activeButton.classList.add('active');
+            // Show the selected tab content and add fade-in class
+            const targetTabContent = document.getElementById(tabId);
+            targetTabContent.classList.remove('hidden');
+            targetTabContent.classList.add('fade-in-tab'); // Add class to trigger animation
+
+            // Add active class to the corresponding top tab button
+            const topActiveButton = document.getElementById(tabId.replace('Content', 'Button'));
+            if (topActiveButton) {
+                topActiveButton.classList.add('active');
+            }
+
+            // Add active class to the corresponding quick link button
+            const quickActiveButton = document.querySelector(`.quick-link-button[data-tab-id="${tabId}"]`);
+            if (quickActiveButton) {
+                quickActiveButton.classList.add('active');
             }
         }
 
-        // Event listeners for tab buttons
+        // Event listeners for top tab buttons
         overviewTabButton.onclick = () => showTab('overviewTabContent');
         statsTabButton.onclick = () => showTab('statsTabContent');
         dealsTabButton.onclick = () => showTab('dealsTabContent');
         accessTabButton.onclick = () => showTab('accessTabContent');
+
+        // Event listeners for quick link buttons
+        quickOverview.onclick = () => showTab('overviewTabContent');
+        quickTrenks.onclick = () => showTab('statsTabContent');
+        quickDeals.onclick = () => showTab('dealsTabContent');
+        quickAccess.onclick = () => showTab('accessTabContent');
+
 
         // --- Main Button (still active globally) ---
         Telegram.WebApp.MainButton.setText("Press Me: Main Button!");
