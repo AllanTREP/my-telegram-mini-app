@@ -253,15 +253,6 @@
             }
         }
 
-        /* Gradient Text for Wallet Connection */
-        .gradient-text {
-            background-image: linear-gradient(to right, #FF8C69, #FFD700); /* Orange to Gold */
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-weight: bold;
-        }
-
         /* Flex container for Deals tab item with image */
         .deal-item.with-image {
             display: flex;
@@ -285,6 +276,17 @@
                 max-width: 200px; /* Max width for image */
                 margin-left: 1rem; /* Space between text and image */
             }
+        }
+
+        /* Fearless Fly Mode Styling */
+        .fearless-fly-active {
+            box-shadow: 0 0 15px 5px rgba(0, 255, 0, 0.5) !important; /* Green glow */
+            border-color: rgba(0, 255, 0, 0.7) !important;
+        }
+        .fearless-fly-button.active {
+            background-color: #4CAF50 !important; /* Green for active button */
+            color: white !important;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
         }
     </style>
 </head>
@@ -434,7 +436,7 @@
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="accessDescription1">
                 Gain lifetime access to the 'TREP Deal Finder - Full Access' channel by burning 1 USD in $TREP tokens. You'll find exclusive deals, clothes, gadgets, oils & remedies, PDFs, news, videos, music, and much more.
             </p>
-            <p class="mb-4 gradient-text" data-i18n="accessDescription2">
+            <p class="mb-4 text-green-500 font-bold" data-i18n="accessDescription2">
                 Connect your Solana wallet to proceed with payment.
             </p>
             <div class="bg-gray-100 p-4 rounded-lg mb-4 text-left">
@@ -450,7 +452,7 @@
             </button>
             <!-- NEW: Changed text color to green for better visibility -->
             <p id="walletStatus" class="text-sm text-center text-green-500 font-bold" data-i18n="walletStatus">
-                Wallet not connected.
+                Wallet not connected
             </p>
             <!-- NEW: Burn Address Note -->
             <p class="text-xs mt-2 text-center" style="color: var(--tg-theme-hint-color, #666);" data-i18n="burnAddressNote">
@@ -512,6 +514,13 @@
                 <span class="font-semibold" data-i18n="yourTrepBalance">Your TREP:</span>
                 <span id="trepBalance" class="font-bold text-lg text-green-500">0 TREP</span> <!-- Initial Balance, updated by JS -->
             </div>
+
+            <!-- Fearless Fly Mode Toggle -->
+            <button id="fearlessFlyToggleButton" class="toggle-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 mb-4"
+                    style="background-color: var(--app-secondary-bg); color: var(--app-text-color);" data-i18n="fearlessFlyModeButton">
+                Activate Fearless Fly Mode 🦸‍♂️
+            </button>
+
 
             <!-- Game Zone Selection (Initially Visible, managed by JS) -->
             <div id="gameZoneSelection" class="game-area p-4 rounded-lg text-center">
@@ -659,7 +668,7 @@
                 earlyHolderAccessHeading: "Early Holder Access",
                 earlyHolderAccessDescription: "Your gateway to token insights, community tools, and exclusive access.",
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
-                walletStatus: "Wallet not connected.",
+                walletStatus: "Wallet not connected",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
                 burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 0x000...BurnAddressHere...000)", // New
                 moreHeading: "More Crypto Info",
@@ -700,6 +709,10 @@
                 subscribeNow: "Subscribe Now (Burn 100,000 TREP)", // New
                 insufficientFunds: "Insufficient TREP to subscribe. You need 100,000 TREP.", // New
                 subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!", // New
+                fearlessFlyModeButton: "Activate Fearless Fly Mode 🦸‍♂️", // New
+                fearlessFlyActivated: "Fearless Fly Mode Activated! Double TREP refunds!", // New
+                fearlessFlyDeactivated: "Fearless Fly Mode Deactivated.", // New
+                fearlessFlyCost: "Activating Fearless Fly Mode costs {cost} TREP. Insufficient funds!", // New
                 helloUser: "Hello, User!",
                 userDataNotAvailable: "User data not available for display.",
                 yourLanguage: "Your language:"
@@ -739,7 +752,7 @@
                 earlyHolderAccessHeading: "Acceso Anticipado para Titulares",
                 earlyHolderAccessDescription: "Tu puerta de entrada a la información de tokens, herramientas comunitarias y acceso exclusivo.",
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
-                walletStatus: "Billetera no conectada.",
+                walletStatus: "Billetera no conectada",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
                 burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 0x000...BurnAddressHere...000)", // New
                 moreHeading: "Más Información Cripto",
@@ -758,7 +771,11 @@
                 visitDexscreenerNewPairs: "Ver Nuevos Pares de Dexscreener",
                 helloUser: "¡Hola, Usuario!",
                 userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
-                yourLanguage: "Tu idioma:"
+                yourLanguage: "Tu idioma:",
+                fearlessFlyModeButton: "Activar Modo Fearless Fly 🦸‍♂️", // New
+                fearlessFlyActivated: "¡Modo Fearless Fly Activado! ¡Reembolsos de TREP dobles!", // New
+                fearlessFlyDeactivated: "Modo Fearless Fly Desactivado.", // New
+                fearlessFlyCost: "Activar el Modo Fearless Fly cuesta {cost} TREP. ¡Fondos insuficientes!" // New
             }
         };
 
@@ -945,6 +962,10 @@
         let isGameSubscribed = false; // New: Game subscription status
         const TREP_SUBSCRIPTION_COST = 100000; // Cost to unlock all games
 
+        // Fearless Fly Mode variables
+        let isFearlessFlyMode = false;
+        const FEARLESS_FLY_ACTIVATION_COST = 500; // Cost to activate Fearless Fly Mode
+
         let currentZone = null;
         const zoneData = {
             jungle: {
@@ -987,6 +1008,7 @@
         const gameFeedback = document.getElementById('gameFeedback');
         const rewardDisplay = document.getElementById('rewardDisplay');
         const gameTabButton = document.getElementById('gameTabButton'); // Get reference to the Game tab button
+        const fearlessFlyToggleButton = document.getElementById('fearlessFlyToggleButton'); // New: Fearless Fly button
 
         // --- Spot the Difference Game Elements ---
         const spotTheDifferenceGame = document.getElementById('spotTheDifferenceGame');
@@ -1088,7 +1110,7 @@
             const clickedHotspot = event.currentTarget;
             clickedHotspot.removeEventListener('click', handleHotspotClick); // Remove listener to prevent multiple clicks
             clickedHotspot.classList.remove('animate-pulse');
-            clickedHotspot.innerHTML = '�'; // Change to searching icon
+            clickedHotspot.innerHTML = '🔍'; // Change to searching icon
 
             gameFeedback.textContent = 'Searching...';
             rewardDisplay.classList.add('hidden');
@@ -1113,8 +1135,12 @@
                         // Simulate recent spend for refund calculation
                         const simulatedRecentSpend = Math.floor(Math.random() * 20000) + 5000; // Between 5,000 and 25,000 TREP
                         rewardAmount = Math.min(simulatedRecentSpend * TREP_REFUND_PERCENTAGE, MAX_TREP_REFUND_PER_CHEST);
-                        currentTREPBalance += rewardAmount;
-                        message = `🎉 You found a TREP Chest! You earned a ${TREP_REFUND_PERCENTAGE * 100}% refund: ${rewardAmount.toLocaleString()} TREP!`;
+                        if (isFearlessFlyMode) { // Double refund if Fearless Fly Mode is active
+                            rewardAmount *= 2;
+                            message = `🎉 You found a TREP Chest! Fearless Fly doubled your refund: ${rewardAmount.toLocaleString()} TREP!`;
+                        } else {
+                            message = `🎉 You found a TREP Chest! You earned a ${TREP_REFUND_PERCENTAGE * 100}% refund: ${rewardAmount.toLocaleString()} TREP!`;
+                        }
                         rewardDisplay.style.backgroundColor = 'var(--tg-theme-button-color, #0088cc)'; // Make it pop
                         rewardDisplay.style.color = 'var(--tg-theme-button-text-color, white)';
                         break;
@@ -1284,6 +1310,39 @@
             }
         });
 
+        // --- Fearless Fly Mode Toggle Logic ---
+        fearlessFlyToggleButton.addEventListener('click', () => {
+            if (isFearlessFlyMode) {
+                // Deactivate Fearless Fly Mode
+                isFearlessFlyMode = false;
+                fearlessFlyToggleButton.classList.remove('active');
+                gameZoneSelection.classList.remove('fearless-fly-active');
+                gamePlayArea.classList.remove('fearless-fly-active');
+                fearlessFlyToggleButton.textContent = translations[currentLanguage].fearlessFlyModeButton;
+                Telegram.WebApp.showNotification({
+                    message: translations[currentLanguage].fearlessFlyDeactivated,
+                    type: "info"
+                });
+            } else {
+                // Activate Fearless Fly Mode
+                if (currentTREPBalance >= FEARLESS_FLY_ACTIVATION_COST) {
+                    currentTREPBalance -= FEARLESS_FLY_ACTIVATION_COST;
+                    isFearlessFlyMode = true;
+                    updateTREPBalanceUI();
+                    fearlessFlyToggleButton.classList.add('active');
+                    gameZoneSelection.classList.add('fearless-fly-active');
+                    gamePlayArea.classList.add('fearless-fly-active');
+                    fearlessFlyToggleButton.textContent = translations[currentLanguage].fearlessFlyActivated.replace('!', '!'); // Update button text
+                    Telegram.WebApp.showNotification({
+                        message: translations[currentLanguage].fearlessFlyActivated,
+                        type: "success"
+                    });
+                } else {
+                    Telegram.WebApp.showAlert(translations[currentLanguage].fearlessFlyCost.replace('{cost}', FEARLESS_FLY_ACTIVATION_COST.toLocaleString()));
+                }
+            }
+        });
+
 
         // --- Event Listeners for Game Tab and Game Elements ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1335,4 +1394,3 @@
     </script>
 </body>
 </html>
-�
