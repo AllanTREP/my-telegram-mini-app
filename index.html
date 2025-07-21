@@ -19,8 +19,8 @@
             background-color: var(--tg-theme-button-color, #ADD8E6) !important; /* Active tab changed to very light blue */
             color: var(--tg-theme-button-text-color, black) !important; /* Active tab text changed to black for contrast */
         }
+        /* Default styles for tab buttons, overridden by inline styles for specific colors */
         .tab-button:not(.active) {
-            background-color: var(--tg-theme-secondary-bg-color, #e0e0e0) !important;
             color: var(--tg-theme-text-color, #333) !important;
         }
     </style>
@@ -46,16 +46,20 @@
 
         <!-- Tab Navigation -->
         <div class="flex justify-center flex-wrap mb-6 w-full space-x-2">
-            <button id="overviewTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200">
+            <button id="overviewTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
+                    style="background-color: lightblue;">
                 Overview
             </button>
-            <button id="statsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200">
+            <button id="statsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
+                    style="background-color: lightyellow;">
                 Real-time Stats
             </button>
-            <button id="dealsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200">
+            <button id="dealsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
+                    style="background-color: navy; color: white;">
                 Deals
             </button>
-            <button id="accessTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200">
+            <button id="accessTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
+                    style="background-color: darkgoldenrod;">
                 Access
             </button>
         </div>
@@ -129,7 +133,7 @@
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="Access Tab Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
             <button id="connectWalletButton"
                     class="w-full py-3 rounded-lg font-bold text-white transition-colors duration-200 mb-4"
-                    style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);">
+                    style="background-color: purple !important; color: white !important;"> <!-- Connect Wallet button color changed to purple with !important -->
                 Connect Wallet & Burn 100,000 TREP
             </button>
             <p id="walletStatus" class="text-sm text-center" style="color: var(--tg-theme-hint-color, #666);">
