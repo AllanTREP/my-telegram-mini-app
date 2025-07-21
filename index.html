@@ -52,7 +52,7 @@
             </button>
             <button id="statsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
                     style="background-color: lightblue;">
-                Stats
+                Trenks
             </button>
             <button id="dealsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
                     style="background-color: lightblue;">
@@ -77,21 +77,31 @@
             </p>
         </div>
 
-        <!-- Tab Content: Real-time Stats -->
+        <!-- Tab Content: Trenks (formerly Real-time Stats) -->
         <div id="statsTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Real-time Stats</h2>
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);">Trenks</h2>
             <p class="mb-4" style="color: var(--tg-theme-text-color, #333);">
-                Here you will find real-time statistics related to TREP tokens and the ecosystem.
+                Here you will find important links related to TREP tokens, community, and social media.
             </p>
             <div id="statsDisplay" class="bg-gray-100 p-4 rounded-lg text-left" style="background-color: var(--tg-theme-bg-color, #f9f9f9); color: var(--tg-theme-text-color, #333);">
                 <p><strong>Check TREP on:</strong></p>
-                <ul class="list-disc list-inside ml-4">
+                <ul class="list-disc list-inside ml-4 mb-4">
                     <li><a href="https://www.coingecko.com/en/coins/trep" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">CoinGecko</a></li>
                     <li><a href="https://dexscreener.com/solana/trep" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dexscreener</a></li>
                     <li><a href="https://www.dextools.io/app/en/solana/pair-explorer/trep" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dextools</a></li>
+                    <li><a href="https://solscan.io/token/Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Solscan</a></li>
+                </ul>
+                <p><strong>Join our Socials:</strong></p>
+                <ul class="list-disc list-inside ml-4 mb-4">
+                    <li><a href="https://www.youtube.com/@Intrepid-TREPofficial" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">YouTube</a></li>
+                    <li><a href="https://x.com/OffcialTrep" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">X (Twitter)</a></li>
+                </ul>
+                <p><strong>Official Website:</strong></p>
+                <ul class="list-disc list-inside ml-4">
+                    <li><a href="https://sites.google.com/view/intrepid-trep/home" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Intrepid TREP Website</a></li>
                 </ul>
             </div>
-            <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Real-time%20stats.png?raw=true" alt="Real-time Stats Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
+            <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Real-time%20stats.png?raw=true" alt="Trenks Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
         </div>
 
         <!-- Tab Content: Deals -->
@@ -160,17 +170,17 @@
 
         // Get references to elements (only those that exist in the HTML)
         const infoText = document.getElementById('infoText');
-        const walletStatus = document.getElementById('walletStatus'); // Re-added walletStatus reference
+        const walletStatus = document.getElementById('walletStatus');
 
         // Tab Buttons
         const overviewTabButton = document.getElementById('overviewTabButton');
-        const statsTabButton = document.getElementById('statsTabButton');
+        const statsTabButton = document.getElementById('statsTabButton'); // Now Trenks
         const dealsTabButton = document.getElementById('dealsTabButton');
         const accessTabButton = document.getElementById('accessTabButton');
 
         // Tab Contents
         const overviewTabContent = document.getElementById('overviewTabContent');
-        const statsTabContent = document.getElementById('statsTabContent');
+        const statsTabContent = document.getElementById('statsTabContent'); // Now Trenks content
         const dealsTabContent = document.getElementById('dealsTabContent');
         const accessTabContent = document.getElementById('accessTabContent');
 
@@ -225,7 +235,6 @@
         }
 
         // --- Wallet Connection Logic (Placeholder in Access tab) ---
-        // Re-added the event listener for the connectWalletButton
         const connectWalletButton = document.getElementById('connectWalletButton');
         if (connectWalletButton) {
             connectWalletButton.onclick = function() {
@@ -233,12 +242,8 @@
                 if (walletStatus) {
                     walletStatus.innerText = 'Attempting to connect wallet... (Placeholder)';
                 }
-                // Placeholder for actual wallet connection logic
-                // You would integrate Solana wallet libraries here (e.g., @solana/web3.js, @solana/wallet-adapter)
-                // and smart contract interaction for token burning.
             };
         }
-
 
         // Adapt to Telegram's Theme
         Telegram.WebApp.onEvent('themeChanged', function() {
