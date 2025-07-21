@@ -348,13 +348,20 @@
                     data-i18n="dealsTab">
                 Deals
             </button>
+            <!-- Access tab is always visible -->
             <button id="accessTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
                     data-i18n="accessTab">
                 Access
             </button>
-            <button id="moreTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
+            <!-- More tab is hidden by default, revealed for premium users -->
+            <button id="moreTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 hidden"
                     data-i18n="moreTab">
                 More
+            </button>
+            <!-- New Premium Games tab, hidden by default -->
+            <button id="premiumGamesTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 hidden"
+                    data-i18n="premiumGamesTab">
+                Premium Games
             </button>
             <button id="gameTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
                     data-i18n="gameTab">
@@ -469,6 +476,14 @@
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="moreDescription">
                 Explore trending cryptocurrencies and market insights.
             </p>
+            <!-- NEW: Trep Deal Finder - Full Access Channel Link -->
+            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
+                <h3 class="font-semibold text-lg" data-i18n="trepDealFinderFullAccessHeading">TREP Deal Finder - Full Access Channel</h3>
+                <p class="text-sm" data-i18n="trepDealFinderFullAccessDescription">Access exclusive deals and content for subscribers.</p>
+                <a href="https://t.me/+UxTGg9zNBzthYTUx" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitTrepDealFinderFullAccess">
+                    Visit TREP Deal Finder - Full Access
+                </a>
+            </div>
             <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
                 <h3 class="font-semibold text-lg" data-i18n="dexscreenerGainersHeading">Dexscreener Gainers</h3>
                 <p class="text-sm" data-i18n="dexscreenerGainersDescription">See the top gaining cryptocurrencies on Dexscreener.</p>
@@ -500,6 +515,26 @@
                     View Dexscreener New Pairs
                 </a>
             </div>
+        </div>
+
+        <!-- New Tab Content: Premium Games -->
+        <div id="premiumGamesTabContent" class="tab-content w-full hidden">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="premiumGamesHeading">Premium Games</h2>
+            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="premiumGamesDescription">
+                Unlock exclusive game modes and challenges by becoming a premium member!
+            </p>
+            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
+                <h3 class="font-semibold text-lg" data-i18n="spotTheDifferencePremiumHeading">Spot the Difference: Premium Puzzles</h3>
+                <p class="text-sm" data-i18n="spotTheDifferencePremiumDescription">Access more challenging puzzles and earn bigger rewards!</p>
+                <button id="playPremiumSpotTheDifference"
+                        class="w-full py-2 rounded-lg font-bold transition-colors duration-200 mt-2"
+                        style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="playNow">
+                    Play Now
+                </button>
+            </div>
+            <p class="text-sm mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="premiumGamesNote">
+                (More premium games coming soon!)
+            </p>
         </div>
 
         <!-- New Tab Content: Game (TREP Treasure) -->
@@ -577,7 +612,7 @@
                     </div>
                     <div class="puzzle-image-wrapper relative">
                         <!-- Updated placeholder image for modified, implying a difference -->
-                        <img id="modifiedImage" src="https://placehold.co/400x225/ADD8E6/000000?text=Forest+Scene+Modified" alt="Modified Image" onerror="this.src='https://placehold.co/400x225/FF0000/FFFFFF?text=Error'; console.error('Failed to load modified image');">
+                        <img id="modifiedImage" src="https://placehold.co/400x225/ADD8E6/000000?text=Forest+Scene+with+Bird" alt="Modified Image" onerror="this.src='https://placehold.co/400x225/FF0000/FFFFFF?text=Error'; console.error('Failed to load modified image');">
                         <!-- Difference hotspots will be injected here by JS -->
                     </div>
                 </div>
@@ -620,6 +655,9 @@
             <button id="quickMore" class="quick-link-button" data-tab-id="moreTabContent">
                 💡
             </button>
+            <button id="quickPremiumGames" class="quick-link-button hidden" data-tab-id="premiumGamesTabContent">
+                💎
+            </button>
             <button id="quickGame" class="quick-link-button" data-tab-id="gameTabContent">
                 🎮
             </button>
@@ -647,6 +685,7 @@
                 dealsTab: "Deals",
                 accessTab: "Access",
                 moreTab: "More",
+                premiumGamesTab: "Premium Games", // New translation key
                 gameTab: "Game",
                 overviewHeading: "Overview",
                 overviewContent: "TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Burn TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.<br><br>Join our community!",
@@ -675,6 +714,9 @@
                 burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 0x000...BurnAddressHere...000)", // New
                 moreHeading: "More Crypto Info",
                 moreDescription: "Explore trending cryptocurrencies and market insights.",
+                trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel", // New translation key
+                trepDealFinderFullAccessDescription: "Access exclusive deals and content for subscribers.", // New translation key
+                visitTrepDealFinderFullAccess: "Visit TREP Deal Finder - Full Access", // New translation key
                 dexscreenerGainersHeading: "Dexscreener Gainers",
                 dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
                 visitDexscreenerGainers: "Visit Dexscreener Gainers",
@@ -687,6 +729,12 @@
                 dexscreenerNewPairsHeading: "Dexscreener New Pairs",
                 dexscreenerNewPairsDescription: "Explore recently listed cryptocurrency pairs on Dexscreener.",
                 visitDexscreenerNewPairs: "View Dexscreener New Pairs",
+                premiumGamesHeading: "Premium Games", // New translation key
+                premiumGamesDescription: "Unlock exclusive game modes and challenges by becoming a premium member!", // New translation key
+                spotTheDifferencePremiumHeading: "Spot the Difference: Premium Puzzles", // New translation key
+                spotTheDifferencePremiumDescription: "Access more challenging puzzles and earn bigger rewards!", // New translation key
+                playNow: "Play Now", // New translation key
+                premiumGamesNote: "(More premium games coming soon!)", // New translation key
                 // Game specific translations
                 gameHeading: "TREP Treasure Game",
                 gameDescription: "Explore themed zones, discover hidden gems, and earn simulated TREP refunds!",
@@ -713,7 +761,7 @@
                 subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!", // New
                 fearlessFlyModeButton: "Activate Fearless Fly Mode 🦸‍♂️", // New
                 fearlessFlyActivated: "Fearless Fly Mode Activated! Double TREP refunds!", // New
-                fearlessFlyDeactivated: "Fearless Fly Mode Deactivated.", // New
+                fearlessFlyDeactivated: "Fearless Fly Mode Desactivated.", // New
                 fearlessFlyCost: "Activating Fearless Fly Mode costs {cost} TREP. Insufficient funds!", // New
                 helloUser: "Hello, User!",
                 userDataNotAvailable: "User data not available for display.",
@@ -731,6 +779,7 @@
                 dealsTab: "Ofertas",
                 accessTab: "Acceso",
                 moreTab: "Más",
+                premiumGamesTab: "Juegos Premium", // New translation key
                 gameTab: "Juego",
                 overviewHeading: "Resumen",
                 overviewContent: "TREP es un token impulsado por la comunidad con utilidad real en el Descubrimiento de Ofertas y Señales de Mercado. Quema TREP para acceder a listados tempranos, análisis de inversores y paneles premium. Impulsado por bots, datos y una leal comunidad de Telegram — únete al futuro de la caza de alfa.",
@@ -759,6 +808,9 @@
                 burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 0x000...BurnAddressHere...000)", // New
                 moreHeading: "Más Información Cripto",
                 moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
+                trepDealFinderFullAccessHeading: "Canal TREP Deal Finder - Acceso Completo", // New translation key
+                trepDealFinderFullAccessDescription: "Accede a ofertas y contenido exclusivos para suscriptores.", // New translation key
+                visitTrepDealFinderFullAccess: "Visitar TREP Deal Finder - Acceso Completo", // New translation key
                 dexscreenerGainersHeading: "Ganadores de Dexscreener",
                 dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.",
                 visitDexscreenerGainers: "Visitar Ganadores de Dexscreener",
@@ -771,6 +823,12 @@
                 dexscreenerNewPairsHeading: "Nuevos Pares de Dexscreener",
                 dexscreenerNewPairsDescription: "Explora los pares de criptomonedas recién listados en Dexscreener.",
                 visitDexscreenerNewPairs: "Ver Nuevos Pares de Dexscreener",
+                premiumGamesHeading: "Juegos Premium", // New translation key
+                premiumGamesDescription: "¡Desbloquea modos de juego y desafíos exclusivos al convertirte en miembro premium!", // New translation key
+                spotTheDifferencePremiumHeading: "Encuentra las Diferencias: Puzzles Premium", // New translation key
+                spotTheDifferencePremiumDescription: "¡Accede a puzzles más desafiantes y gana mayores recompensas!", // New translation key
+                playNow: "Jugar Ahora", // New translation key
+                premiumGamesNote: "¡Más juegos premium próximamente!", // New translation key
                 helloUser: "¡Hola, Usuario!",
                 userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
                 yourLanguage: "Tu idioma:",
@@ -949,6 +1007,7 @@
                         message: translations[currentLanguage].subscriptionSuccess,
                         type: "success"
                     });
+                    updatePremiumTabVisibility(); // Reveal premium tabs on successful subscription
                 } else {
                     walletStatus.textContent = translations[currentLanguage].walletStatusFailed || "Wallet connection failed.";
                     Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
@@ -1025,6 +1084,13 @@
         const subscriptionRequiredDiv = document.getElementById('subscriptionRequired');
         const subscribeToGamesButton = document.getElementById('subscribeToGamesButton');
 
+        // Premium tab elements
+        const moreTabButton = document.getElementById('moreTabButton');
+        const quickMoreButton = document.getElementById('quickMore');
+        const premiumGamesTabButton = document.getElementById('premiumGamesTabButton'); // New
+        const quickPremiumGamesButton = document.getElementById('quickPremiumGames'); // New
+        const premiumGamesTabContent = document.getElementById('premiumGamesTabContent'); // New content div
+
 
         let currentPuzzle = null;
         let foundDifferences = [];
@@ -1035,7 +1101,7 @@
                 id: 'puzzle1',
                 title: 'Forest Friends (Free)',
                 // Updated placeholder images to imply differences
-                originalImage: 'https://placehold.co/400x225/ADD8E6/000000?text=Original+Forest+Scene',
+                originalImage: 'https://placehold.co/400x225/ADD8E6/000000?text=Forest+Scene',
                 modifiedImage: 'https://placehold.co/400x225/ADD8E6/000000?text=Forest+Scene+with+Bird',
                 differences: [
                     // These coordinates correspond to where the "Bird" text would be on the modified image
@@ -1116,7 +1182,7 @@
             const clickedHotspot = event.currentTarget;
             clickedHotspot.removeEventListener('click', handleHotspotClick); // Remove listener to prevent multiple clicks
             clickedHotspot.classList.remove('animate-pulse');
-            clickedHotspot.innerHTML = '�'; // Change to searching icon
+            clickedHotspot.innerHTML = '🔍'; // Change to searching icon
 
             gameFeedback.textContent = 'Searching...';
             rewardDisplay.classList.add('hidden');
@@ -1310,6 +1376,7 @@
                 walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Wallet Connected & Access Granted!";
                 // Automatically start the current puzzle (which was previously locked)
                 startSpotTheDifferenceGame();
+                updatePremiumTabVisibility(); // Reveal premium tabs on successful subscription
             } else {
                 puzzleFeedback.textContent = translations[currentLanguage].insufficientFunds;
                 Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
@@ -1349,6 +1416,20 @@
             }
         });
 
+        // --- Premium Tab Visibility Logic ---
+        function updatePremiumTabVisibility() {
+            if (isGameSubscribed) {
+                moreTabButton.classList.remove('hidden');
+                quickMoreButton.classList.remove('hidden');
+                premiumGamesTabButton.classList.remove('hidden');
+                quickPremiumGamesButton.classList.remove('hidden');
+            } else {
+                moreTabButton.classList.add('hidden');
+                quickMoreButton.classList.add('hidden');
+                premiumGamesTabButton.classList.add('hidden');
+                quickPremiumGamesButton.classList.add('hidden');
+            }
+        }
 
         // --- Event Listeners for Game Tab and Game Elements ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1357,6 +1438,14 @@
                 showTab('gameTabContent');
                 showZoneSelection(); // Ensure zone selection is shown when game tab is opened
             });
+
+            // Event listener for the new "Play Now" button in Premium Games tab
+            document.getElementById('playPremiumSpotTheDifference').addEventListener('click', () => {
+                // Assuming the premium spot the difference puzzle is at index 1
+                currentSpotTheDifferencePuzzleIndex = 1; // Set to the premium puzzle index
+                startSpotTheDifferenceGame();
+            });
+
 
             // Add event listeners for zone cards
             document.querySelectorAll('.zone-card').forEach(card => {
@@ -1372,7 +1461,12 @@
             // Add event listener for back button from puzzle game
             backToGameFromPuzzleButton.addEventListener('click', () => {
                 spotTheDifferenceGame.classList.add('hidden');
-                gamePlayArea.classList.remove('hidden'); // Go back to the zone exploration screen
+                // Decide where to go back: if from premium game, go to premium games tab, else to main game
+                if (currentPuzzle && currentPuzzle.requiresSubscription) {
+                    showTab('premiumGamesTabContent');
+                } else {
+                    gamePlayArea.classList.remove('hidden'); // Go back to the zone exploration screen
+                }
                 resetSpotTheDifferenceGame(); // Reset puzzle state (but not index)
             });
 
@@ -1387,8 +1481,15 @@
                         message: translations[currentLanguage].allPuzzlesCompleted || "All puzzles completed! Great job!",
                         type: "success"
                     });
-                    setTimeout(showZoneSelection, 2000); // Go back to zones after a delay
-                    currentSpotTheDifferencePuzzleIndex = 0; // Reset for next time user plays
+                    setTimeout(() => {
+                        // After completing all puzzles, if the last one was premium, go back to premium games tab
+                        if (currentPuzzle && currentPuzzle.requiresSubscription) {
+                            showTab('premiumGamesTabContent');
+                        } else {
+                            showZoneSelection(); // Go back to zones after a delay
+                        }
+                        currentSpotTheDifferencePuzzleIndex = 0; // Reset for next time user plays
+                    }, 2000);
                 }
             });
 
@@ -1396,8 +1497,8 @@
             updateTREPBalanceUI();
             updateContent(); // Initial content update based on default/saved language
             languageToggleButton.textContent = currentLanguage.toUpperCase(); // Ensure language button shows correct initial state
+            updatePremiumTabVisibility(); // Call this on load to set initial visibility
         });
     </script>
 </body>
 </html>
-�
