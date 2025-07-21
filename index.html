@@ -10,7 +10,7 @@
         /* Custom CSS Variables for App Theme */
         :root {
             --app-main-bg: #FFFFFF; /* Light mode main background */
-            --app-secondary-bg: #F9F9F9; /* Light mode secondary background (for statsDisplay, deal-item) */
+            --app-secondary-bg: #F9FF9; /* Light mode secondary background (for statsDisplay, deal-item) */
             --app-text-color: #333333; /* Light mode general text color */
         }
 
@@ -212,6 +212,7 @@
             overflow: hidden;
             border-radius: 0.5rem;
             border: 2px solid var(--app-text-color);
+            min-height: 150px; /* Ensure a minimum visible area */
         }
         .puzzle-image-wrapper img {
             width: 100%;
@@ -511,10 +512,10 @@
 
                 <div class="puzzle-images-container w-full">
                     <div class="puzzle-image-wrapper">
-                        <img id="originalImage" src="https://placehold.co/400x225/ADD8E6/000000?text=Original+Image" alt="Original Image">
+                        <img id="originalImage" src="https://placehold.co/400x225/ADD8E6/000000?text=Original+Image" alt="Original Image" onerror="this.src='https://placehold.co/400x225/FF0000/FFFFFF?text=Error'; console.error('Failed to load original image');">
                     </div>
                     <div class="puzzle-image-wrapper relative">
-                        <img id="modifiedImage" src="https://placehold.co/400x225/90EE90/000000?text=Modified+Image" alt="Modified Image">
+                        <img id="modifiedImage" src="https://placehold.co/400x225/90EE90/000000?text=Modified+Image" alt="Modified Image" onerror="this.src='https://placehold.co/400x225/FF0000/FFFFFF?text=Error'; console.error('Failed to load modified image');">
                         <!-- Difference hotspots will be injected here by JS -->
                     </div>
                 </div>
@@ -1245,7 +1246,6 @@
                 spotTheDifferenceGame.classList.add('hidden');
                 gamePlayArea.classList.remove('hidden'); // Go back to the zone exploration screen
                 resetSpotTheDifferenceGame(); // Reset puzzle state (but not index)
-            });
 
             // Add event listener for next puzzle button
             nextPuzzleButton.addEventListener('click', () => {
