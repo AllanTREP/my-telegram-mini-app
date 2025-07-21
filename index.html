@@ -416,6 +416,10 @@
             <p id="walletStatus" class="text-sm text-center" style="color: #22C55E;" data-i18n="walletStatus">
                 Wallet not connected.
             </p>
+            <!-- NEW: Burn Address Note -->
+            <p class="text-xs mt-2 text-center" style="color: var(--tg-theme-hint-color, #666);" data-i18n="burnAddressNote">
+                (Note: All burned tokens are sent to a verifiable burn address: <span class="font-mono text-gray-800 dark:text-gray-300">0x000...BurnAddressHere...000</span>)
+            </p>
             <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletNote">
                 (Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)
             </p>
@@ -518,6 +522,13 @@
                 <button id="nextPuzzleButton" class="py-3 px-6 rounded-lg font-bold text-white transition-colors duration-200 mt-4 hidden" style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="nextPuzzle">
                     Next Puzzle
                 </button>
+                <!-- Subscription Message and Button -->
+                <div id="subscriptionRequired" class="mt-4 p-4 bg-red-100 dark:bg-red-700 text-red-800 dark:text-red-100 rounded-lg hidden">
+                    <p class="font-bold mb-2" data-i18n="subscribeToPlay"></p>
+                    <button id="subscribeToGamesButton" class="py-2 px-4 rounded-lg font-bold text-white transition-colors duration-200" style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="subscribeNow">
+                        Subscribe Now (Burn 100,000 TREP)
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -598,14 +609,15 @@
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
                 walletStatus: "Wallet not connected.",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
+                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 0x000...BurnAddressHere...000)", // New
                 moreHeading: "More Crypto Info",
                 moreDescription: "Explore trending cryptocurrencies and market insights.",
                 dexscreenerGainersHeading: "Dexscreener Gainers",
                 dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
                 visitDexscreenerGainers: "Visit Dexscreener Gainers",
-                lowestFeesCryptoHeading: "Lowest Fees Crypto Coins", // New translation
-                lowestFeesCryptoDescription: "Find cryptocurrencies with the lowest transaction fees.", // New translation
-                visitLowestFeesCrypto: "View Lowest Fees Crypto List", // New translation
+                lowestFeesCryptoHeading: "Lowest Fees Crypto Coins",
+                lowestFeesCryptoDescription: "Find cryptocurrencies with the lowest transaction fees.",
+                visitLowestFeesCrypto: "View Lowest Fees Crypto List",
                 // Game specific translations
                 gameHeading: "TREP Treasure Game",
                 gameDescription: "Explore themed zones, discover hidden gems, and earn simulated TREP refunds!",
@@ -619,13 +631,17 @@
                 zoneLabyrinthDesc: "Navigate winding paths for cryptic clues.",
                 backToZones: "← Back to Zones",
                 gamePrompt: "Tap on glowing areas to find treasure!",
-                findTreasure: "Find Treasure", // This button is now largely replaced by hotspot clicks
-                spotTheDifferenceTitle: "Spot the Difference!", // New
-                differencesFound: "Differences Found: ", // New
-                puzzleSolved: "Puzzle Solved!", // New
-                tryAgain: "Try again!", // New
-                nextPuzzle: "Next Puzzle", // New
-                backToGame: "← Back to Game", // New
+                findTreasure: "Find Treasure",
+                spotTheDifferenceTitle: "Spot the Difference!",
+                differencesFound: "Differences Found: ",
+                puzzleSolved: "Puzzle Solved!",
+                tryAgain: "You already found this one or that's not a difference. Try again!",
+                nextPuzzle: "Next Puzzle",
+                backToGame: "← Back to Game",
+                subscribeToPlay: "This puzzle requires a subscription to play!", // New
+                subscribeNow: "Subscribe Now (Burn 100,000 TREP)", // New
+                insufficientFunds: "Insufficient TREP to subscribe. You need 100,000 TREP.", // New
+                subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!", // New
                 helloUser: "Hello, User!",
                 userDataNotAvailable: "User data not available for display.",
                 yourLanguage: "Your language:"
@@ -667,6 +683,7 @@
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
                 walletStatus: "Billetera no conectada.",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
+                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 0x000...BurnAddressHere...000)", // New
                 moreHeading: "Más Información Cripto",
                 moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
                 dexscreenerGainersHeading: "Ganadores de Dexscreener",
@@ -831,6 +848,7 @@
         // --- Wallet Connection Logic (Placeholder) ---
         const connectWalletButton = document.getElementById('connectWalletButton');
         const walletStatus = document.getElementById('walletStatus');
+        const TREP_FULL_ACCESS_COST = 100000; // Cost for full access and games
 
         connectWalletButton.addEventListener('click', () => {
             walletStatus.textContent = translations[currentLanguage].walletStatusConnecting || "Connecting wallet...";
@@ -838,24 +856,19 @@
             // In a real app, you'd initiate wallet connection here
             // e.g., @solana/wallet-adapter-wallets or similar
             setTimeout(() => {
-                const isConnected = Math.random() > 0.5; // Simulate success/failure
-                if (isConnected) {
-                    walletStatus.textContent = translations[currentLanguage].walletStatusConnected || "Wallet Connected: ABC...XYZ";
+                // Simulate successful connection and burn if enough balance
+                if (currentTREPBalance >= TREP_FULL_ACCESS_COST) {
+                    currentTREPBalance -= TREP_FULL_ACCESS_COST;
+                    isGameSubscribed = true; // Grant game access
+                    updateTREPBalanceUI();
+                    walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Wallet Connected & Access Granted!";
                     Telegram.WebApp.showNotification({
-                        message: "Wallet Connected! Initiating TREP burn...",
+                        message: translations[currentLanguage].subscriptionSuccess,
                         type: "success"
                     });
-                    // Simulate burn transaction
-                    setTimeout(() => {
-                        Telegram.WebApp.showNotification({
-                            message: "100,000 TREP burned! Access Granted!",
-                            type: "success"
-                        });
-                        walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Access Granted!";
-                    }, 1500);
                 } else {
                     walletStatus.textContent = translations[currentLanguage].walletStatusFailed || "Wallet connection failed.";
-                    Telegram.WebApp.showAlert('Failed to connect wallet. Please try again.');
+                    Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
                 }
             }, 2000); // Simulate connection delay
         });
@@ -865,6 +878,9 @@
         let currentTREPBalance = 100000; // Simulated starting TREP balance
         const TREP_REFUND_PERCENTAGE = 0.25; // 25% refund
         const MAX_TREP_REFUND_PER_CHEST = 5000; // Cap to prevent huge refunds in simulation
+        let isGameSubscribed = false; // New: Game subscription status
+        const TREP_SUBSCRIPTION_COST = 100000; // Cost to unlock all games
+
         let currentZone = null;
         const zoneData = {
             jungle: {
@@ -918,6 +934,9 @@
         const puzzleFeedback = document.getElementById('puzzleFeedback');
         const nextPuzzleButton = document.getElementById('nextPuzzleButton');
         const modifiedImageWrapper = modifiedImage.parentElement; // Get the parent div for hotspot positioning
+        const subscriptionRequiredDiv = document.getElementById('subscriptionRequired');
+        const subscribeToGamesButton = document.getElementById('subscribeToGamesButton');
+
 
         let currentPuzzle = null;
         let foundDifferences = [];
@@ -926,24 +945,26 @@
         const spotTheDifferencePuzzles = [
             {
                 id: 'puzzle1',
-                title: 'Forest Friends',
+                title: 'Forest Friends (Free)',
                 originalImage: 'https://placehold.co/400x225/ADD8E6/000000?text=Original+Forest',
                 modifiedImage: 'https://placehold.co/400x225/90EE90/000000?text=Modified+Forest',
                 differences: [
                     { id: 'diff1', x: 20, y: 30, width: 10, height: 15, found: false }, // Example: x, y, width, height in %
                     { id: 'diff2', x: 70, y: 50, width: 12, height: 10, found: false },
                     { id: 'diff3', x: 45, y: 80, width: 8, height: 12, found: false }
-                ]
+                ],
+                requiresSubscription: false // This puzzle is free
             },
             {
                 id: 'puzzle2',
-                title: 'Island Paradise',
+                title: 'Island Paradise (Subscribers Only)',
                 originalImage: 'https://placehold.co/400x225/FFDAB9/000000?text=Original+Island',
                 modifiedImage: 'https://placehold.co/400x225/FFB6C1/000000?text=Modified+Island',
                 differences: [
                     { id: 'diff4', x: 15, y: 25, width: 10, height: 10, found: false },
                     { id: 'diff5', x: 80, y: 70, width: 15, height: 10, found: false }
-                ]
+                ],
+                requiresSubscription: true // This puzzle requires subscription
             }
         ];
         let currentSpotTheDifferencePuzzleIndex = 0;
@@ -1075,12 +1096,27 @@
         function startSpotTheDifferenceGame() {
             gamePlayArea.classList.add('hidden'); // Hide main game area
             spotTheDifferenceGame.classList.remove('hidden'); // Show puzzle game
+            subscriptionRequiredDiv.classList.add('hidden'); // Hide subscription message by default
 
             currentPuzzle = spotTheDifferencePuzzles[currentSpotTheDifferencePuzzleIndex];
             if (!currentPuzzle) {
                 puzzleFeedback.textContent = "No more puzzles available!";
                 nextPuzzleButton.classList.add('hidden');
                 return;
+            }
+
+            // Check for subscription requirement
+            if (currentPuzzle.requiresSubscription && !isGameSubscribed) {
+                puzzleFeedback.textContent = translations[currentLanguage].subscribeToPlay;
+                subscriptionRequiredDiv.classList.remove('hidden');
+                // Hide puzzle images and hotspots if subscription is required
+                originalImage.src = 'https://placehold.co/400x225/CCCCCC/000000?text=Locked+Puzzle';
+                modifiedImage.src = 'https://placehold.co/400x225/CCCCCC/000000?text=Locked+Puzzle';
+                modifiedImageWrapper.querySelectorAll('.difference-hotspot').forEach(hotspot => hotspot.remove());
+                differencesFoundDisplay.textContent = '0';
+                totalDifferencesDisplay.textContent = '0';
+                nextPuzzleButton.classList.add('hidden');
+                return; // Stop here if subscription is required
             }
 
             originalImage.src = currentPuzzle.originalImage;
@@ -1155,12 +1191,35 @@
         function resetSpotTheDifferenceGame() {
             currentPuzzle = null;
             foundDifferences = [];
-            currentSpotTheDifferencePuzzleIndex = 0; // Reset to first puzzle
+            // Do NOT reset currentSpotTheDifferencePuzzleIndex here if we want to allow replaying or continuing
+            // Instead, manage progression with nextPuzzleButton
             updateDifferencesFoundDisplay();
             puzzleFeedback.textContent = '';
             nextPuzzleButton.classList.add('hidden');
             modifiedImageWrapper.querySelectorAll('.difference-hotspot').forEach(hotspot => hotspot.remove()); // Clear hotspots
+            subscriptionRequiredDiv.classList.add('hidden'); // Ensure subscription message is hidden on reset
         }
+
+        // --- Subscription Logic for Games ---
+        subscribeToGamesButton.addEventListener('click', () => {
+            if (currentTREPBalance >= TREP_SUBSCRIPTION_COST) {
+                currentTREPBalance -= TREP_SUBSCRIPTION_COST;
+                isGameSubscribed = true;
+                updateTREPBalanceUI();
+                Telegram.WebApp.showNotification({
+                    message: translations[currentLanguage].subscriptionSuccess,
+                    type: "success"
+                });
+                // Also update the wallet status in the Access tab
+                walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Wallet Connected & Access Granted!";
+                // Automatically start the current puzzle (which was previously locked)
+                startSpotTheDifferenceGame();
+            } else {
+                puzzleFeedback.textContent = translations[currentLanguage].insufficientFunds;
+                Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
+            }
+        });
+
 
         // --- Event Listeners for Game Tab and Game Elements ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1185,7 +1244,7 @@
             backToGameFromPuzzleButton.addEventListener('click', () => {
                 spotTheDifferenceGame.classList.add('hidden');
                 gamePlayArea.classList.remove('hidden'); // Go back to the zone exploration screen
-                resetSpotTheDifferenceGame(); // Reset puzzle state
+                resetSpotTheDifferenceGame(); // Reset puzzle state (but not index)
             });
 
             // Add event listener for next puzzle button
@@ -1194,12 +1253,13 @@
                 if (currentSpotTheDifferencePuzzleIndex < spotTheDifferencePuzzles.length) {
                     startSpotTheDifferenceGame(); // Load next puzzle
                 } else {
-                    puzzleFeedback.textContent = "You've completed all puzzles! Returning to zones...";
+                    puzzleFeedback.textContent = translations[currentLanguage].allPuzzlesCompleted || "You've completed all available puzzles! More coming soon!";
                     Telegram.WebApp.showNotification({
-                        message: "All puzzles completed! Great job!",
+                        message: translations[currentLanguage].allPuzzlesCompleted || "All puzzles completed! Great job!",
                         type: "success"
                     });
                     setTimeout(showZoneSelection, 2000); // Go back to zones after a delay
+                    currentSpotTheDifferencePuzzleIndex = 0; // Reset for next time user plays
                 }
             });
 
