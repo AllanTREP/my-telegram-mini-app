@@ -46,13 +46,17 @@
         }
 
         /* Specific styles for tab buttons to handle active/inactive states */
-        .tab-button.active {
-            background-color: var(--tg-theme-button-color, #ADD8E6) !important; /* Active tab changed to very light blue */
-            color: var(--tg-theme-button-text-color, black) !important; /* Active tab text changed to black for contrast */
+        .tab-button {
+            /* Default background and text color for inactive tabs, adapting to app theme */
+            background-color: var(--app-secondary-bg);
+            color: var(--app-text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        /* Default styles for tab buttons, overridden by inline styles for specific colors */
-        .tab-button:not(.active) {
-            color: var(--tg-theme-text-color, #333) !important;
+
+        .tab-button.active {
+            /* Active tab uses Telegram's button colors for strong contrast */
+            background-color: var(--tg-theme-button-color, #0088cc) !important;
+            color: var(--tg-theme-button-text-color, white) !important;
         }
 
         /* Onboarding screen styles */
@@ -199,19 +203,19 @@
         <!-- Tab Navigation -->
         <div class="flex justify-center flex-wrap mb-6 w-full space-x-2">
             <button id="overviewTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    style="background-color: lightblue;" data-i18n="overviewTab">
+                    data-i18n="overviewTab">
                 Overview
             </button>
             <button id="statsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    style="background-color: lightblue;" data-i18n="trenksTab">
+                    data-i18n="trenksTab">
                 Trenks
             </button>
             <button id="dealsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    style="background-color: lightblue;" data-i18n="dealsTab">
+                    data-i18n="dealsTab">
                 Deals
             </button>
             <button id="accessTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    style="background-color: lightblue;" data-i18n="accessTab">
+                    data-i18n="accessTab">
                 Access
             </button>
         </div>
@@ -441,7 +445,9 @@
                 if (user.language_code) {
                     infoText.innerHTML += `<br>${translations[currentLanguage].yourLanguage} ${user.language_code}`;
                 }
-                // Update app info tab
+                // The appInfoText element is not in the current HTML, so this part of the logic will not execute on the UI.
+                // It's kept here in case you re-introduce an app info tab.
+                /*
                 appInfoText.innerHTML = `
                     <p><strong>User ID:</strong> ${user.id || 'N/A'}</p>
                     <p><strong>First Name:</strong> ${user.first_name || 'N/A'}</p>
@@ -451,6 +457,7 @@
                     <p><strong>Is Premium:</strong> ${user.is_premium ? 'Yes' : 'No'}</p>
                     <p><strong>Allows Write To PM:</strong> ${user.allows_write_to_pm ? 'Yes' : 'No'}</p>
                 `;
+                */
             } else {
                 infoText.innerHTML = translations[currentLanguage].helloUser + `<br>${translations[currentLanguage].userDataNotAvailable}`;
                 // This appInfoText element is not in the current HTML, but leaving the logic in case it's added back
@@ -495,7 +502,7 @@
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
-                themeToggleButton.innerHTML = '🌙'; // Moon emoji for dark mode toggle
+                themeToggleButton.innerHTML = '�'; // Moon emoji for dark mode toggle
                 localStorage.setItem('app_theme', 'light');
             }
         }
