@@ -476,7 +476,7 @@
             </p>
             <!-- NEW: Burn Address Note -->
             <p class="text-xs mt-2 text-center" style="color: var(--tg-theme-hint-color, #666);" data-i18n="burnAddressNote">
-                (Note: All burned tokens are sent to a verifiable burn address: <span class="font-mono text-gray-800 dark:text-gray-300">0x000...BurnAddressHere...000</span>)
+                (Note: All burned tokens are sent to a verifiable burn address: <span class="font-mono text-gray-800 dark:text-gray-300">8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF</span>)
             </p>
             <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletNote">
                 (Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)
@@ -737,7 +737,7 @@
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
                 walletStatus: "Wallet not connected",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
-                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 0x000...BurnAddressHere...000)",
+                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)", // Updated burn address
                 moreHeading: "More Crypto Info",
                 moreDescription: "Explore trending cryptocurrencies and market insights.",
                 trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel",
@@ -798,7 +798,8 @@
                 walletConnectionFailed: "Wallet connection failed.",
                 connectedToWallet: "Connected to wallet: {publicKey}",
                 burnConfirmed: "🎉 Burn confirmed! Premium access granted.",
-                burnFailed: "Burn failed. Please try again."
+                burnFailed: "Burn failed. Please try again.",
+                viewTransaction: "View transaction: " // New translation key
             },
             es: {
                 appTitle: "TREP Mini Aplicación",
@@ -838,7 +839,7 @@
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
                 walletStatus: "Billetera no conectada",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
-                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 0x000...BurnAddressHere...000)",
+                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)", // Updated burn address
                 moreHeading: "Más Información Cripto",
                 moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
                 trepDealFinderFullAccessHeading: "Canal TREP Deal Finder - Acceso Completo",
@@ -875,7 +876,8 @@
                 walletConnectionFailed: "Fallo la conexión de la billetera.",
                 connectedToWallet: "Conectado a la billetera: {publicKey}",
                 burnConfirmed: "🎉 ¡Quema confirmada! Acceso premium concedido.",
-                burnFailed: "Fallo la quema. Por favor, intenta de nuevo."
+                burnFailed: "Fallo la quema. Por favor, intenta de nuevo.",
+                viewTransaction: "Ver transacción: " // New translation key
             }
         };
 
@@ -1039,9 +1041,9 @@
         const walletStatus = document.getElementById('walletStatus');
 
         // Define your TREP token's mint address and the burn address
-        // IMPORTANT: Replace these with your actual addresses!
-        const TREP_MINT_ADDRESS = new solanaWeb3.PublicKey("TREP_MINT_ADDRESS_HERE"); // e.g., "Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka"
-        const TREP_BURN_ADDRESS = new solanaWeb3.PublicKey("TREP_BURN_ADDRESS_HERE"); // e.g., "11111111111111111111111111111111" (a common burn address)
+        // IMPORTANT: These are now the actual addresses provided by the user.
+        const TREP_MINT_ADDRESS = new solanaWeb3.PublicKey("Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka");
+        const TREP_BURN_ADDRESS = new solanaWeb3.PublicKey("8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF");
         const TREP_DECIMALS = 9; // Confirmed by user
         const TREP_FULL_ACCESS_COST = 100000; // Cost in raw token units (e.g., 100,000 TREP)
 
@@ -1086,20 +1088,31 @@
          */
         async function burnTREP(payerPublicKey, amountInSmallestUnits) {
             try {
-                // Get the associated token account for the user's wallet and the TREP mint
-                const userTokenAccountAddress = await splToken.getAssociatedTokenAddress(
-                    TREP_MINT_ADDRESS,
-                    payerPublicKey
-                );
+                let userTokenAccountAddress;
+                const MAX_RETRIES = 3;
+                for (let i = 0; i < MAX_RETRIES; i++) {
+                    try {
+                        // Get the associated token account for the user's wallet and the TREP mint
+                        userTokenAccountAddress = await splToken.getAssociatedTokenAddress(
+                            TREP_MINT_ADDRESS,
+                            payerPublicKey
+                        );
+                        break; // If successful, break the loop
+                    } catch (ataError) {
+                        console.warn(`Attempt ${i + 1} to getAssociatedTokenAddress failed:`, ataError);
+                        if (i < MAX_RETRIES - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+                        } else {
+                            throw new Error("Failed to get associated token account after multiple retries.");
+                        }
+                    }
+                }
 
                 // Create a new transaction
                 const burnTransaction = new solanaWeb3.Transaction();
 
                 // Add the SPL Token transfer instruction (transfer to burn address)
-                // Note: For a true "burn" instruction, you'd use splToken.createBurnInstruction
-                // However, sending to a known burn address is a common way to "burn" by removing from circulation.
-                // If you have a specific burn authority or program, that would change this instruction.
-                // Copilot suggested createTransferInstruction, which is valid for sending to a burn address.
+                // Sending to a known burn address is a common way to "burn" by removing from circulation.
                 const instruction = splToken.createTransferInstruction(
                     userTokenAccountAddress, // Source (user's TREP token account)
                     TREP_BURN_ADDRESS,       // Destination (the burn address)
@@ -1126,6 +1139,9 @@
                     message: translations[currentLanguage].burnConfirmed,
                     type: "success"
                 });
+
+                // Show verifiable transaction explorer link
+                Telegram.WebApp.showAlert(`${translations[currentLanguage].viewTransaction} https://solscan.io/tx/${signature}`);
 
                 // Update app state after successful burn
                 isGameSubscribed = true;
