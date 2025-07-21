@@ -330,6 +330,10 @@
             <button id="themeToggleButton" class="toggle-button text-2xl">
                 ☀️
             </button>
+            <!-- Devnet Toggle Button -->
+            <button id="devnetToggleButton" class="toggle-button text-sm">
+                Devnet
+            </button>
         </div>
 
         <!-- Logo -->
@@ -737,7 +741,7 @@
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
                 walletStatus: "Wallet not connected",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
-                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)", // Updated burn address
+                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)",
                 moreHeading: "More Crypto Info",
                 moreDescription: "Explore trending cryptocurrencies and market insights.",
                 trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel",
@@ -787,7 +791,7 @@
                 subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!",
                 fearlessFlyModeButton: "Activate Fearless Fly Mode 🦸‍♂️",
                 fearlessFlyActivated: "Fearless Fly Mode Activated! Double TREP refunds!",
-                fearlessFlyDeactivated: "Modo Fearless Fly Desactivated.",
+                fearlessFlyDeactivated: "Fearless Fly Mode Deactivated.",
                 fearlessFlyCost: "Activating Fearless Fly Mode costs {cost} TREP. Insufficient funds!",
                 premiumContentLocked: "This content is for premium users. Please subscribe in the 'Access' tab to unlock!",
                 helloUser: "Hello, User!",
@@ -799,7 +803,9 @@
                 connectedToWallet: "Connected to wallet: {publicKey}",
                 burnConfirmed: "🎉 Burn confirmed! Premium access granted.",
                 burnFailed: "Burn failed. Please try again.",
-                viewTransaction: "View transaction: " // New translation key
+                viewTransaction: "View transaction: ",
+                devnetMode: "Devnet Mode: ON",
+                mainnetMode: "Devnet Mode: OFF"
             },
             es: {
                 appTitle: "TREP Mini Aplicación",
@@ -839,7 +845,7 @@
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
                 walletStatus: "Billetera no conectada",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
-                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)", // Updated burn address
+                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)",
                 moreHeading: "Más Información Cripto",
                 moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
                 trepDealFinderFullAccessHeading: "Canal TREP Deal Finder - Acceso Completo",
@@ -877,7 +883,9 @@
                 connectedToWallet: "Conectado a la billetera: {publicKey}",
                 burnConfirmed: "🎉 ¡Quema confirmada! Acceso premium concedido.",
                 burnFailed: "Fallo la quema. Por favor, intenta de nuevo.",
-                viewTransaction: "Ver transacción: " // New translation key
+                viewTransaction: "Ver transacción: ",
+                devnetMode: "Modo Devnet: ENCENDIDO",
+                mainnetMode: "Modo Devnet: APAGADO"
             }
         };
 
@@ -904,11 +912,14 @@
             } else {
                 document.getElementById('infoText').textContent = translations[currentLanguage].userDataNotAvailable;
             }
+            // Update Devnet/Mainnet button text
+            devnetToggleButton.textContent = isDevnetMode ? translations[currentLanguage].devnetMode : translations[currentLanguage].mainnetMode;
         }
 
         // --- Theme and Language Toggles ---
         const themeToggleButton = document.getElementById('themeToggleButton');
         const languageToggleButton = document.getElementById('languageToggleButton');
+        const devnetToggleButton = document.getElementById('devnetToggleButton'); // New: Devnet toggle button
         const appContainer = document.getElementById('app-container');
         const appLogo = document.getElementById('appLogo');
 
@@ -918,7 +929,7 @@
                 document.body.classList.add('dark-mode');
                 // Updated logo for dark mode
                 appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true";
-                themeToggleButton.textContent = '�';
+                themeToggleButton.textContent = '🌙';
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
@@ -946,6 +957,29 @@
             languageToggleButton.textContent = currentLanguage.toUpperCase();
             updateContent();
         });
+
+        // --- Devnet/Mainnet Toggle Logic ---
+        let currentCluster = localStorage.getItem('solana_cluster') || 'mainnet-beta'; // Default to mainnet-beta
+        let isDevnetMode = currentCluster === 'devnet';
+        let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl(currentCluster)); // Initialize connection
+
+        function updateSolanaConnection() {
+            connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl(currentCluster));
+            console.log(`Solana connection switched to: ${currentCluster}`);
+            // After switching, if a wallet is connected, try to fetch its balance on the new network
+            if (solanaWallet && solanaWallet.publicKey) {
+                fetchTREPBalance(solanaWallet.publicKey);
+            }
+            updateContent(); // Update button text
+        }
+
+        devnetToggleButton.addEventListener('click', () => {
+            isDevnetMode = !isDevnetMode;
+            currentCluster = isDevnetMode ? 'devnet' : 'mainnet-beta';
+            localStorage.setItem('solana_cluster', currentCluster);
+            updateSolanaConnection();
+        });
+
 
         // --- Tab Switching Logic ---
         const tabButtons = document.querySelectorAll('.tab-button');
@@ -1042,13 +1076,12 @@
 
         // Define your TREP token's mint address and the burn address
         // IMPORTANT: These are now the actual addresses provided by the user.
+        // For Devnet testing, you would need to deploy your TREP token on Devnet
+        // and update these addresses accordingly for Devnet mode.
         const TREP_MINT_ADDRESS = new solanaWeb3.PublicKey("Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka");
         const TREP_BURN_ADDRESS = new solanaWeb3.PublicKey("8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF");
         const TREP_DECIMALS = 9; // Confirmed by user
         const TREP_FULL_ACCESS_COST = 100000; // Cost in raw token units (e.g., 100,000 TREP)
-
-        // Solana connection setup (mainnet-beta is common for live tokens)
-        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
 
         connectWalletButton.addEventListener('click', async () => {
             try {
@@ -1068,6 +1101,9 @@
                 walletStatus.textContent = "Wallet Connected";
                 walletStatus.style.color = "green";
 
+                // Fetch and display live balance after connection
+                await fetchTREPBalance(publicKey);
+
                 // Proceed to burn tokens
                 // The burn amount should be in smallest units (e.g., 100,000 * 10^9 for 9 decimals)
                 const burnAmountInSmallestUnits = TREP_FULL_ACCESS_COST * (10 ** TREP_DECIMALS);
@@ -1080,6 +1116,37 @@
                 Telegram.WebApp.showAlert(translations[currentLanguage].walletConnectionFailed);
             }
         });
+
+        /**
+         * Fetches and updates the displayed TREP balance for the given public key.
+         * @param {solanaWeb3.PublicKey} publicKey - The public key of the wallet to fetch balance for.
+         */
+        async function fetchTREPBalance(publicKey) {
+            trepBalanceDisplay.textContent = "Loading..."; // Show loading state
+            try {
+                const userTokenAccountAddress = await splToken.getAssociatedTokenAddress(
+                    TREP_MINT_ADDRESS,
+                    publicKey
+                );
+
+                const tokenAccountInfo = await connection.getTokenAccountBalance(userTokenAccountAddress);
+
+                if (tokenAccountInfo && tokenAccountInfo.value && tokenAccountInfo.value.uiAmount !== undefined) {
+                    currentTREPBalance = tokenAccountInfo.value.uiAmount; // Update simulated balance with actual UI amount
+                    updateTREPBalanceUI();
+                } else {
+                    console.warn("Could not fetch TREP balance or token account not found.");
+                    currentTREPBalance = 0; // Set to 0 if not found
+                    updateTREPBalanceUI();
+                }
+            } catch (error) {
+                console.error("Error fetching TREP balance:", error);
+                currentTREPBalance = 0; // Assume 0 on error
+                updateTREPBalanceUI();
+                Telegram.WebApp.showAlert("Failed to fetch TREP balance. Please try again.");
+            }
+        }
+
 
         /**
          * Initiates a Solana SPL token burn transaction.
@@ -1146,10 +1213,8 @@
                 // Update app state after successful burn
                 isGameSubscribed = true;
                 updatePremiumTabVisibility();
-                // In a real app, you'd fetch the user's new TREP balance from the blockchain here
-                // For simulation, we'll deduct it from our local variable
-                currentTREPBalance -= TREP_FULL_ACCESS_COST;
-                updateTREPBalanceUI();
+                // Fetch live balance after successful burn to reflect the change
+                await fetchTREPBalance(payerPublicKey);
 
             } catch (err) {
                 console.error("Burn failed:", err);
@@ -1159,7 +1224,8 @@
 
 
         // --- Game Variables and Logic for TREP Treasure ---
-        let currentTREPBalance = 100000; // Simulated starting TREP balance
+        // currentTREPBalance is now updated by fetchTREPBalance for live data
+        let currentTREPBalance = 0; // Initialize to 0, will be fetched live
         const TREP_REFUND_PERCENTAGE = 0.25; // 25% refund
         const MAX_TREP_REFUND_PER_CHEST = 5000; // Cap to prevent huge refunds in simulation
         let isGameSubscribed = false; // New: Game subscription status
@@ -1636,8 +1702,8 @@
             updateContent(); // Initial content update based on default/saved language
             languageToggleButton.textContent = currentLanguage.toUpperCase(); // Ensure language button shows correct initial state
             updatePremiumTabVisibility(); // Call this on load to set initial visibility
+            updateSolanaConnection(); // Initialize Solana connection based on saved cluster
         });
     </script>
 </body>
 </html>
-�
