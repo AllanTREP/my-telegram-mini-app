@@ -33,7 +33,8 @@
         #app-container {
             background-color: var(--app-main-bg) !important; /* Use custom variable */
             color: var(--app-text-color); /* Use custom variable */
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease; /* Added border transition */
+            border: 1px solid rgba(255,255,255,0.15); /* Glassy border */
         }
 
         /* Tab Content backgrounds */
@@ -43,6 +44,8 @@
         #statsDisplay, .deal-item {
             background-color: var(--app-secondary-bg) !important; /* Use custom variable */
             color: var(--app-text-color) !important; /* Use custom variable */
+            border: 1px solid rgba(255,255,255,0.15); /* Glassy border */
+            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease; /* Added border transition */
         }
 
         /* Specific styles for tab buttons to handle active/inactive states */
@@ -83,6 +86,8 @@
             max-width: 90%;
             width: 500px;
             color: var(--tg-theme-text-color, #333);
+            border: 1px solid rgba(255,255,255,0.15); /* Glassy border */
+            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease; /* Added border transition */
         }
         .onboarding-button {
             background-color: var(--tg-theme-button-color, #0088cc);
