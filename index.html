@@ -1,13 +1,3 @@
-You are absolutely right! My apologies for that oversight. I got a bit carried away with the game logic and missed integrating it with the existing UI elements you had already established.
-
-The image clearly shows the "Game" tab button in the main navigation and the gamepad icon in the quick links, both circled in blue. My previous code correctly implemented the functionality for the game tab, but the UI for starting the game within that tab was an older placeholder ("Tap the button below to start your adventure! Start Game"). We had since moved to a "Choose your adventure zone" approach.
-
-I need to make sure the "Game" tab's content accurately reflects the "choose zone" interaction we developed.
-
-Here's the corrected and adapted HTML code. I've removed the old "Start Game" button and introductory text from the gameTabContent and ensured that the gameZoneSelection (with the zone cards) is the default view when the "Game" tab is active.
-
-HTML
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,7 +200,7 @@ HTML
         </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center relative hidden"
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center relative"
          id="app-container">
 
         <div class="absolute top-4 right-4 flex space-x-2">
@@ -280,7 +270,7 @@ HTML
                 <div class="flex-1 min-w-[200px]">
                     <p data-i18n="checkTrepOn"><strong>Check TREP on:</strong></p>
                     <ul class="list-disc list-inside ml-4 mb-4">
-                        <li><a href="https://dexscreener.com/solana/a6fmyrfluwn8xvfsnyqtsd2kpxht2b4lq4l8lkp11nnm" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dexscreener</a></li>
+                        <li><a href="https://dexscreener.com/solana/a6fmyrfluwn8xvnyqtsd2kpxht2b4lq4l8lkp11nnm" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dexscreener</a></li>
                         <li><a href="https://www.geckoterminal.com/solana/pools/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">GeckoTerminal (CoinGecko)</a></li>
                         <li><a href="https://www.dextools.io/app/en/solana/pair-explorer/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?t=1753065837128" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dextools</a></li>
                         <li><a href="https://solscan.io/token/Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Solscan</a></li>
@@ -669,7 +659,7 @@ HTML
 
         // Set initial tab and quick link active state
         let initialTabId = localStorage.getItem('activeTab') || 'overviewTabContent';
-        showTab(initialTabId);
+        // showTab(initialTabId); // This will be called after onboarding check
 
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -697,16 +687,18 @@ HTML
 
         if (!hasVisited) {
             onboardingScreen.classList.remove('hidden');
-            appContainerMain.classList.add('hidden');
+            appContainerMain.classList.add('hidden'); // Ensure app container is hidden during onboarding
         } else {
             onboardingScreen.classList.add('hidden');
-            appContainerMain.classList.remove('hidden');
+            appContainerMain.classList.remove('hidden'); // Ensure app container is visible if already visited
+            showTab(initialTabId); // Show the last active tab if already visited
         }
 
         startJourneyButton.addEventListener('click', () => {
             onboardingScreen.classList.add('hidden');
             appContainerMain.classList.remove('hidden');
             localStorage.setItem('hasVisitedApp', 'true');
+            showTab('overviewTabContent'); // Default to overview after onboarding
         });
 
         // --- Wallet Connection Logic (Placeholder) ---
