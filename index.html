@@ -232,6 +232,10 @@
                     data-i18n="moreTab">
                 More
             </button>
+            <button id="gameTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
+                    data-i18n="gameTab">
+                Game
+            </button>
         </div>
 
         <!-- Tab Content: Overview -->
@@ -342,6 +346,23 @@
             </div>
         </div>
 
+        <!-- New Tab Content: Game -->
+        <div id="gameTabContent" class="tab-content w-full hidden">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="gameHeading">TREP Treasure Game</h2>
+            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="gameDescription">
+                Explore themed zones, discover hidden gems, and earn simulated TREP refunds!
+            </p>
+            <div class="game-area bg-gray-100 p-4 rounded-lg text-center" style="background-color: var(--app-secondary-bg) !important; color: var(--app-text-color) !important; border: 1px solid rgba(255,255,255,0.15);">
+                <p class="mb-4" data-i18n="gameIntro">Tap the button below to start your adventure!</p>
+                <button id="startGameButton"
+                        class="py-3 px-6 rounded-lg font-bold text-white transition-colors duration-200"
+                        style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="startGameButton">
+                    Start Game
+                </button>
+                <p id="gameMessage" class="mt-4 text-sm" style="color: var(--tg-theme-hint-color, #666);"></p>
+            </div>
+        </div>
+
         <!-- General Info Text at the bottom of the main container -->
         <p id="infoText" class="mt-6 text-sm text-gray-600 text-center w-full"
            style="color: var(--tg-theme-hint-color, #666);">
@@ -366,6 +387,9 @@
             <button id="quickMore" class="quick-link-button" data-tab-id="moreTabContent">
                 💡
             </button>
+            <button id="quickGame" class="quick-link-button" data-tab-id="gameTabContent">
+                🎮
+            </button>
         </div>
 
     </div>
@@ -389,7 +413,8 @@
                 trenksTab: "Trenks",
                 dealsTab: "Deals",
                 accessTab: "Access",
-                moreTab: "More", // New translation
+                moreTab: "More",
+                gameTab: "Game", // New translation
                 overviewHeading: "Overview",
                 overviewContent: "TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Stake TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.<br><br>Join our community!",
                 overviewLearnMore: "Learn more about our mission and features.",
@@ -414,11 +439,15 @@
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
                 walletStatus: "Wallet not connected.",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
-                moreHeading: "More Crypto Info", // New translation
-                moreDescription: "Explore trending cryptocurrencies and market insights.", // New translation
-                dexscreenerGainersHeading: "Dexscreener Gainers", // New translation
-                dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.", // New translation
-                visitDexscreenerGainers: "Visit Dexscreener Gainers", // New translation
+                moreHeading: "More Crypto Info",
+                moreDescription: "Explore trending cryptocurrencies and market insights.",
+                dexscreenerGainersHeading: "Dexscreener Gainers",
+                dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
+                visitDexscreenerGainers: "Visit Dexscreener Gainers",
+                gameHeading: "TREP Treasure Game", // New translation
+                gameDescription: "Explore themed zones, discover hidden gems, and earn simulated TREP refunds!", // New translation
+                gameIntro: "Tap the button below to start your adventure!", // New translation
+                startGameButton: "Start Game", // New translation
                 helloUser: "Hello, User!",
                 userDataNotAvailable: "User data not available for display.",
                 yourLanguage: "Your language:"
@@ -434,7 +463,8 @@
                 trenksTab: "Trenks",
                 dealsTab: "Ofertas",
                 accessTab: "Acceso",
-                moreTab: "Más", // New translation
+                moreTab: "Más",
+                gameTab: "Juego", // New translation
                 overviewHeading: "Resumen",
                 overviewContent: "TREP es un token impulsado por la comunidad con utilidad real en el Descubrimiento de Ofertas y Señales de Mercado. Apuesta TREP para acceder a listados tempranos, análisis de inversores y paneles premium. Impulsado por bots, datos y una leal comunidad de Telegram — únete al futuro de la caza de alfa.",
                 overviewLearnMore: "Aprende más sobre nuestra misión y características.",
@@ -459,11 +489,15 @@
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
                 walletStatus: "Billetera no conectada.",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
-                moreHeading: "Más Información Cripto", // New translation
-                moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.", // New translation
-                dexscreenerGainersHeading: "Ganadores de Dexscreener", // New translation
-                dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.", // New translation
-                visitDexscreenerGainers: "Visitar Ganadores de Dexscreener", // New translation
+                moreHeading: "Más Información Cripto",
+                moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
+                dexscreenerGainersHeading: "Ganadores de Dexscreener",
+                dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.",
+                visitDexscreenerGainers: "Visitar Ganadores de Dexscreener",
+                gameHeading: "Juego del Tesoro TREP", // New translation
+                gameDescription: "¡Explora zonas temáticas, descubre gemas ocultas y gana reembolsos simulados de TREP!", // New translation
+                gameIntro: "¡Toca el botón de abajo para comenzar tu aventura!", // New translation
+                startGameButton: "Iniciar Juego", // New translation
                 helloUser: "¡Hola, Usuario!",
                 userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
                 yourLanguage: "Tu idioma:"
@@ -510,21 +544,24 @@
         const statsTabButton = document.getElementById('statsTabButton'); // Now Trenks
         const dealsTabButton = document.getElementById('dealsTabButton');
         const accessTabButton = document.getElementById('accessTabButton');
-        const moreTabButton = document.getElementById('moreTabButton'); // New tab button
+        const moreTabButton = document.getElementById('moreTabButton');
+        const gameTabButton = document.getElementById('gameTabButton'); // New tab button
 
         // Tab Contents
         const overviewTabContent = document.getElementById('overviewTabContent');
         const statsTabContent = document.getElementById('statsTabContent'); // Now Trenks content
         const dealsTabContent = document.getElementById('dealsTabContent');
         const accessTabContent = document.getElementById('accessTabContent');
-        const moreTabContent = document.getElementById('moreTabContent'); // New tab content
+        const moreTabContent = document.getElementById('moreTabContent');
+        const gameTabContent = document.getElementById('gameTabContent'); // New tab content
 
         // Quick Link Buttons (bottom navigation)
         const quickOverview = document.getElementById('quickOverview');
         const quickTrenks = document.getElementById('quickTrenks');
         const quickDeals = document.getElementById('quickDeals');
         const quickAccess = document.getElementById('quickAccess');
-        const quickMore = document.getElementById('quickMore'); // New quick link button
+        const quickMore = document.getElementById('quickMore');
+        const quickGame = document.getElementById('quickGame'); // New quick link button
 
         // --- Theme Toggle Logic ---
         function applyTheme(theme) {
@@ -632,14 +669,16 @@
         statsTabButton.onclick = () => showTab('statsTabContent');
         dealsTabButton.onclick = () => showTab('dealsTabContent');
         accessTabButton.onclick = () => showTab('accessTabContent');
-        moreTabButton.onclick = () => showTab('moreTabContent'); // New event listener
+        moreTabButton.onclick = () => showTab('moreTabContent');
+        gameTabButton.onclick = () => showTab('gameTabContent'); // New event listener
 
         // Event listeners for quick link buttons
         quickOverview.onclick = () => showTab('overviewTabContent');
         quickTrenks.onclick = () => showTab('statsTabContent');
         quickDeals.onclick = () => showTab('dealsTabContent');
         quickAccess.onclick = () => showTab('accessTabContent');
-        quickMore.onclick = () => showTab('moreTabContent'); // New event listener
+        quickMore.onclick = () => showTab('moreTabContent');
+        quickGame.onclick = () => showTab('gameTabContent'); // New event listener
 
 
         // --- Main Button (still active globally) ---
