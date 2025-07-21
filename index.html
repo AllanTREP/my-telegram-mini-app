@@ -154,6 +154,11 @@
         .toggle-button:hover {
             filter: brightness(90%);
         }
+
+        /* New style for navy blue text */
+        .text-navy-blue {
+            color: #000080; /* Navy Blue */
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -300,8 +305,8 @@
                 Connect your Solana wallet to proceed with payment.
             </p>
             <div class="bg-gray-100 p-4 rounded-lg mb-4 text-left">
-                <h3 class="font-semibold text-lg" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="earlyHolderAccessHeading">Early Holder Access</h3>
-                <p class="text-sm" data-i18n="earlyHolderAccessDescription">Your gateway to token insights, community tools, and exclusive access.</p>
+                <h3 class="font-semibold text-lg text-navy-blue" data-i18n="earlyHolderAccessHeading">Early Holder Access</h3>
+                <p class="text-sm text-navy-blue" data-i18n="earlyHolderAccessDescription">Your gateway to token insights, community tools, and exclusive access.</p>
             </div>
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="Access Tab Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
             <button id="connectWalletButton"
