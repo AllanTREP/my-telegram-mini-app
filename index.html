@@ -288,6 +288,13 @@
             color: white !important;
             box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
         }
+
+        /* New: Disabled tab styling */
+        .disabled-tab {
+            opacity: 0.5; /* Visually dim the tab */
+            cursor: not-allowed; /* Indicate it's not clickable */
+            pointer-events: none; /* Prevent all click events */
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -334,8 +341,8 @@
             Your gateway to exclusive deals, real-time stats, and community access.
         </p>
 
-        <!-- Tab Navigation -->
-        <div class="flex justify-center flex-wrap mb-6 w-full space-x-2">
+        <!-- Tab Navigation - Main Row -->
+        <div class="flex justify-center flex-wrap mb-2 w-full space-x-2">
             <button id="overviewTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
                     data-i18n="overviewTab">
                 Overview
@@ -348,24 +355,27 @@
                     data-i18n="dealsTab">
                 Deals
             </button>
+            <button id="gameTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
+                    data-i18n="gameTab">
+                Game
+            </button>
             <!-- Access tab is always visible -->
             <button id="accessTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
                     data-i18n="accessTab">
                 Access
             </button>
-            <!-- More tab is hidden by default, revealed for premium users -->
-            <button id="moreTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 hidden"
+            <!-- More tab is visible but disabled by default -->
+            <button id="moreTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 disabled-tab"
                     data-i18n="moreTab">
                 More
             </button>
-            <!-- New Premium Games tab, hidden by default -->
-            <button id="premiumGamesTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 hidden"
+        </div>
+
+        <!-- Tab Navigation - Premium Games (separated and centered) -->
+        <div class="flex justify-center w-full mt-4 mb-6">
+            <button id="premiumGamesTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 disabled-tab"
                     data-i18n="premiumGamesTab">
                 Premium Games
-            </button>
-            <button id="gameTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    data-i18n="gameTab">
-                Game
             </button>
         </div>
 
@@ -649,17 +659,17 @@
             <button id="quickDeals" class="quick-link-button" data-tab-id="dealsTabContent">
                 💰
             </button>
+            <button id="quickGame" class="quick-link-button" data-tab-id="gameTabContent">
+                🎮
+            </button>
             <button id="quickAccess" class="quick-link-button" data-tab-id="accessTabContent">
                 🔑
             </button>
-            <button id="quickMore" class="quick-link-button" data-tab-id="moreTabContent">
+            <button id="quickMore" class="quick-link-button disabled-tab" data-tab-id="moreTabContent">
                 💡
             </button>
-            <button id="quickPremiumGames" class="quick-link-button hidden" data-tab-id="premiumGamesTabContent">
+            <button id="quickPremiumGames" class="quick-link-button disabled-tab" data-tab-id="premiumGamesTabContent">
                 💎
-            </button>
-            <button id="quickGame" class="quick-link-button" data-tab-id="gameTabContent">
-                🎮
             </button>
         </div>
 
@@ -761,8 +771,9 @@
                 subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!", // New
                 fearlessFlyModeButton: "Activate Fearless Fly Mode 🦸‍♂️", // New
                 fearlessFlyActivated: "Fearless Fly Mode Activated! Double TREP refunds!", // New
-                fearlessFlyDeactivated: "Fearless Fly Mode Desactivated.", // New
+                fearlessFlyDeactivated: "Modo Fearless Fly Desactivated.", // New
                 fearlessFlyCost: "Activating Fearless Fly Mode costs {cost} TREP. Insufficient funds!", // New
+                premiumContentLocked: "This content is for premium users. Please subscribe in the 'Access' tab to unlock!", // New
                 helloUser: "Hello, User!",
                 userDataNotAvailable: "User data not available for display.",
                 yourLanguage: "Your language:"
@@ -835,7 +846,8 @@
                 fearlessFlyModeButton: "Activar Modo Fearless Fly 🦸‍♂️", // New
                 fearlessFlyActivated: "¡Modo Fearless Fly Activado! ¡Reembolsos de TREP dobles!", // New
                 fearlessFlyDeactivated: "Modo Fearless Fly Desactivado.", // New
-                fearlessFlyCost: "Activar el Modo Fearless Fly cuesta {cost} TREP. ¡Fondos insuficientes!" // New
+                fearlessFlyCost: "Activar el Modo Fearless Fly cuesta {cost} TREP. ¡Fondos insuficientes!", // New
+                premiumContentLocked: "Este contenido es para usuarios premium. ¡Suscríbete en la pestaña 'Acceso' para desbloquear!" // New
             }
         };
 
@@ -910,6 +922,14 @@
         const tabContents = document.querySelectorAll('.tab-content');
 
         function showTab(tabId) {
+            // Check if the tab is disabled before switching
+            const clickedButton = document.querySelector(`[id="${tabId.replace('Content', 'Button')}"]`);
+            if (clickedButton && clickedButton.classList.contains('disabled-tab')) {
+                Telegram.WebApp.showAlert(translations[currentLanguage].premiumContentLocked);
+                showTab('accessTabContent'); // Redirect to Access tab
+                return; // Prevent further execution
+            }
+
             tabContents.forEach(content => {
                 content.classList.add('hidden');
                 content.classList.remove('fade-in-tab');
@@ -947,7 +967,7 @@
         // showTab(initialTabId); // This will be called after onboarding check
 
         tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', (event) => { // Added event parameter
                 const tabId = button.id.replace('Button', 'Content');
                 showTab(tabId);
                 localStorage.setItem('activeTab', tabId);
@@ -956,7 +976,7 @@
 
         // Quick links functionality
         document.querySelectorAll('.quick-link-button').forEach(button => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', (event) => { // Added event parameter
                 const tabId = button.dataset.tabId;
                 showTab(tabId);
                 localStorage.setItem('activeTab', tabId);
@@ -1224,7 +1244,7 @@
                         rewardDisplay.style.color = 'var(--app-text-color)';
                         break;
                     case 'puzzle':
-                        message = `🧩 A tricky puzzle appears! Solve it for a bonus!`;
+                        message = `� A tricky puzzle appears! Solve it for a bonus!`;
                         rewardDisplay.style.backgroundColor = 'var(--app-secondary-bg)';
                         rewardDisplay.style.color = 'var(--app-text-color)';
                         // Immediately start the puzzle game
@@ -1376,7 +1396,7 @@
                 walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Wallet Connected & Access Granted!";
                 // Automatically start the current puzzle (which was previously locked)
                 startSpotTheDifferenceGame();
-                updatePremiumTabVisibility(); // Reveal premium tabs on successful subscription
+                updatePremiumTabVisibility(); // Update premium tabs on successful subscription
             } else {
                 puzzleFeedback.textContent = translations[currentLanguage].insufficientFunds;
                 Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
@@ -1416,18 +1436,17 @@
             }
         });
 
-        // --- Premium Tab Visibility Logic ---
+        // --- Premium Tab Visibility/Clickability Logic ---
         function updatePremiumTabVisibility() {
+            const premiumElements = [
+                moreTabButton, quickMoreButton,
+                premiumGamesTabButton, quickPremiumGamesButton
+            ];
+
             if (isGameSubscribed) {
-                moreTabButton.classList.remove('hidden');
-                quickMoreButton.classList.remove('hidden');
-                premiumGamesTabButton.classList.remove('hidden');
-                quickPremiumGamesButton.classList.remove('hidden');
+                premiumElements.forEach(el => el.classList.remove('disabled-tab'));
             } else {
-                moreTabButton.classList.add('hidden');
-                quickMoreButton.classList.add('hidden');
-                premiumGamesTabButton.classList.add('hidden');
-                quickPremiumGamesButton.classList.add('hidden');
+                premiumElements.forEach(el => el.classList.add('disabled-tab'));
             }
         }
 
@@ -1502,3 +1521,4 @@
     </script>
 </body>
 </html>
+�
