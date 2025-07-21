@@ -6,6 +6,9 @@
     <title data-i18n="appTitle">TREP Mini App</title>
     <!-- Tailwind CSS CDN for easy styling and responsiveness -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Solana Web3.js and SPL Token Library CDNs -->
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/lib/index.iife.min.js"></script>
     <style>
         /* Custom CSS Variables for App Theme */
         :root {
@@ -681,6 +684,19 @@
     <script>
         Telegram.WebApp.ready();
 
+        // --- Solana Wallet Detection ---
+        // Check if wallet object exists in the window (for Solana-compatible wallets like Phantom or Backpack)
+        let solanaWallet;
+        if (window.solana && window.solana.isPhantom) {
+            solanaWallet = window.solana;
+            console.log("Phantom wallet detected");
+        } else if (window.backpack) {
+            solanaWallet = window.backpack;
+            console.log("Backpack wallet detected");
+        } else {
+            console.warn("No compatible Solana wallet detected in WebView.");
+        }
+
         // --- Language Data ---
         const translations = {
             en: {
@@ -695,7 +711,7 @@
                 dealsTab: "Deals",
                 accessTab: "Access",
                 moreTab: "More",
-                premiumGamesTab: "Premium Games", // New translation key
+                premiumGamesTab: "Premium Games",
                 gameTab: "Game",
                 overviewHeading: "Overview",
                 overviewContent: "TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Burn TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.<br><br>Join our community!",
@@ -708,7 +724,7 @@
                 publicDealsHeading: "Public Deals",
                 publicDealsDescription: "Exclusive Discount on Tech Gadgets and more.",
                 dealItemHeading: "Unlock Exclusive Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!",
-                dealItemDescription: "Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!", // This will be replaced by the heading, but keeping for consistency if needed elsewhere
+                dealItemDescription: "Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!",
                 visitPublicDealFinder: "Visit Public Deal Finder",
                 communityChannelHeading: "Community Channel: Intrepid Public",
                 communityChannelDescription: "Join our public channel for updates and discussions.",
@@ -721,12 +737,12 @@
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
                 walletStatus: "Wallet not connected",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
-                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 0x000...BurnAddressHere...000)", // New
+                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 0x000...BurnAddressHere...000)",
                 moreHeading: "More Crypto Info",
                 moreDescription: "Explore trending cryptocurrencies and market insights.",
-                trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel", // New translation key
-                trepDealFinderFullAccessDescription: "Access exclusive deals and content for subscribers.", // New translation key
-                visitTrepDealFinderFullAccess: "Visit TREP Deal Finder - Full Access", // New translation key
+                trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel",
+                trepDealFinderFullAccessDescription: "Access exclusive deals and content for subscribers.",
+                visitTrepDealFinderFullAccess: "Visit TREP Deal Finder - Full Access",
                 dexscreenerGainersHeading: "Dexscreener Gainers",
                 dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
                 visitDexscreenerGainers: "Visit Dexscreener Gainers",
@@ -739,12 +755,12 @@
                 dexscreenerNewPairsHeading: "Dexscreener New Pairs",
                 dexscreenerNewPairsDescription: "Explore recently listed cryptocurrency pairs on Dexscreener.",
                 visitDexscreenerNewPairs: "View Dexscreener New Pairs",
-                premiumGamesHeading: "Premium Games", // New translation key
-                premiumGamesDescription: "Unlock exclusive game modes and challenges by becoming a premium member!", // New translation key
-                spotTheDifferencePremiumHeading: "Spot the Difference: Premium Puzzles", // New translation key
-                spotTheDifferencePremiumDescription: "Access more challenging puzzles and earn bigger rewards!", // New translation key
-                playNow: "Play Now", // New translation key
-                premiumGamesNote: "(More premium games coming soon!)", // New translation key
+                premiumGamesHeading: "Premium Games",
+                premiumGamesDescription: "Unlock exclusive game modes and challenges by becoming a premium member!",
+                spotTheDifferencePremiumHeading: "Spot the Difference: Premium Puzzles",
+                spotTheDifferencePremiumDescription: "Access more challenging puzzles and earn bigger rewards!",
+                playNow: "Play Now",
+                premiumGamesNote: "(More premium games coming soon!)",
                 // Game specific translations
                 gameHeading: "TREP Treasure Game",
                 gameDescription: "Explore themed zones, discover hidden gems, and earn simulated TREP refunds!",
@@ -765,18 +781,24 @@
                 tryAgain: "You already found this one or that's not a difference. Try again!",
                 nextPuzzle: "Next Puzzle",
                 backToGame: "← Back to Game",
-                subscribeToPlay: "This puzzle requires a subscription to play!", // New
-                subscribeNow: "Subscribe Now (Burn 100,000 TREP)", // New
-                insufficientFunds: "Insufficient TREP to subscribe. You need 100,000 TREP.", // New
-                subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!", // New
-                fearlessFlyModeButton: "Activate Fearless Fly Mode 🦸‍♂️", // New
-                fearlessFlyActivated: "Fearless Fly Mode Activated! Double TREP refunds!", // New
-                fearlessFlyDeactivated: "Modo Fearless Fly Desactivated.", // New
-                fearlessFlyCost: "Activating Fearless Fly Mode costs {cost} TREP. Insufficient funds!", // New
-                premiumContentLocked: "This content is for premium users. Please subscribe in the 'Access' tab to unlock!", // New
+                subscribeToPlay: "This puzzle requires a subscription to play!",
+                subscribeNow: "Subscribe Now (Burn 100,000 TREP)",
+                insufficientFunds: "Insufficient TREP to subscribe. You need 100,000 TREP.",
+                subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!",
+                fearlessFlyModeButton: "Activate Fearless Fly Mode 🦸‍♂️",
+                fearlessFlyActivated: "Fearless Fly Mode Activated! Double TREP refunds!",
+                fearlessFlyDeactivated: "Modo Fearless Fly Desactivated.",
+                fearlessFlyCost: "Activating Fearless Fly Mode costs {cost} TREP. Insufficient funds!",
+                premiumContentLocked: "This content is for premium users. Please subscribe in the 'Access' tab to unlock!",
                 helloUser: "Hello, User!",
                 userDataNotAvailable: "User data not available for display.",
-                yourLanguage: "Your language:"
+                yourLanguage: "Your language:",
+                // New wallet-related translations
+                walletNotFound: "No wallet found. Please install Phantom or Backpack.",
+                walletConnectionFailed: "Wallet connection failed.",
+                connectedToWallet: "Connected to wallet: {publicKey}",
+                burnConfirmed: "🎉 Burn confirmed! Premium access granted.",
+                burnFailed: "Burn failed. Please try again."
             },
             es: {
                 appTitle: "TREP Mini Aplicación",
@@ -790,7 +812,7 @@
                 dealsTab: "Ofertas",
                 accessTab: "Acceso",
                 moreTab: "Más",
-                premiumGamesTab: "Juegos Premium", // New translation key
+                premiumGamesTab: "Juegos Premium",
                 gameTab: "Juego",
                 overviewHeading: "Resumen",
                 overviewContent: "TREP es un token impulsado por la comunidad con utilidad real en el Descubrimiento de Ofertas y Señales de Mercado. Quema TREP para acceder a listados tempranos, análisis de inversores y paneles premium. Impulsado por bots, datos y una leal comunidad de Telegram — únete al futuro de la caza de alfa.",
@@ -803,7 +825,7 @@
                 publicDealsHeading: "Ofertas Públicas",
                 publicDealsDescription: "Descuento exclusivo en gadgets tecnológicos y más.",
                 dealItemHeading: "¡Desbloquea Ofertas Exclusivas Dentro: Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!",
-                dealItemDescription: "Ofertas dentro: ¡Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!", // This will be replaced by the heading, but keeping for consistency if needed elsewhere
+                dealItemDescription: "Ofertas dentro: ¡Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!",
                 visitPublicDealFinder: "Visitar Buscador de Ofertas Públicas",
                 communityChannelHeading: "Canal de la Comunidad: Intrepid Public",
                 communityChannelDescription: "Únete a nuestro canal público para actualizaciones y discusiones.",
@@ -816,12 +838,12 @@
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
                 walletStatus: "Billetera no conectada",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
-                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 0x000...BurnAddressHere...000)", // New
+                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 0x000...BurnAddressHere...000)",
                 moreHeading: "Más Información Cripto",
                 moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
-                trepDealFinderFullAccessHeading: "Canal TREP Deal Finder - Acceso Completo", // New translation key
-                trepDealFinderFullAccessDescription: "Accede a ofertas y contenido exclusivos para suscriptores.", // New translation key
-                visitTrepDealFinderFullAccess: "Visitar TREP Deal Finder - Acceso Completo", // New translation key
+                trepDealFinderFullAccessHeading: "Canal TREP Deal Finder - Acceso Completo",
+                trepDealFinderFullAccessDescription: "Accede a ofertas y contenido exclusivos para suscriptores.",
+                visitTrepDealFinderFullAccess: "Visitar TREP Deal Finder - Acceso Completo",
                 dexscreenerGainersHeading: "Ganadores de Dexscreener",
                 dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.",
                 visitDexscreenerGainers: "Visitar Ganadores de Dexscreener",
@@ -834,20 +856,26 @@
                 dexscreenerNewPairsHeading: "Nuevos Pares de Dexscreener",
                 dexscreenerNewPairsDescription: "Explora los pares de criptomonedas recién listados en Dexscreener.",
                 visitDexscreenerNewPairs: "Ver Nuevos Pares de Dexscreener",
-                premiumGamesHeading: "Juegos Premium", // New translation key
-                premiumGamesDescription: "¡Desbloquea modos de juego y desafíos exclusivos al convertirte en miembro premium!", // New translation key
-                spotTheDifferencePremiumHeading: "Encuentra las Diferencias: Puzzles Premium", // New translation key
-                spotTheDifferencePremiumDescription: "¡Accede a puzzles más desafiantes y gana mayores recompensas!", // New translation key
-                playNow: "Jugar Ahora", // New translation key
-                premiumGamesNote: "¡Más juegos premium próximamente!", // New translation key
+                premiumGamesHeading: "Juegos Premium",
+                premiumGamesDescription: "¡Desbloquea modos de juego y desafíos exclusivos al convertirte en miembro premium!",
+                spotTheDifferencePremiumHeading: "Encuentra las Diferencias: Puzzles Premium",
+                spotTheDifferencePremiumDescription: "¡Accede a puzzles más desafiantes y gana mayores recompensas!",
+                playNow: "Jugar Ahora",
+                premiumGamesNote: "¡Más juegos premium próximamente!",
                 helloUser: "¡Hola, Usuario!",
                 userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
                 yourLanguage: "Tu idioma:",
-                fearlessFlyModeButton: "Activar Modo Fearless Fly 🦸‍♂️", // New
-                fearlessFlyActivated: "¡Modo Fearless Fly Activado! ¡Reembolsos de TREP dobles!", // New
-                fearlessFlyDeactivated: "Modo Fearless Fly Desactivado.", // New
-                fearlessFlyCost: "Activar el Modo Fearless Fly cuesta {cost} TREP. ¡Fondos insuficientes!", // New
-                premiumContentLocked: "Este contenido es para usuarios premium. ¡Suscríbete en la pestaña 'Acceso' para desbloquear!" // New
+                fearlessFlyModeButton: "Activar Modo Fearless Fly 🦸‍♂️",
+                fearlessFlyActivated: "¡Modo Fearless Fly Activado! ¡Reembolsos de TREP dobles!",
+                fearlessFlyDeactivated: "Modo Fearless Fly Desactivado.",
+                fearlessFlyCost: "Activar el Modo Fearless Fly cuesta {cost} TREP. ¡Fondos insuficientes!",
+                premiumContentLocked: "Este contenido es para usuarios premium. ¡Suscríbete en la pestaña 'Acceso' para desbloquear!",
+                // New wallet-related translations
+                walletNotFound: "No se encontró ninguna billetera. Por favor, instala Phantom o Backpack.",
+                walletConnectionFailed: "Fallo la conexión de la billetera.",
+                connectedToWallet: "Conectado a la billetera: {publicKey}",
+                burnConfirmed: "🎉 ¡Quema confirmada! Acceso premium concedido.",
+                burnFailed: "Fallo la quema. Por favor, intenta de nuevo."
             }
         };
 
@@ -967,7 +995,7 @@
         // showTab(initialTabId); // This will be called after onboarding check
 
         tabButtons.forEach(button => {
-            button.addEventListener('click', (event) => { // Added event parameter
+            button.addEventListener('click', (event) => {
                 const tabId = button.id.replace('Button', 'Content');
                 showTab(tabId);
                 localStorage.setItem('activeTab', tabId);
@@ -976,7 +1004,7 @@
 
         // Quick links functionality
         document.querySelectorAll('.quick-link-button').forEach(button => {
-            button.addEventListener('click', (event) => { // Added event parameter
+            button.addEventListener('click', (event) => {
                 const tabId = button.dataset.tabId;
                 showTab(tabId);
                 localStorage.setItem('activeTab', tabId);
@@ -1006,34 +1034,112 @@
             showTab('overviewTabContent'); // Default to overview after onboarding
         });
 
-        // --- Wallet Connection Logic (Placeholder) ---
+        // --- Wallet Connection & Burn Logic ---
         const connectWalletButton = document.getElementById('connectWalletButton');
         const walletStatus = document.getElementById('walletStatus');
-        const TREP_FULL_ACCESS_COST = 100000; // Cost for full access and games
 
-        connectWalletButton.addEventListener('click', () => {
-            walletStatus.textContent = translations[currentLanguage].walletStatusConnecting || "Connecting wallet...";
-            Telegram.WebApp.showAlert('Connecting to Solana wallet (Phantom/Backpack)... (Simulation)');
-            // In a real app, you'd initiate wallet connection here
-            // e.g., @solana/wallet-adapter-wallets or similar
-            setTimeout(() => {
-                // Simulate successful connection and burn if enough balance
-                if (currentTREPBalance >= TREP_FULL_ACCESS_COST) {
-                    currentTREPBalance -= TREP_FULL_ACCESS_COST;
-                    isGameSubscribed = true; // Grant game access
-                    updateTREPBalanceUI();
-                    walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Wallet Connected & Access Granted!";
-                    Telegram.WebApp.showNotification({
-                        message: translations[currentLanguage].subscriptionSuccess,
-                        type: "success"
-                    });
-                    updatePremiumTabVisibility(); // Reveal premium tabs on successful subscription
-                } else {
-                    walletStatus.textContent = translations[currentLanguage].walletStatusFailed || "Wallet connection failed.";
-                    Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
+        // Define your TREP token's mint address and the burn address
+        // IMPORTANT: Replace these with your actual addresses!
+        const TREP_MINT_ADDRESS = new solanaWeb3.PublicKey("TREP_MINT_ADDRESS_HERE"); // e.g., "Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka"
+        const TREP_BURN_ADDRESS = new solanaWeb3.PublicKey("TREP_BURN_ADDRESS_HERE"); // e.g., "11111111111111111111111111111111" (a common burn address)
+        const TREP_DECIMALS = 9; // Confirmed by user
+        const TREP_FULL_ACCESS_COST = 100000; // Cost in raw token units (e.g., 100,000 TREP)
+
+        // Solana connection setup (mainnet-beta is common for live tokens)
+        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+
+        connectWalletButton.addEventListener('click', async () => {
+            try {
+                if (!solanaWallet) {
+                    Telegram.WebApp.showAlert(translations[currentLanguage].walletNotFound);
+                    return;
                 }
-            }, 2000); // Simulate connection delay
+
+                walletStatus.textContent = translations[currentLanguage].walletStatusConnecting || "Connecting wallet...";
+
+                // Attempt to connect
+                const response = await solanaWallet.connect();
+                const publicKey = response.publicKey; // publicKey is already a PublicKey object
+
+                Telegram.WebApp.showAlert(translations[currentLanguage].connectedToWallet.replace('{publicKey}', publicKey.toString()));
+
+                walletStatus.textContent = "Wallet Connected";
+                walletStatus.style.color = "green";
+
+                // Proceed to burn tokens
+                // The burn amount should be in smallest units (e.g., 100,000 * 10^9 for 9 decimals)
+                const burnAmountInSmallestUnits = TREP_FULL_ACCESS_COST * (10 ** TREP_DECIMALS);
+                burnTREP(publicKey, burnAmountInSmallestUnits);
+
+            } catch (err) {
+                console.error("Wallet connection failed:", err);
+                walletStatus.textContent = translations[currentLanguage].walletConnectionFailed;
+                walletStatus.style.color = "red";
+                Telegram.WebApp.showAlert(translations[currentLanguage].walletConnectionFailed);
+            }
         });
+
+        /**
+         * Initiates a Solana SPL token burn transaction.
+         * @param {solanaWeb3.PublicKey} payerPublicKey - The public key of the wallet initiating the burn.
+         * @param {number} amountInSmallestUnits - The amount of tokens to burn, in their smallest unit (e.g., 100,000 * 10^9 for 9 decimals).
+         */
+        async function burnTREP(payerPublicKey, amountInSmallestUnits) {
+            try {
+                // Get the associated token account for the user's wallet and the TREP mint
+                const userTokenAccountAddress = await splToken.getAssociatedTokenAddress(
+                    TREP_MINT_ADDRESS,
+                    payerPublicKey
+                );
+
+                // Create a new transaction
+                const burnTransaction = new solanaWeb3.Transaction();
+
+                // Add the SPL Token transfer instruction (transfer to burn address)
+                // Note: For a true "burn" instruction, you'd use splToken.createBurnInstruction
+                // However, sending to a known burn address is a common way to "burn" by removing from circulation.
+                // If you have a specific burn authority or program, that would change this instruction.
+                // Copilot suggested createTransferInstruction, which is valid for sending to a burn address.
+                const instruction = splToken.createTransferInstruction(
+                    userTokenAccountAddress, // Source (user's TREP token account)
+                    TREP_BURN_ADDRESS,       // Destination (the burn address)
+                    payerPublicKey,          // Owner of the source account
+                    amountInSmallestUnits,   // Amount to transfer/burn
+                    [],                      // Signers (empty as payer will sign)
+                    splToken.TOKEN_PROGRAM_ID // SPL Token Program ID
+                );
+                burnTransaction.add(instruction);
+
+                // Get the latest blockhash for the transaction
+                const { blockhash } = await connection.getLatestBlockhash();
+                burnTransaction.recentBlockhash = blockhash;
+                burnTransaction.feePayer = payerPublicKey;
+
+                // Sign and send the transaction
+                const signedTransaction = await solanaWallet.signTransaction(burnTransaction);
+                const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+
+                // Confirm the transaction
+                await connection.confirmTransaction(signature, 'confirmed');
+
+                Telegram.WebApp.showNotification({
+                    message: translations[currentLanguage].burnConfirmed,
+                    type: "success"
+                });
+
+                // Update app state after successful burn
+                isGameSubscribed = true;
+                updatePremiumTabVisibility();
+                // In a real app, you'd fetch the user's new TREP balance from the blockchain here
+                // For simulation, we'll deduct it from our local variable
+                currentTREPBalance -= TREP_FULL_ACCESS_COST;
+                updateTREPBalanceUI();
+
+            } catch (err) {
+                console.error("Burn failed:", err);
+                Telegram.WebApp.showAlert(translations[currentLanguage].burnFailed);
+            }
+        }
 
 
         // --- Game Variables and Logic for TREP Treasure ---
@@ -1041,7 +1147,7 @@
         const TREP_REFUND_PERCENTAGE = 0.25; // 25% refund
         const MAX_TREP_REFUND_PER_CHEST = 5000; // Cap to prevent huge refunds in simulation
         let isGameSubscribed = false; // New: Game subscription status
-        const TREP_SUBSCRIPTION_COST = 100000; // Cost to unlock all games
+        const TREP_SUBSCRIPTION_COST = 100000; // Cost to unlock all games (in raw token units)
 
         // Fearless Fly Mode variables
         let isFearlessFlyMode = false;
@@ -1244,7 +1350,7 @@
                         rewardDisplay.style.color = 'var(--app-text-color)';
                         break;
                     case 'puzzle':
-                        message = `� A tricky puzzle appears! Solve it for a bonus!`;
+                        message = `🧩 A tricky puzzle appears! Solve it for a bonus!`;
                         rewardDisplay.style.backgroundColor = 'var(--app-secondary-bg)';
                         rewardDisplay.style.color = 'var(--app-text-color)';
                         // Immediately start the puzzle game
@@ -1383,23 +1489,20 @@
         }
 
         // --- Subscription Logic for Games ---
-        subscribeToGamesButton.addEventListener('click', () => {
-            if (currentTREPBalance >= TREP_SUBSCRIPTION_COST) {
-                currentTREPBalance -= TREP_SUBSCRIPTION_COST;
-                isGameSubscribed = true;
-                updateTREPBalanceUI();
-                Telegram.WebApp.showNotification({
-                    message: translations[currentLanguage].subscriptionSuccess,
-                    type: "success"
-                });
-                // Also update the wallet status in the Access tab
-                walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Wallet Connected & Access Granted!";
-                // Automatically start the current puzzle (which was previously locked)
-                startSpotTheDifferenceGame();
-                updatePremiumTabVisibility(); // Update premium tabs on successful subscription
-            } else {
-                puzzleFeedback.textContent = translations[currentLanguage].insufficientFunds;
-                Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
+        subscribeToGamesButton.addEventListener('click', async () => {
+            // This button now triggers the burnTREP function directly
+            // The cost is handled by burnTREP, which will then set isGameSubscribed
+            try {
+                if (!solanaWallet || !solanaWallet.publicKey) {
+                    Telegram.WebApp.showAlert(translations[currentLanguage].walletNotFound);
+                    return;
+                }
+                const burnAmountInSmallestUnits = TREP_SUBSCRIPTION_COST * (10 ** TREP_DECIMALS);
+                await burnTREP(solanaWallet.publicKey, burnAmountInSmallestUnits);
+                // If burnTREP succeeds, isGameSubscribed will be true and UI updated
+            } catch (error) {
+                console.error("Subscription via burn failed:", error);
+                // Error message already handled by burnTREP's catch block
             }
         });
 
@@ -1521,4 +1624,3 @@
     </script>
 </body>
 </html>
-�
