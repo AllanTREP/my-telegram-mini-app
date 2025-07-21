@@ -23,12 +23,64 @@
         .tab-button:not(.active) {
             color: var(--tg-theme-text-color, #333) !important;
         }
+        /* Onboarding screen styles */
+        .onboarding-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--tg-theme-bg-color, #f0f2f5); /* Use Telegram background color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top */
+            flex-direction: column;
+            padding: 1rem;
+            text-align: center;
+        }
+        .onboarding-content {
+            background: var(--tg-theme-secondary-bg-color, white);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 500px;
+            color: var(--tg-theme-text-color, #333);
+        }
+        .onboarding-button {
+            background-color: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 1.5rem;
+        }
+        .onboarding-button:hover {
+            filter: brightness(90%);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
+    <!-- Onboarding Screen -->
+    <div id="onboardingScreen" class="onboarding-overlay hidden">
+        <div class="onboarding-content">
+            <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover mx-auto">
+            <h2 class="text-2xl font-bold mb-3" style="color: var(--tg-theme-link-color, #0088cc);">Welcome to TREP Mini App!</h2>
+            <p class="mb-6" style="color: var(--tg-theme-text-color, #333);">
+                Your ultimate companion for exclusive deals, real-time market insights, and community connections within the TREP ecosystem.
+            </p>
+            <button id="startJourneyButton" class="onboarding-button">
+                Start Your Journey
+            </button>
+        </div>
+    </div>
+
     <!-- Main App Container -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center"
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center hidden"
          id="app-container"
          style="background-color: lightgreen !important;"> <!-- Main container background set to lightgreen with !important -->
 
@@ -171,7 +223,10 @@
     <script>
         Telegram.WebApp.ready();
 
-        // Get references to elements (only those that exist in the HTML)
+        // Get references to elements
+        const onboardingScreen = document.getElementById('onboardingScreen');
+        const startJourneyButton = document.getElementById('startJourneyButton');
+        const appContainer = document.getElementById('app-container');
         const infoText = document.getElementById('infoText');
         const walletStatus = document.getElementById('walletStatus');
 
@@ -186,6 +241,26 @@
         const statsTabContent = document.getElementById('statsTabContent'); // Now Trenks content
         const dealsTabContent = document.getElementById('dealsTabContent');
         const accessTabContent = document.getElementById('accessTabContent');
+
+        // --- Onboarding Logic ---
+        function checkOnboardingStatus() {
+            const onboardingComplete = localStorage.getItem('onboarding_complete');
+            if (onboardingComplete === 'true') {
+                onboardingScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                showTab('overviewTabContent'); // Show default tab after onboarding
+            } else {
+                onboardingScreen.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+            }
+        }
+
+        startJourneyButton.onclick = function() {
+            localStorage.setItem('onboarding_complete', 'true');
+            onboardingScreen.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            showTab('overviewTabContent'); // Show default tab after onboarding
+        };
 
         // --- Tab Switching Logic ---
         function showTab(tabId) {
@@ -214,10 +289,7 @@
         dealsTabButton.onclick = () => showTab('dealsTabContent');
         accessTabButton.onclick = () => showTab('accessTabContent');
 
-        // Show the Overview tab by default on load
-        showTab('overviewTabContent');
-
-        // Main Button (still active globally)
+        // --- Main Button (still active globally) ---
         Telegram.WebApp.MainButton.setText("Press Me: Main Button!");
         Telegram.WebApp.MainButton.show();
         Telegram.WebApp.MainButton.onClick(function() {
@@ -268,6 +340,9 @@
             document.documentElement.style.setProperty('--tg-theme-button-text-color', Telegram.WebApp.themeParams.button_text_color);
             document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', Telegram.WebApp.themeParams.secondary_bg_color);
         }
+
+        // Initial check for onboarding status when the script loads
+        checkOnboardingStatus();
     </script>
 </body>
 </html>
