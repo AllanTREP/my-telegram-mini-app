@@ -41,7 +41,7 @@
         .tab-content p, .tab-content h2 {
             color: var(--app-text-color); /* Ensure text color adapts */
         }
-        #statsDisplay, .deal-item, .game-area, #spotTheDifferenceGame {
+        #statsDisplay, .deal-item, .game-area {
             background-color: var(--app-secondary-bg) !important; /* Use custom variable */
             color: var(--app-text-color) !important; /* Use custom variable */
             border: 1px solid rgba(255,255,255,0.15); /* Glassy border */
@@ -171,7 +171,7 @@
             color: #000080; /* Navy Blue */
         }
 
-        /* Hotspot specific styles for main game */
+        /* Hotspot specific styles */
         .hotspot {
             background-color: rgba(255, 255, 0, 0.6); /* Semi-transparent yellow */
             border: 2px solid rgba(255, 255, 0, 0.8);
@@ -183,74 +183,6 @@
             0% { box-shadow: 0 0 0px 0px rgba(255, 255, 0, 0.7); opacity: 0.8; }
             50% { box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.9); opacity: 1; }
             100% { box-shadow: 0 0 0px 0px rgba(255, 255, 0, 0.7); opacity: 0.8; }
-        }
-
-        /* Spot the Difference Game Styles */
-        #spotTheDifferenceGame {
-            width: 100%;
-            max-width: 600px; /* Limit width for better display of two images */
-            margin: 0 auto;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .puzzle-images-container {
-            display: flex;
-            flex-wrap: wrap; /* Allow wrapping on small screens */
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            position: relative; /* For absolute positioning of hotspots */
-        }
-
-        .puzzle-image-wrapper {
-            position: relative;
-            width: 100%; /* Full width on small screens */
-            max-width: 280px; /* Max width for each image in a pair */
-            aspect-ratio: 16 / 9; /* Maintain aspect ratio */
-            overflow: hidden;
-            border-radius: 0.5rem;
-            border: 2px solid var(--app-text-color);
-            min-height: 150px; /* Ensure a minimum visible area */
-        }
-        .puzzle-image-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .difference-hotspot {
-            position: absolute;
-            background-color: rgba(255, 0, 0, 0.0); /* Completely transparent initially */
-            border: 2px dashed transparent; /* Invisible border */
-            cursor: pointer;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        .difference-hotspot:hover {
-            background-color: rgba(255, 255, 0, 0.2); /* Light yellow on hover */
-            border-color: rgba(255, 255, 0, 0.5); /* Yellow border on hover */
-        }
-        .difference-hotspot.found {
-            background-color: rgba(0, 255, 0, 0.3); /* Green when found */
-            border-color: rgba(0, 255, 0, 0.7); /* Solid green border when found */
-            cursor: default;
-            pointer-events: none; /* Disable further clicks */
-        }
-        .difference-hotspot.found::after {
-            content: '✅'; /* Checkmark emoji */
-            display: block;
-        }
-
-        @media (min-width: 640px) { /* Tailwind's sm breakpoint */
-            .puzzle-image-wrapper {
-                width: calc(50% - 0.5rem); /* Two images side-by-side with gap */
-            }
         }
     </style>
 </head>
@@ -271,6 +203,7 @@
     </div>
 
     <!-- Main App Container -->
+    <!-- REMOVED 'hidden' class from here. Its visibility is controlled by JS now. -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center relative"
          id="app-container">
 
@@ -417,10 +350,6 @@
             <p id="walletStatus" class="text-sm text-center" style="color: #22C55E;" data-i18n="walletStatus">
                 Wallet not connected.
             </p>
-            <!-- NEW: Burn Address Note -->
-            <p class="text-xs mt-2 text-center" style="color: var(--tg-theme-hint-color, #666);" data-i18n="burnAddressNote">
-                (Note: All burned tokens are sent to a verifiable burn address: <span class="font-mono text-gray-800 dark:text-gray-300">0x000...BurnAddressHere...000</span>)
-            </p>
             <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletNote">
                 (Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)
             </p>
@@ -501,37 +430,6 @@
                 <p id="gameFeedback" class="mt-4 text-base font-semibold" style="color: var(--tg-theme-hint-color, #666);"></p>
                 <div id="rewardDisplay" class="mt-4 p-3 bg-green-100 dark:bg-green-700 rounded-lg text-green-800 dark:text-green-100 font-bold hidden" style="background-color: var(--tg-theme-secondary-bg-color, #e0e0e0);"></div>
             </div>
-
-            <!-- Spot the Difference Game (Initially Hidden) -->
-            <div id="spotTheDifferenceGame" class="hidden flex flex-col items-center p-4 rounded-lg text-center">
-                <button id="backToGameFromPuzzleButton" class="absolute top-3 left-3 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-md text-sm transition-colors duration-200" data-i18n="backToGame">
-                    ← Back to Game
-                </button>
-                <h3 class="text-xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="spotTheDifferenceTitle">Spot the Difference!</h3>
-                <p class="mb-2" data-i18n="differencesFound">Differences Found: <span id="differencesFoundDisplay">0</span>/<span id="totalDifferences">0</span></p>
-
-                <div class="puzzle-images-container w-full">
-                    <div class="puzzle-image-wrapper">
-                        <img id="originalImage" src="https://placehold.co/400x225/ADD8E6/000000?text=Original+Image" alt="Original Image" onerror="this.src='https://placehold.co/400x225/FF0000/FFFFFF?text=Error'; console.error('Failed to load original image');">
-                    </div>
-                    <div class="puzzle-image-wrapper relative">
-                        <img id="modifiedImage" src="https://placehold.co/400x225/90EE90/000000?text=Modified+Image" alt="Modified Image" onerror="this.src='https://placehold.co/400x225/FF0000/FFFFFF?text=Error'; console.error('Failed to load modified image');">
-                        <!-- Difference hotspots will be injected here by JS -->
-                    </div>
-                </div>
-                <p id="puzzleFeedback" class="mt-2 text-base font-semibold" style="color: var(--tg-theme-hint-color, #666);"></p>
-                <button id="nextPuzzleButton" class="py-3 px-6 rounded-lg font-bold text-white transition-colors duration-200 mt-4 hidden" style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="nextPuzzle">
-                    Next Puzzle
-                </button>
-                <!-- Subscription Message and Button -->
-                <div id="subscriptionRequired" class="mt-4 p-4 bg-red-100 dark:bg-red-700 text-red-800 dark:text-red-100 rounded-lg hidden">
-                    <p class="font-bold mb-2" data-i18n="subscribeToPlay"></p>
-                    <button id="subscribeToGamesButton" class="py-2 px-4 rounded-lg font-bold text-white transition-colors duration-200" style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="subscribeNow">
-                        Subscribe Now (Burn 100,000 TREP)
-                    </button>
-                </div>
-            </div>
-
         </div>
 
         <!-- General Info Text at the bottom of the main container -->
@@ -610,15 +508,14 @@
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
                 walletStatus: "Wallet not connected.",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
-                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 0x000...BurnAddressHere...000)", // New
                 moreHeading: "More Crypto Info",
                 moreDescription: "Explore trending cryptocurrencies and market insights.",
                 dexscreenerGainersHeading: "Dexscreener Gainers",
                 dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
                 visitDexscreenerGainers: "Visit Dexscreener Gainers",
-                lowestFeesCryptoHeading: "Lowest Fees Crypto Coins",
-                lowestFeesCryptoDescription: "Find cryptocurrencies with the lowest transaction fees.",
-                visitLowestFeesCrypto: "View Lowest Fees Crypto List",
+                lowestFeesCryptoHeading: "Lowest Fees Crypto Coins", // New translation
+                lowestFeesCryptoDescription: "Find cryptocurrencies with the lowest transaction fees.", // New translation
+                visitLowestFeesCrypto: "View Lowest Fees Crypto List", // New translation
                 // Game specific translations
                 gameHeading: "TREP Treasure Game",
                 gameDescription: "Explore themed zones, discover hidden gems, and earn simulated TREP refunds!",
@@ -632,17 +529,7 @@
                 zoneLabyrinthDesc: "Navigate winding paths for cryptic clues.",
                 backToZones: "← Back to Zones",
                 gamePrompt: "Tap on glowing areas to find treasure!",
-                findTreasure: "Find Treasure",
-                spotTheDifferenceTitle: "Spot the Difference!",
-                differencesFound: "Differences Found: ",
-                puzzleSolved: "Puzzle Solved!",
-                tryAgain: "You already found this one or that's not a difference. Try again!",
-                nextPuzzle: "Next Puzzle",
-                backToGame: "← Back to Game",
-                subscribeToPlay: "This puzzle requires a subscription to play!", // New
-                subscribeNow: "Subscribe Now (Burn 100,000 TREP)", // New
-                insufficientFunds: "Insufficient TREP to subscribe. You need 100,000 TREP.", // New
-                subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!", // New
+                findTreasure: "Find Treasure", // This button is now largely replaced by hotspot clicks
                 helloUser: "Hello, User!",
                 userDataNotAvailable: "User data not available for display.",
                 yourLanguage: "Your language:"
@@ -684,15 +571,14 @@
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
                 walletStatus: "Billetera no conectada.",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
-                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 0x000...BurnAddressHere...000)", // New
                 moreHeading: "Más Información Cripto",
                 moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
                 dexscreenerGainersHeading: "Ganadores de Dexscreener",
                 dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.",
                 visitDexscreenerGainers: "Visitar Ganadores de Dexscreener",
-                lowestFeesCryptoHeading: "Monedas Cripto con Tarifas Más Bajas",
-                lowestFeesCryptoDescription: "Encuentra criptomonedas con las tarifas de transacción más bajas.",
-                visitLowestFeesCrypto: "Ver Lista de Monedas Cripto con Tarifas Más Bajas",
+                lowestFeesCryptoHeading: "Monedas Cripto con Tarifas Más Bajas", // New translation
+                lowestFeesCryptoDescription: "Encuentra criptomonedas con las tarifas de transacción más bajas.", // New translation
+                visitLowestFeesCrypto: "Ver Lista de Monedas Cripto con Tarifas Más Bajas", // New translation
                 helloUser: "¡Hola, Usuario!",
                 userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
                 yourLanguage: "Tu idioma:"
@@ -735,7 +621,7 @@
             if (theme === 'dark') {
                 document.body.classList.add('dark-mode');
                 // Updated logo for dark mode
-                appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true";
+                appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true"; 
                 themeToggleButton.textContent = '🌙';
                 localStorage.setItem('app_theme', 'dark');
             } else {
@@ -849,7 +735,6 @@
         // --- Wallet Connection Logic (Placeholder) ---
         const connectWalletButton = document.getElementById('connectWalletButton');
         const walletStatus = document.getElementById('walletStatus');
-        const TREP_FULL_ACCESS_COST = 100000; // Cost for full access and games
 
         connectWalletButton.addEventListener('click', () => {
             walletStatus.textContent = translations[currentLanguage].walletStatusConnecting || "Connecting wallet...";
@@ -857,19 +742,24 @@
             // In a real app, you'd initiate wallet connection here
             // e.g., @solana/wallet-adapter-wallets or similar
             setTimeout(() => {
-                // Simulate successful connection and burn if enough balance
-                if (currentTREPBalance >= TREP_FULL_ACCESS_COST) {
-                    currentTREPBalance -= TREP_FULL_ACCESS_COST;
-                    isGameSubscribed = true; // Grant game access
-                    updateTREPBalanceUI();
-                    walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Wallet Connected & Access Granted!";
+                const isConnected = Math.random() > 0.5; // Simulate success/failure
+                if (isConnected) {
+                    walletStatus.textContent = translations[currentLanguage].walletStatusConnected || "Wallet Connected: ABC...XYZ";
                     Telegram.WebApp.showNotification({
-                        message: translations[currentLanguage].subscriptionSuccess,
+                        message: "Wallet Connected! Initiating TREP burn...",
                         type: "success"
                     });
+                    // Simulate burn transaction
+                    setTimeout(() => {
+                        Telegram.WebApp.showNotification({
+                            message: "100,000 TREP burned! Access Granted!",
+                            type: "success"
+                        });
+                        walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Access Granted!";
+                    }, 1500);
                 } else {
                     walletStatus.textContent = translations[currentLanguage].walletStatusFailed || "Wallet connection failed.";
-                    Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
+                    Telegram.WebApp.showAlert('Failed to connect wallet. Please try again.');
                 }
             }, 2000); // Simulate connection delay
         });
@@ -879,9 +769,6 @@
         let currentTREPBalance = 100000; // Simulated starting TREP balance
         const TREP_REFUND_PERCENTAGE = 0.25; // 25% refund
         const MAX_TREP_REFUND_PER_CHEST = 5000; // Cap to prevent huge refunds in simulation
-        let isGameSubscribed = false; // New: Game subscription status
-        const TREP_SUBSCRIPTION_COST = 100000; // Cost to unlock all games
-
         let currentZone = null;
         const zoneData = {
             jungle: {
@@ -925,52 +812,6 @@
         const rewardDisplay = document.getElementById('rewardDisplay');
         const gameTabButton = document.getElementById('gameTabButton'); // Get reference to the Game tab button
 
-        // --- Spot the Difference Game Elements ---
-        const spotTheDifferenceGame = document.getElementById('spotTheDifferenceGame');
-        const backToGameFromPuzzleButton = document.getElementById('backToGameFromPuzzleButton');
-        const originalImage = document.getElementById('originalImage');
-        const modifiedImage = document.getElementById('modifiedImage');
-        const differencesFoundDisplay = document.getElementById('differencesFoundDisplay');
-        const totalDifferencesDisplay = document.getElementById('totalDifferences');
-        const puzzleFeedback = document.getElementById('puzzleFeedback');
-        const nextPuzzleButton = document.getElementById('nextPuzzleButton');
-        const modifiedImageWrapper = modifiedImage.parentElement; // Get the parent div for hotspot positioning
-        const subscriptionRequiredDiv = document.getElementById('subscriptionRequired');
-        const subscribeToGamesButton = document.getElementById('subscribeToGamesButton');
-
-
-        let currentPuzzle = null;
-        let foundDifferences = [];
-
-        // Puzzle data (replace with your actual images and difference coordinates)
-        const spotTheDifferencePuzzles = [
-            {
-                id: 'puzzle1',
-                title: 'Forest Friends (Free)',
-                originalImage: 'https://placehold.co/400x225/ADD8E6/000000?text=Original+Forest',
-                modifiedImage: 'https://placehold.co/400x225/90EE90/000000?text=Modified+Forest',
-                differences: [
-                    { id: 'diff1', x: 20, y: 30, width: 10, height: 15, found: false }, // Example: x, y, width, height in %
-                    { id: 'diff2', x: 70, y: 50, width: 12, height: 10, found: false },
-                    { id: 'diff3', x: 45, y: 80, width: 8, height: 12, found: false }
-                ],
-                requiresSubscription: false // This puzzle is free
-            },
-            {
-                id: 'puzzle2',
-                title: 'Island Paradise (Subscribers Only)',
-                originalImage: 'https://placehold.co/400x225/FFDAB9/000000?text=Original+Island',
-                modifiedImage: 'https://placehold.co/400x225/FFB6C1/000000?text=Modified+Island',
-                differences: [
-                    { id: 'diff4', x: 15, y: 25, width: 10, height: 10, found: false },
-                    { id: 'diff5', x: 80, y: 70, width: 15, height: 10, found: false }
-                ],
-                requiresSubscription: true // This puzzle requires subscription
-            }
-        ];
-        let currentSpotTheDifferencePuzzleIndex = 0;
-
-
         // Update TREP balance display
         function updateTREPBalanceUI() {
             trepBalanceDisplay.textContent = `${currentTREPBalance.toLocaleString()} TREP`;
@@ -979,7 +820,6 @@
         // Function to reset game state and show zone selection
         function showZoneSelection() {
             gamePlayArea.classList.add('hidden');
-            spotTheDifferenceGame.classList.add('hidden'); // Ensure puzzle game is hidden
             gameZoneSelection.classList.remove('hidden');
             gameFeedback.textContent = '';
             rewardDisplay.classList.add('hidden');
@@ -1036,14 +876,15 @@
                 // Adjust probabilities for a more engaging experience
                 const weightedOutcomes = [
                     ...Array(2).fill('trep_chest'), // 20% chance for TREP chest
-                    ...Array(1).fill('puzzle'),    // 10% chance for puzzle
                     ...Array(4).fill('collectible'), // 40% chance for collectible
-                    ...Array(3).fill('nothing') // 30% chance for nothing
+                    ...Array(3).fill('puzzle'), // 30% chance for puzzle
+                    ...Array(1).fill('nothing') // 10% chance for nothing
                 ];
                 const randomOutcome = weightedOutcomes[Math.floor(Math.random() * weightedOutcomes.length)];
 
                 let message = '';
                 let rewardAmount = 0;
+                // let showRewardDisplay = false; // Not needed if we always show the rewardDisplay container
 
                 switch (randomOutcome) {
                     case 'trep_chest':
@@ -1063,13 +904,10 @@
                         rewardDisplay.style.color = 'var(--app-text-color)';
                         break;
                     case 'puzzle':
-                        message = `🧩 A tricky puzzle appears! Solve it for a bonus!`;
+                        message = `🧩 A tricky puzzle appears! Solve it for a bonus! (Placeholder for puzzle logic)`;
                         rewardDisplay.style.backgroundColor = 'var(--app-secondary-bg)';
                         rewardDisplay.style.color = 'var(--app-text-color)';
-                        // Immediately start the puzzle game
-                        startSpotTheDifferenceGame();
-                        // Do not re-enable the hotspot, as the user is now in a different game mode
-                        return; // Exit function to prevent re-enabling hotspot
+                        break;
                     case 'nothing':
                     default:
                         message = `🤷‍♂️ You searched, but found nothing here. Try another spot!`;
@@ -1083,144 +921,15 @@
                 rewardDisplay.classList.remove('hidden');
                 updateTREPBalanceUI();
 
-                // Re-enable hotspot after a short delay
+                // Re-enable hotspot after a short delay or if new hotspots appear
                 setTimeout(() => {
+                    // For now, re-add the hotspot. In a real game, it might disappear or be replaced.
                     clickedHotspot.addEventListener('click', handleHotspotClick);
                     clickedHotspot.classList.add('animate-pulse');
                     clickedHotspot.innerHTML = '✨';
                 }, 3000); // Allow user to read message, then hotspot reappears
             }, 1000); // Simulate network delay
         }
-
-        // --- Spot the Difference Game Logic ---
-
-        function startSpotTheDifferenceGame() {
-            gamePlayArea.classList.add('hidden'); // Hide main game area
-            spotTheDifferenceGame.classList.remove('hidden'); // Show puzzle game
-            subscriptionRequiredDiv.classList.add('hidden'); // Hide subscription message by default
-
-            currentPuzzle = spotTheDifferencePuzzles[currentSpotTheDifferencePuzzleIndex];
-            if (!currentPuzzle) {
-                puzzleFeedback.textContent = "No more puzzles available!";
-                nextPuzzleButton.classList.add('hidden');
-                return;
-            }
-
-            // Check for subscription requirement
-            if (currentPuzzle.requiresSubscription && !isGameSubscribed) {
-                puzzleFeedback.textContent = translations[currentLanguage].subscribeToPlay;
-                subscriptionRequiredDiv.classList.remove('hidden');
-                // Hide puzzle images and hotspots if subscription is required
-                originalImage.src = 'https://placehold.co/400x225/CCCCCC/000000?text=Locked+Puzzle';
-                modifiedImage.src = 'https://placehold.co/400x225/CCCCCC/000000?text=Locked+Puzzle';
-                modifiedImageWrapper.querySelectorAll('.difference-hotspot').forEach(hotspot => hotspot.remove());
-                differencesFoundDisplay.textContent = '0';
-                totalDifferencesDisplay.textContent = '0';
-                nextPuzzleButton.classList.add('hidden');
-                return; // Stop here if subscription is required
-            }
-
-            originalImage.src = currentPuzzle.originalImage;
-            modifiedImage.src = currentPuzzle.modifiedImage;
-
-            // Clear previous hotspots
-            modifiedImageWrapper.querySelectorAll('.difference-hotspot').forEach(hotspot => hotspot.remove());
-
-            foundDifferences = currentPuzzle.differences.map(diff => ({ ...diff, found: false }));
-            updateDifferencesFoundDisplay();
-            puzzleFeedback.textContent = '';
-            nextPuzzleButton.classList.add('hidden');
-
-            // Wait for images to load to ensure correct dimensions for hotspot placement
-            Promise.all([
-                new Promise(resolve => originalImage.onload = resolve),
-                new Promise(resolve => modifiedImage.onload = resolve)
-            ]).then(() => {
-                // Create new hotspots
-                foundDifferences.forEach((diff, index) => {
-                    const hotspotDiv = document.createElement('div');
-                    hotspotDiv.className = 'difference-hotspot';
-                    hotspotDiv.style.left = `${diff.x}%`;
-                    hotspotDiv.style.top = `${diff.y}%`;
-                    hotspotDiv.style.width = `${diff.width}%`;
-                    hotspotDiv.style.height = `${diff.height}%`;
-                    hotspotDiv.dataset.diffIndex = index; // Store index to identify which difference was clicked
-                    modifiedImageWrapper.appendChild(hotspotDiv);
-                    hotspotDiv.addEventListener('click', handleDifferenceClick);
-                });
-            }).catch(error => {
-                console.error("Error loading puzzle images:", error);
-                puzzleFeedback.textContent = "Error loading puzzle images. Please try again.";
-            });
-        }
-
-        function handleDifferenceClick(event) {
-            const clickedHotspot = event.currentTarget;
-            const diffIndex = parseInt(clickedHotspot.dataset.diffIndex);
-            const difference = foundDifferences[diffIndex];
-
-            if (difference && !difference.found) {
-                difference.found = true;
-                clickedHotspot.classList.add('found');
-                updateDifferencesFoundDisplay();
-
-                const remainingDifferences = foundDifferences.filter(d => !d.found).length;
-                if (remainingDifferences === 0) {
-                    puzzleFeedback.textContent = translations[currentLanguage].puzzleSolved || "Puzzle Solved!";
-                    const reward = Math.floor(Math.random() * 1000) + 500; // Simulate 500-1500 TREP reward for puzzle
-                    currentTREPBalance += reward;
-                    updateTREPBalanceUI();
-                    Telegram.WebApp.showNotification({
-                        message: `🎉 Puzzle solved! You earned ${reward.toLocaleString()} TREP!`,
-                        type: "success"
-                    });
-                    nextPuzzleButton.classList.remove('hidden');
-                } else {
-                    puzzleFeedback.textContent = `Keep going! ${remainingDifferences} differences left.`;
-                }
-            } else {
-                puzzleFeedback.textContent = translations[currentLanguage].tryAgain || "You already found this one or that's not a difference. Try again!";
-            }
-        }
-
-        function updateDifferencesFoundDisplay() {
-            const foundCount = foundDifferences.filter(d => d.found).length;
-            differencesFoundDisplay.textContent = foundCount;
-            totalDifferencesDisplay.textContent = foundDifferences.length;
-        }
-
-        function resetSpotTheDifferenceGame() {
-            currentPuzzle = null;
-            foundDifferences = [];
-            // Do NOT reset currentSpotTheDifferencePuzzleIndex here if we want to allow replaying or continuing
-            // Instead, manage progression with nextPuzzleButton
-            updateDifferencesFoundDisplay();
-            puzzleFeedback.textContent = '';
-            nextPuzzleButton.classList.add('hidden');
-            modifiedImageWrapper.querySelectorAll('.difference-hotspot').forEach(hotspot => hotspot.remove()); // Clear hotspots
-            subscriptionRequiredDiv.classList.add('hidden'); // Ensure subscription message is hidden on reset
-        }
-
-        // --- Subscription Logic for Games ---
-        subscribeToGamesButton.addEventListener('click', () => {
-            if (currentTREPBalance >= TREP_SUBSCRIPTION_COST) {
-                currentTREPBalance -= TREP_SUBSCRIPTION_COST;
-                isGameSubscribed = true;
-                updateTREPBalanceUI();
-                Telegram.WebApp.showNotification({
-                    message: translations[currentLanguage].subscriptionSuccess,
-                    type: "success"
-                });
-                // Also update the wallet status in the Access tab
-                walletStatus.textContent = translations[currentLanguage].walletStatusAccessGranted || "Wallet Connected & Access Granted!";
-                // Automatically start the current puzzle (which was previously locked)
-                startSpotTheDifferenceGame();
-            } else {
-                puzzleFeedback.textContent = translations[currentLanguage].insufficientFunds;
-                Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds);
-            }
-        });
-
 
         // --- Event Listeners for Game Tab and Game Elements ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -1238,31 +947,8 @@
                 });
             });
 
-            // Add event listener for back button in main game play area
+            // Add event listener for back button in game play area
             backToZonesButton.addEventListener('click', showZoneSelection);
-
-            // Add event listener for back button from puzzle game
-            backToGameFromPuzzleButton.addEventListener('click', () => {
-                spotTheDifferenceGame.classList.add('hidden');
-                gamePlayArea.classList.remove('hidden'); // Go back to the zone exploration screen
-                resetSpotTheDifferenceGame(); // Reset puzzle state (but not index)
-            });
-
-            // Add event listener for next puzzle button
-            nextPuzzleButton.addEventListener('click', () => {
-                currentSpotTheDifferencePuzzleIndex++;
-                if (currentSpotTheDifferencePuzzleIndex < spotTheDifferencePuzzles.length) {
-                    startSpotTheDifferenceGame(); // Load next puzzle
-                } else {
-                    puzzleFeedback.textContent = translations[currentLanguage].allPuzzlesCompleted || "You've completed all available puzzles! More coming soon!";
-                    Telegram.WebApp.showNotification({
-                        message: translations[currentLanguage].allPuzzlesCompleted || "All puzzles completed! Great job!",
-                        type: "success"
-                    });
-                    setTimeout(showZoneSelection, 2000); // Go back to zones after a delay
-                    currentSpotTheDifferencePuzzleIndex = 0; // Reset for next time user plays
-                }
-            });
 
             // Initial update of TREP balance when app loads (or when game tab is first shown)
             updateTREPBalanceUI();
