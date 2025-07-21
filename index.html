@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="appTitle">TREP Mini App</title>
+    <!-- Tailwind CSS CDN for easy styling and responsiveness -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom CSS Variables for App Theme */
@@ -187,6 +188,7 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
+    <!-- Onboarding Screen -->
     <div id="onboardingScreen" class="onboarding-overlay hidden">
         <div class="onboarding-content">
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover mx-auto">
@@ -200,20 +202,27 @@
         </div>
     </div>
 
+    <!-- Main App Container -->
+    <!-- REMOVED 'hidden' class from here. Its visibility is controlled by JS now. -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center relative"
          id="app-container">
 
+        <!-- Top Right Buttons Container -->
         <div class="absolute top-4 right-4 flex space-x-2">
+            <!-- Language Toggle Button -->
             <button id="languageToggleButton" class="toggle-button">
                 ES
             </button>
+            <!-- Theme Toggle Button -->
             <button id="themeToggleButton" class="toggle-button text-2xl">
                 ☀️
             </button>
         </div>
 
+        <!-- Logo -->
         <img id="appLogo" src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover">
 
+        <!-- Welcome Message -->
         <h1 class="text-3xl font-bold mb-3 text-center"
             style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="mainWelcome">
             Welcome to TREP Mini App!
@@ -222,6 +231,7 @@
             Your gateway to exclusive deals, real-time stats, and community access.
         </p>
 
+        <!-- Tab Navigation -->
         <div class="flex justify-center flex-wrap mb-6 w-full space-x-2">
             <button id="overviewTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
                     data-i18n="overviewTab">
@@ -249,11 +259,11 @@
             </button>
         </div>
 
+        <!-- Tab Content: Overview -->
         <div id="overviewTabContent" class="tab-content w-full hidden">
             <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="overviewHeading">Overview</h2>
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="overviewContent">
-                TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Stake TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.
-                <br><br>Join our community!
+                TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Stake TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.<br><br>Join our community!
             </p>
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Overview.png?raw=true" alt="TREP Ecosystem Overview" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
             <p class="text-sm" style="color: var(--tg-theme-hint-color, #666);" data-i18n="overviewLearnMore">
@@ -261,6 +271,7 @@
             </p>
         </div>
 
+        <!-- Tab Content: Trenks (formerly Real-time Stats) -->
         <div id="statsTabContent" class="tab-content w-full hidden">
             <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="trenksHeading">Trenks</h2>
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="trenksDescription">
@@ -270,10 +281,12 @@
                 <div class="flex-1 min-w-[200px]">
                     <p data-i18n="checkTrepOn"><strong>Check TREP on:</strong></p>
                     <ul class="list-disc list-inside ml-4 mb-4">
-                        <li><a href="https://dexscreener.com/solana/a6fmyrfluwn8xvnyqtsd2kpxht2b4lq4l8lkp11nnm" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dexscreener</a></li>
+                        <li><a href="https://dexscreener.com/solana/a6fmyrfluwn8xvfsnyqtsd2kpxht2b4lq4l8lkp11nnm" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dexscreener</a></li>
                         <li><a href="https://www.geckoterminal.com/solana/pools/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">GeckoTerminal (CoinGecko)</a></li>
                         <li><a href="https://www.dextools.io/app/en/solana/pair-explorer/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?t=1753065837128" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dextools</a></li>
                         <li><a href="https://solscan.io/token/Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Solscan</a></li>
+                        <!-- NEW: CoinMarketCap Link -->
+                        <li><a href="https://dex.coinmarketcap.com/token/solana/Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka/" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">CoinMarketCap (Dex)</a></li>
                     </ul>
 
                     <p data-i18n="joinSocials"><strong>Join our Socials:</strong></p>
@@ -290,6 +303,7 @@
             </div>
         </div>
 
+        <!-- Tab Content: Deals -->
         <div id="dealsTabContent" class="tab-content w-full hidden">
             <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="publicDealsHeading">Public Deals</h2>
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="publicDealsDescription">
@@ -312,6 +326,7 @@
             </div>
         </div>
 
+        <!-- Tab Content: Access -->
         <div id="accessTabContent" class="tab-content w-full hidden">
             <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="accessHeading">Gain Full Access</h2>
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="accessDescription1">
@@ -322,7 +337,8 @@
             </p>
             <div class="bg-gray-100 p-4 rounded-lg mb-4 text-left">
                 <h3 class="font-semibold text-lg text-navy-blue" data-i18n="earlyHolderAccessHeading">Early Holder Access</h3>
-                <p class="text-sm text-navy-blue" data-i18n="earlyHolderAccessDescription">Your gateway to token insights, community tools, and exclusive access.</p>
+                <!-- NEW: Changed text color to black for better visibility in dark mode -->
+                <p class="text-sm" style="color: #000000;" data-i18n="earlyHolderAccessDescription">Your gateway to token insights, community tools, and exclusive access.</p>
             </div>
             <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="Access Tab Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
             <button id="connectWalletButton"
@@ -330,7 +346,8 @@
                     style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="connectWalletButton">
                 Connect Wallet & Burn 100,000 TREP
             </button>
-            <p id="walletStatus" class="text-sm text-center" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletStatus">
+            <!-- NEW: Changed text color to green for better visibility -->
+            <p id="walletStatus" class="text-sm text-center" style="color: #22C55E;" data-i18n="walletStatus">
                 Wallet not connected.
             </p>
             <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletNote">
@@ -338,6 +355,7 @@
             </p>
         </div>
 
+        <!-- New Tab Content: More -->
         <div id="moreTabContent" class="tab-content w-full hidden">
             <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="moreHeading">More Crypto Info</h2>
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="moreDescription">
@@ -350,31 +368,46 @@
                     Visit Dexscreener Gainers
                 </a>
             </div>
+            <!-- NEW: Added link for Lowest Fees Crypto Coins -->
+            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
+                <h3 class="font-semibold text-lg" data-i18n="lowestFeesCryptoHeading">Lowest Fees Crypto Coins</h3>
+                <p class="text-sm" data-i18n="lowestFeesCryptoDescription">Find cryptocurrencies with the lowest transaction fees.</p>
+                <a href="https://docs.google.com/document/d/1ib5zFEr3i0xjlJP5go51VOKB5zXmFMTywQugObuBYw8/edit?usp=sharing" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitLowestFeesCrypto">
+                    View Lowest Fees Crypto List
+                </a>
+            </div>
         </div>
 
+        <!-- New Tab Content: Game (TREP Treasure) -->
         <div id="gameTabContent" class="tab-content w-full hidden">
             <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="gameHeading">TREP Treasure Game</h2>
             <p class="mb-4" style="color: var(--app-text-color);" data-i18n="gameDescription">
                 Explore themed zones, discover hidden gems, and earn simulated TREP refunds!
             </p>
 
+            <!-- Game Balance Display -->
             <div class="flex justify-between items-center bg-gray-100 p-3 rounded-lg mb-4" style="background-color: var(--app-secondary-bg) !important; color: var(--app-text-color) !important; border: 1px solid rgba(255,255,255,0.15);">
                 <span class="font-semibold" data-i18n="yourTrepBalance">Your TREP:</span>
-                <span id="trepBalance" class="font-bold text-lg text-green-500">0 TREP</span> </div>
+                <span id="trepBalance" class="font-bold text-lg text-green-500">0 TREP</span> <!-- Initial Balance, updated by JS -->
+            </div>
 
+            <!-- Game Zone Selection (Initially Visible, managed by JS) -->
             <div id="gameZoneSelection" class="game-area p-4 rounded-lg text-center">
                 <p class="mb-4 text-xl font-semibold" data-i18n="selectZone">Choose your adventure zone:</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Zone 1: TREP Jungle -->
                     <div class="zone-card p-3 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-200" data-zone="jungle">
                         <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Overview.png?raw=true" alt="TREP Jungle" class="w-24 h-24 mx-auto mb-2 rounded-full object-cover">
                         <h3 class="font-bold text-lg" data-i18n="zoneJungle">TREP Jungle</h3>
                         <p class="text-sm text-gray-600" style="color: var(--app-text-color);" data-i18n="zoneJungleDesc">Discover ancient remedies and wild discoveries.</p>
                     </div>
+                    <!-- Zone 2: TREP Island -->
                     <div class="zone-card p-3 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-200" data-zone="island">
                         <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="TREP Island" class="w-24 h-24 mx-auto mb-2 rounded-full object-cover">
                         <h3 class="font-bold text-lg" data-i18n="zoneIsland">TREP Island</h3>
                         <p class="text-sm text-gray-600" style="color: var(--app-text-color);" data-i18n="zoneIslandDesc">Sail to the sun-drenched island for exclusive merch.</p>
                     </div>
+                    <!-- Zone 3: TREP Labyrinth -->
                     <div class="zone-card p-3 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-200" data-zone="labyrinth">
                         <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Real-time%20stats.png?raw=true" alt="TREP Labyrinth" class="w-24 h-24 mx-auto mb-2 rounded-full object-cover">
                         <h3 class="font-bold text-lg" data-i18n="zoneLabyrinth">TREP Labyrinth</h3>
@@ -384,24 +417,28 @@
                 <p id="gameMessage" class="mt-4 text-sm" style="color: var(--tg-theme-hint-color, #666);"></p>
             </div>
 
+            <!-- Game Play Area (Initially Hidden, managed by JS) -->
             <div id="gamePlayArea" class="game-area p-4 rounded-lg text-center relative hidden">
                 <button id="backToZonesButton" class="absolute top-3 left-3 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-md text-sm transition-colors duration-200" data-i18n="backToZones">
                     ← Back to Zones
                 </button>
                 <h3 id="currentZoneTitle" class="text-xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);"></h3>
                 <div id="zoneImageContainer" class="relative w-full h-64 bg-cover bg-center rounded-lg mb-4 mx-auto" style="background-image: url('https://via.placeholder.com/400x256?text=Explore+Zone');">
-                    </div>
+                    <!-- Hotspots will be dynamically added here by JavaScript -->
+                </div>
                 <p id="gamePrompt" class="text-base mb-4" data-i18n="gamePrompt">Tap on glowing areas to find treasure!</p>
                 <p id="gameFeedback" class="mt-4 text-base font-semibold" style="color: var(--tg-theme-hint-color, #666);"></p>
                 <div id="rewardDisplay" class="mt-4 p-3 bg-green-100 dark:bg-green-700 rounded-lg text-green-800 dark:text-green-100 font-bold hidden" style="background-color: var(--tg-theme-secondary-bg-color, #e0e0e0);"></div>
             </div>
         </div>
 
+        <!-- General Info Text at the bottom of the main container -->
         <p id="infoText" class="mt-6 text-sm text-gray-600 text-center w-full"
            style="color: var(--tg-theme-hint-color, #666);">
             Hello, User!
         </p>
 
+        <!-- Quick Links (Icons) Navigation -->
         <div class="flex justify-around items-center w-full mt-6 p-3 bg-gray-100 rounded-lg shadow-inner"
              style="background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);">
             <button id="quickOverview" class="quick-link-button" data-tab-id="overviewTabContent">
@@ -426,6 +463,7 @@
 
     </div>
 
+    <!-- Telegram Mini Apps SDK Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <script>
@@ -475,6 +513,9 @@
                 dexscreenerGainersHeading: "Dexscreener Gainers",
                 dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
                 visitDexscreenerGainers: "Visit Dexscreener Gainers",
+                lowestFeesCryptoHeading: "Lowest Fees Crypto Coins", // New translation
+                lowestFeesCryptoDescription: "Find cryptocurrencies with the lowest transaction fees.", // New translation
+                visitLowestFeesCrypto: "View Lowest Fees Crypto List", // New translation
                 // Game specific translations
                 gameHeading: "TREP Treasure Game",
                 gameDescription: "Explore themed zones, discover hidden gems, and earn simulated TREP refunds!",
@@ -535,20 +576,9 @@
                 dexscreenerGainersHeading: "Ganadores de Dexscreener",
                 dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.",
                 visitDexscreenerGainers: "Visitar Ganadores de Dexscreener",
-                // Game specific translations
-                gameHeading: "Juego del Tesoro TREP",
-                gameDescription: "¡Explora zonas temáticas, descubre gemas ocultas y gana reembolsos simulados de TREP!",
-                yourTrepBalance: "Tu TREP:",
-                selectZone: "Elige tu zona de aventura:",
-                zoneJungle: "Selva TREP",
-                zoneJungleDesc: "Descubre remedios ancestrales y hallazgos salvajes.",
-                zoneIsland: "Isla TREP",
-                zoneIslandDesc: "Navega a la isla bañada por el sol para conseguir merchandising exclusivo.",
-                zoneLabyrinth: "Laberinto TREP",
-                zoneLabyrinthDesc: "Navega por caminos sinuosos en busca de pistas crípticas.",
-                backToZones: "← Volver a Zonas",
-                gamePrompt: "¡Toca las áreas brillantes para encontrar tesoros!",
-                findTreasure: "Encontrar Tesoro",
+                lowestFeesCryptoHeading: "Monedas Cripto con Tarifas Más Bajas", // New translation
+                lowestFeesCryptoDescription: "Encuentra criptomonedas con las tarifas de transacción más bajas.", // New translation
+                visitLowestFeesCrypto: "Ver Lista de Monedas Cripto con Tarifas Más Bajas", // New translation
                 helloUser: "¡Hola, Usuario!",
                 userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
                 yourLanguage: "Tu idioma:"
@@ -590,7 +620,8 @@
         function applyTheme(theme) {
             if (theme === 'dark') {
                 document.body.classList.add('dark-mode');
-                appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true"; // Assuming a dark mode logo
+                // Updated logo for dark mode
+                appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true"; 
                 themeToggleButton.textContent = '🌙';
                 localStorage.setItem('app_theme', 'dark');
             } else {
