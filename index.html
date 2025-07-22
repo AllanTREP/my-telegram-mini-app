@@ -298,6 +298,49 @@
             cursor: not-allowed; /* Indicate it's not clickable */
             pointer-events: none; /* Prevent all click events */
         }
+
+        /* Burn spark effect */
+        .burn-sparkle {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, #ffcc00, #ff6600, transparent);
+            border-radius: 50%;
+            animation: sparkleFade 1.2s ease-out forwards;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        @keyframes sparkleFade {
+            0% { opacity: 1; transform: scale(1); }
+            60% { opacity: 0.8; transform: scale(1.5); }
+            100% { opacity: 0; transform: scale(2); }
+        }
+
+        /* Toast message */
+        .burn-toast {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #222;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 18px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.4);
+            z-index: 9999;
+            animation: toastSlide 2.5s ease-out forwards;
+        }
+
+        @keyframes toastSlide {
+            0% { transform: translate(-50%, -150%); opacity: 0; }
+            30% { transform: translate(-50%, 0); opacity: 1; }
+            100% { transform: translate(-50%, 100%); opacity: 0; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -805,7 +848,8 @@
                 burnFailed: "Burn failed. Please try again.",
                 viewTransaction: "View transaction: ",
                 devnetMode: "Devnet Mode: ON",
-                mainnetMode: "Devnet Mode: OFF"
+                mainnetMode: "Devnet Mode: OFF",
+                burnToastMessage: "🔥 Burned {amount} TREP — Welcome to the Fearless Fly League!"
             },
             es: {
                 appTitle: "TREP Mini Aplicación",
@@ -885,7 +929,8 @@
                 burnFailed: "Fallo la quema. Por favor, intenta de nuevo.",
                 viewTransaction: "Ver transacción: ",
                 devnetMode: "Modo Devnet: ENCENDIDO",
-                mainnetMode: "Modo Devnet: APAGADO"
+                mainnetMode: "Modo Devnet: APAGADO",
+                burnToastMessage: "🔥 Quemados {amount} TREP — ¡Bienvenido a la Liga Fearless Fly!"
             }
         };
 
@@ -1209,6 +1254,26 @@
 
                 // Show verifiable transaction explorer link
                 Telegram.WebApp.showAlert(`${translations[currentLanguage].viewTransaction} https://solscan.io/tx/${signature}`);
+
+                // --- NEW: Burn Animation and Toast ---
+                // Show sparkle effect
+                const sparkle = document.createElement('div');
+                sparkle.className = 'burn-sparkle';
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 1500);
+
+                // Show toast message
+                const toast = document.createElement('div');
+                toast.className = 'burn-toast';
+                // Use the TREP_FULL_ACCESS_COST for the toast message
+                toast.textContent = translations[currentLanguage].burnToastMessage.replace('{amount}', TREP_FULL_ACCESS_COST.toLocaleString());
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2500);
+
+                // Play sound (optional - using Tone.js or a pre-loaded audio element is recommended for web apps)
+                // const burnSound = new Audio('https://example.com/burn-sfx.mp3'); // Replace with your hosted file
+                // burnSound.play();
+                // --- END NEW ---
 
                 // Update app state after successful burn
                 isGameSubscribed = true;
