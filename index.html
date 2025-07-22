@@ -7,20 +7,8 @@
     <!-- Tailwind CSS CDN for easy styling and responsiveness -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Solana Web3.js and SPL Token Library CDNs -->
-    <!-- IMPORTANT: Using module type for better import control and to avoid global conflicts -->
-    <script type="module">
-        // Explicitly import from the Solana Web3.js and SPL Token libraries using +esm for better module resolution
-        // These are imported into this module's scope.
-        import * as solanaWeb3 from 'https://cdn.jsdelivr.net/npm/@solana/web3.js/+esm';
-        import * as splToken from 'https://cdn.jsdelivr.net/npm/@solana/spl-token/+esm';
-
-        // Attach them to a global property (e.g., window.appModules) so the main script can access them.
-        // This is a safer way than directly attaching to window.solanaWeb3, which might conflict.
-        window.appModules = {
-            solanaWeb3: solanaWeb3,
-            splToken: splToken
-        };
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/lib/index.iife.min.js"></script>
     <style>
         /* Custom CSS Variables for App Theme */
         :root {
@@ -437,12 +425,10 @@
 
         <!-- Top Right Buttons Container -->
         <div class="absolute top-4 right-4 flex space-x-2">
-            <!-- Language Toggle Button (Removed ES, now only EN is supported) -->
-            <!-- The button is removed as there's only one language. If you wish to re-add it for future languages,
-                 you can uncomment and modify the language toggle logic. -->
-            <!-- <button id="languageToggleButton" class="toggle-button">
-                EN
-            </button> -->
+            <!-- Language Toggle Button -->
+            <button id="languageToggleButton" class="toggle-button">
+                ES
+            </button>
             <!-- Theme Toggle Button -->
             <button id="themeToggleButton" class="toggle-button text-2xl">
                 ☀️
@@ -526,7 +512,7 @@
                     <p data-i18n="checkTrepOn"><strong>Check TREP on:</strong></p>
                     <ul class="list-disc list-inside ml-4 mb-4">
                         <li><a href="https://dexscreener.com/solana/a6fmyrfluwn8xvfsnyqtsd2kpxht2b4lq4l8lkp11nnm" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dexscreener</a></li>
-                        <li><a href="https://www.geckoterminal.com/solana/pools/A6FMyRFLuwN8xvFSNYqtsd2B4LQ4L8LkP11NnM?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">GeckoTerminal (CoinGecko)</a></li>
+                        <li><a href="https://www.geckoterminal.com/solana/pools/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">GeckoTerminal (CoinGecko)</a></li>
                         <li><a href="https://www.dextools.io/app/en/solana/pair-explorer/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?t=1753065837128" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dextools</a></li>
                         <li><a href="https://solscan.io/token/Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Solscan</a></li>
                         <!-- NEW: CoinMarketCap Link -->
@@ -799,24 +785,6 @@
 
     </div>
 
-    <!-- Debug Overlay -->
-    <div id="debug-overlay" style="
-      position:fixed;
-      bottom:0;
-      left:0;
-      background:#111;
-      color:#0f0;
-      font-family:monospace;
-      font-size:12px;
-      padding:8px;
-      max-height:30vh;
-      overflow:auto;
-      z-index:9999;
-      width:100%;
-      box-shadow:0 -2px 5px rgba(0,0,0,0.4);
-      display:none;
-    "></div>
-
     <!-- Telegram Mini Apps SDK Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -842,18 +810,18 @@
         customModalOkButton.addEventListener('click', hideCustomAlert);
         // --- End Custom Modal Functions ---
 
-        // Declare solanaWeb3 and splToken here, to be assigned later
-        let solanaWeb3;
-        let splToken;
-        let solanaWallet; // Declare solanaWallet here
 
-        // --- Debug Logging Function ---
-        function logDebug(message) {
-            const debugEl = document.getElementById('debug-overlay');
-            debugEl.style.display = 'block';
-            const time = new Date().toLocaleTimeString();
-            debugEl.innerHTML += `<div>[${time}] ${message}</div>`;
-            debugEl.scrollTop = debugEl.scrollHeight; // Auto-scroll to bottom
+        // --- Solana Wallet Detection ---
+        // Check if wallet object exists in the window (for Solana-compatible wallets like Phantom or Backpack)
+        let solanaWallet;
+        if (window.solana && window.solana.isPhantom) {
+            solanaWallet = window.solana;
+            console.log("Phantom wallet detected");
+        } else if (window.backpack) {
+            solanaWallet = window.backpack;
+            console.log("Backpack wallet detected");
+        } else {
+            console.warn("No compatible Solana wallet detected in WebView.");
         }
 
         // --- Language Data ---
@@ -962,10 +930,91 @@
                 devnetMode: "Devnet Mode: ON",
                 mainnetMode: "Devnet Mode: OFF",
                 burnToastMessage: "🔥 Burned {amount} TREP — Welcome to the Fearless Fly League!"
+            },
+            es: {
+                appTitle: "TREP Mini Aplicación",
+                onboardingWelcome: "¡Bienvenido a la Mini Aplicación TREP!",
+                onboardingDescription: "Tu compañero definitivo para ofertas exclusivas, información de mercado en tiempo real y conexiones comunitarias dentro del ecosistema TREP.",
+                startJourneyButton: "Comenzar tu Viaje",
+                mainWelcome: "¡Bienvenido a la Mini Aplicación TREP!",
+                mainDescription: "Tu puerta de entrada a ofertas exclusivas, estadísticas en tiempo real y acceso a la comunidad.",
+                overviewTab: "Resumen",
+                trenksTab: "Trenks",
+                dealsTab: "Ofertas",
+                accessTab: "Acceso",
+                moreTab: "Más",
+                premiumGamesTab: "Juegos Premium",
+                gameTab: "Juego",
+                overviewHeading: "Resumen",
+                overviewContent: "TREP es un token impulsado por la comunidad con utilidad real en el Descubrimiento de Ofertas y Señales de Mercado. Quema TREP para acceder a listados tempranos, análisis de inversores y paneles premium. Impulsado por bots, datos y una leal comunidad de Telegram — únete al futuro de la caza de alfa.",
+                overviewLearnMore: "Aprende más sobre nuestra misión y características.",
+                trenksHeading: "Trenks",
+                trenksDescription: "Aquí encontrarás enlaces importantes relacionados con los tokens TREP, la comunidad y las redes sociales.",
+                checkTrepOn: "Consulta TREP en:",
+                joinSocials: "Únete a nuestras Redes Sociales:",
+                officialWebsite: "Sitio Web Oficial:",
+                publicDealsHeading: "Ofertas Públicas",
+                publicDealsDescription: "Descuento exclusivo en gadgets tecnológicos y más.",
+                dealItemHeading: "¡Desbloquea Ofertas Exclusivas Dentro: Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!",
+                dealItemDescription: "Ofertas dentro: ¡Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!",
+                visitPublicDealFinder: "Visitar Buscador de Ofertas Públicas",
+                communityChannelHeading: "Canal de la Comunidad: Intrepid Public",
+                communityChannelDescription: "Únete a nuestro canal público para actualizaciones y discusiones.",
+                joinIntrepidPublicChannel: "Unirse al Canal Público Intrepid",
+                accessHeading: "Obtener Acceso Completo",
+                accessDescription1: "Obtén acceso de por vida al canal 'TREP Deal Finder - Acceso Completo' quemando 1 USD en tokens $TREP. Encontrarás ofertas exclusivas, ropa, gadgets, aceites y remedios, PDFs, noticias, videos, música y mucho más.",
+                accessDescription2: "Conecta tu billetera de Solana para proceder con el pago.",
+                earlyHolderAccessHeading: "Acceso Anticipado para Titulares",
+                earlyHolderAccessDescription: "Tu puerta de entrada a la información de tokens, herramientas comunitarias y acceso exclusivo.",
+                connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
+                walletStatus: "Billetera no conectada",
+                walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
+                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)",
+                moreHeading: "Más Información Cripto",
+                moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
+                trepDealFinderFullAccessHeading: "Canal TREP Deal Finder - Acceso Completo",
+                trepDealFinderFullAccessDescription: "Accede a ofertas y contenido exclusivos para suscriptores.",
+                visitTrepDealFinderFullAccess: "Visitar TREP Deal Finder - Acceso Completo",
+                dexscreenerGainersHeading: "Ganadores de Dexscreener",
+                dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.",
+                visitDexscreenerGainers: "Visitar Ganadores de Dexscreener",
+                lowestFeesCryptoHeading: "Monedas Cripto con Tarifas Más Bajas",
+                lowestFeesCryptoDescription: "Encuentra criptomonedas con las tarifas de transacción más bajas.",
+                visitLowestFeesCrypto: "Ver Lista de Monedas Cripto con Tarifas Más Bajas",
+                coinsTokensHeading: "Aprender Monedas vs Tokens",
+                coinsTokensDescription: "Aprende las diferencias fundamentales entre criptomonedas y tokens.",
+                visitCoinsTokens: "Aprender más sobre Monedas vs Tokens",
+                dexscreenerNewPairsHeading: "Nuevos Pares de Dexscreener",
+                dexscreenerNewPairsDescription: "Explora los pares de criptomonedas recién listados en Dexscreener.",
+                visitDexscreenerNewPairs: "Ver Nuevos Pares de Dexscreener",
+                premiumGamesHeading: "Juegos Premium",
+                premiumGamesDescription: "¡Desbloquea modos de juego y desafíos exclusivos al convertirte en miembro premium!",
+                spotTheDifferencePremiumHeading: "Encuentra las Diferencias: Puzzles Premium",
+                spotTheDifferencePremiumDescription: "¡Accede a puzzles más desafiantes y gana mayores recompensas!",
+                playNow: "Jugar Ahora",
+                premiumGamesNote: "¡Más juegos premium próximamente!",
+                helloUser: "¡Hola, Usuario!",
+                userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
+                yourLanguage: "Tu idioma:",
+                fearlessFlyModeButton: "Activar Modo Fearless Fly 🦸‍♂️",
+                fearlessFlyActivated: "¡Modo Fearless Fly Activado! ¡Reembolsos de TREP dobles!",
+                fearlessFlyDeactivated: "Modo Fearless Fly Desactivado.",
+                fearlessFlyCost: "Activar el Modo Fearless Fly cuesta {cost} TREP. ¡Fondos insuficientes!",
+                premiumContentLocked: "Este contenido es para usuarios premium. ¡Suscríbete en la pestaña 'Acceso' para desbloquear!",
+                // New wallet-related translations
+                walletNotFound: "No se encontró ninguna billetera. Por favor, instala Phantom o Backpack.",
+                walletConnectionFailed: "Fallo la conexión de la billetera.",
+                connectedToWallet: "Conectado a la billetera: {publicKey}",
+                burnConfirmed: "🎉 ¡Quema confirmada! Acceso premium concedido.",
+                burnFailed: "Fallo la quema. Por favor, intenta de nuevo.",
+                viewTransaction: "Ver transacción: ",
+                devnetMode: "Modo Devnet: ENCENDIDO",
+                mainnetMode: "Modo Devnet: APAGADO",
+                burnToastMessage: "🔥 Quemados {amount} TREP — ¡Bienvenido a la Liga Fearless Fly!"
             }
         };
 
-        let currentLanguage = 'en'; // Default to English, as ES is removed
+        let currentLanguage = localStorage.getItem('app_language') || 'en'; // Default to English
 
         function updateContent() {
             document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -994,7 +1043,7 @@
 
         // --- Theme and Language Toggles ---
         const themeToggleButton = document.getElementById('themeToggleButton');
-        // const languageToggleButton = document.getElementById('languageToggleButton'); // Removed as only EN is supported
+        const languageToggleButton = document.getElementById('languageToggleButton');
         const devnetToggleButton = document.getElementById('devnetToggleButton'); // New: Devnet toggle button
         const appContainer = document.getElementById('app-container');
         const appLogo = document.getElementById('appLogo');
@@ -1005,7 +1054,7 @@
                 document.body.classList.add('dark-mode');
                 // Updated logo for dark mode
                 appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true";
-                themeToggleButton.textContent = '🌙';
+                themeToggleButton.textContent = ' ';
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
@@ -1027,32 +1076,21 @@
             applyTheme(currentTheme === 'light' ? 'dark' : 'light');
         });
 
-        // Language toggle button is removed, so this listener is no longer needed
-        /*
         languageToggleButton.addEventListener('click', () => {
             currentLanguage = currentLanguage === 'en' ? 'es' : 'en';
             localStorage.setItem('app_language', currentLanguage);
             languageToggleButton.textContent = currentLanguage.toUpperCase();
             updateContent();
         });
-        */
 
         // --- Devnet/Mainnet Toggle Logic ---
         let currentCluster = localStorage.getItem('solana_cluster') || 'mainnet-beta'; // Default to mainnet-beta
         let isDevnetMode = currentCluster === 'devnet';
-        let connection; // Declare connection here, assign later
+        let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl(currentCluster)); // Initialize connection
 
         function updateSolanaConnection() {
-            // Ensure solanaWeb3 is defined before using it
-            if (!solanaWeb3) {
-                logDebug("solanaWeb3 is not defined. Cannot update Solana connection.");
-                return;
-            }
-            connection = new solanaWeb3.Connection(
-                isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://rpc.ankr.com/solana', // Updated RPC to Ankr
-                'confirmed'
-            );
-            logDebug(`Solana connection switched to: ${currentCluster}`);
+            connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl(currentCluster));
+            console.log(`Solana connection switched to: ${currentCluster}`);
             // After switching, if a wallet is connected, try to fetch its balance on the new network
             if (solanaWallet && solanaWallet.publicKey) {
                 fetchTREPBalance(solanaWallet.publicKey);
@@ -1117,6 +1155,23 @@
         let initialTabId = localStorage.getItem('activeTab') || 'overviewTabContent';
         // showTab(initialTabId); // This will be called after onboarding check
 
+        tabButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const tabId = button.id.replace('Button', 'Content');
+                showTab(tabId);
+                localStorage.setItem('activeTab', tabId);
+            });
+        });
+
+        // Quick links functionality
+        document.querySelectorAll('.quick-link-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const tabId = button.dataset.tabId;
+                showTab(tabId);
+                localStorage.setItem('activeTab', tabId);
+            });
+        });
+
         // Onboarding logic
         const onboardingScreen = document.getElementById('onboardingScreen');
         const startJourneyButton = document.getElementById('startJourneyButton');
@@ -1124,14 +1179,32 @@
 
         const hasVisited = localStorage.getItem('hasVisitedApp');
 
+        if (!hasVisited) {
+            onboardingScreen.classList.remove('hidden');
+            appContainerMain.classList.add('hidden'); // Ensure app container is hidden during onboarding
+        } else {
+            onboardingScreen.classList.add('hidden');
+            appContainerMain.classList.remove('hidden'); // Ensure app container is visible if already visited
+            showTab(initialTabId); // Show the last active tab if already visited
+        }
+
+        startJourneyButton.addEventListener('click', () => {
+            onboardingScreen.classList.add('hidden');
+            appContainerMain.classList.remove('hidden');
+            localStorage.setItem('hasVisitedApp', 'true');
+            showTab('overviewTabContent'); // Default to overview after onboarding
+        });
+
         // --- Wallet Connection & Burn Logic ---
         const connectWalletButton = document.getElementById('connectWalletButton');
         const walletStatus = document.getElementById('walletStatus');
 
         // Define your TREP token's mint address and the burn address
-        // These will be initialized after solanaWeb3 is available
-        let TREP_MINT_ADDRESS;
-        let TREP_BURN_ADDRESS;
+        // IMPORTANT: These are now the actual addresses provided by the user.
+        // For Devnet testing, you would need to deploy your TREP token on Devnet
+        // and update these addresses accordingly for Devnet mode.
+        const TREP_MINT_ADDRESS = new solanaWeb3.PublicKey("Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka");
+        const TREP_BURN_ADDRESS = new solanaWeb3.PublicKey("8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF");
         const TREP_DECIMALS = 9; // Confirmed by user
         const TREP_FULL_ACCESS_COST = 100000; // Cost in raw token units (e.g., 100,000 TREP)
 
@@ -1139,19 +1212,16 @@
             try {
                 if (!solanaWallet) {
                     showCustomAlert(translations[currentLanguage].walletNotFound); // Replaced Telegram.WebApp.showAlert
-                    logDebug("Wallet not found. Please install Phantom or Backpack.");
                     return;
                 }
 
                 walletStatus.textContent = translations[currentLanguage].walletStatusConnecting || "Connecting wallet...";
-                logDebug("Attempting to connect wallet...");
 
                 // Attempt to connect
                 const response = await solanaWallet.connect();
                 const publicKey = response.publicKey; // publicKey is already a PublicKey object
 
                 showCustomAlert(translations[currentLanguage].connectedToWallet.replace('{publicKey}', publicKey.toString())); // Replaced Telegram.WebApp.showAlert
-                logDebug(`Connected to wallet: ${publicKey.toString()}`);
 
                 walletStatus.textContent = "Wallet Connected";
                 walletStatus.style.color = "green";
@@ -1165,7 +1235,6 @@
                 burnTREP(publicKey, burnAmountInSmallestUnits);
 
             } catch (err) {
-                logDebug(`❌ Wallet connection failed: ${err.message}`);
                 console.error("Wallet connection failed:", err);
                 walletStatus.textContent = translations[currentLanguage].walletConnectionFailed;
                 walletStatus.style.color = "red";
@@ -1179,36 +1248,36 @@
          */
         async function fetchTREPBalance(publicKey) {
             trepBalanceDisplay.textContent = "Loading..."; // Show loading state
-            logDebug("--- Fetching TREP Balance Debug ---");
-            logDebug(`Fetching balance for PublicKey: ${publicKey.toString()}`);
-            logDebug(`Using Token Mint Address: ${TREP_MINT_ADDRESS.toString()}`);
-            logDebug(`Current Cluster for Connection: ${currentCluster}`); // Crucial for network mismatch diagnosis
+            console.log("--- Fetching TREP Balance Debug ---");
+            console.log("Fetching balance for PublicKey:", publicKey.toString());
+            console.log("Using Token Mint Address:", TREP_MINT_ADDRESS.toString());
+            console.log("Current Cluster for Connection:", currentCluster); // Crucial for network mismatch diagnosis
 
             try {
                 let userTokenAccountAddress;
                 try {
-                    // Primary method: Get the Associated Token Account (ATA) address
+                    // First, try to get the Associated Token Account (ATA) address
                     userTokenAccountAddress = await splToken.getAssociatedTokenAddress(
                         TREP_MINT_ADDRESS,
                         publicKey
                     );
-                    logDebug(`Derived User Token Account Address (ATA): ${userTokenAccountAddress.toString()}`);
+                    console.log("Derived User Token Account Address (ATA):", userTokenAccountAddress.toString());
 
                     // Then, try to get the balance of this specific ATA
                     const tokenAccountInfo = await connection.getTokenAccountBalance(userTokenAccountAddress);
 
                     if (tokenAccountInfo && tokenAccountInfo.value && tokenAccountInfo.value.uiAmount !== undefined) {
                         currentTREPBalance = tokenAccountInfo.value.uiAmount;
-                        logDebug(`✅ Successfully fetched TREP Balance via ATA: ${currentTREPBalance}`);
+                        console.log("Successfully fetched TREP Balance via ATA:", currentTREPBalance);
                     } else {
                         // If ATA exists but balance is 0 or unreadable (e.g., empty account)
-                        logDebug(`⚠️ Derived ATA found, but balance is 0 or could not be read: ${JSON.stringify(tokenAccountInfo)}`);
+                        console.warn("Derived ATA found, but balance is 0 or could not be read:", tokenAccountInfo);
                         currentTREPBalance = 0;
                     }
                 } catch (ataError) {
                     // This catch handles if getAssociatedTokenAddress itself fails (less common)
                     // or if getTokenAccountBalance throws an error like "Account not found"
-                    logDebug(`⚠️ Error with primary ATA lookup/balance fetch. Attempting fallback: ${ataError.message}`);
+                    console.warn("Error with primary ATA lookup/balance fetch. Attempting fallback:", ataError);
 
                     // Fallback: Use getParsedTokenAccountsByOwner to find any existing token account for the mint
                     const accounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
@@ -1218,18 +1287,18 @@
                     if (accounts.value.length > 0) {
                         // Found an account, use the first one
                         userTokenAccountAddress = accounts.value[0].pubkey;
-                        logDebug(`Found TREP Token Account via fallback: ${userTokenAccountAddress.toString()}`);
+                        console.log("Found TREP Token Account via fallback:", userTokenAccountAddress.toString());
                         const tokenAccountInfo = await connection.getTokenAccountBalance(userTokenAccountAddress);
                         if (tokenAccountInfo && tokenAccountInfo.value && tokenAccountInfo.value.uiAmount !== undefined) {
                             currentTREPBalance = tokenAccountInfo.value.uiAmount;
-                            logDebug(`✅ Successfully fetched TREP Balance via fallback: ${currentTREPBalance}`);
+                            console.log("Successfully fetched TREP Balance via fallback:", currentTREPBalance);
                         } else {
-                            logDebug(`⚠️ Fallback account found, but balance is 0 or could not be read: ${JSON.stringify(tokenAccountInfo)}`);
+                            console.warn("Fallback account found, but balance is 0 or could not be read:", tokenAccountInfo);
                             currentTREPBalance = 0;
                         }
                     } else {
                         // No token account found even with fallback
-                        logDebug("⚠️ No TREP token account found for this wallet on the current cluster, assuming 0 balance.");
+                        console.warn("No TREP token account found for this wallet on the current cluster, assuming 0 balance.");
                         currentTREPBalance = 0;
                     }
                 }
@@ -1238,7 +1307,6 @@
 
             } catch (error) {
                 // This outer catch block catches any unexpected errors during the entire process
-                logDebug(`❌ Critical error during TREP balance fetch: ${error.message}`);
                 console.error("Critical error during TREP balance fetch:", error);
                 currentTREPBalance = 0;
                 updateTREPBalanceUI();
@@ -1254,12 +1322,12 @@
          */
         async function burnTREP(payerPublicKey, amountInSmallestUnits) {
             try {
-                // --- NEW DEBUGGING LOGS ---
-                logDebug("--- Initiating Burn Transaction Debug ---");
-                logDebug(`Wallet PublicKey: ${payerPublicKey.toString()}`);
-                logDebug(`Token Mint: ${TREP_MINT_ADDRESS.toString()}`);
-                logDebug(`Burn Address: ${TREP_BURN_ADDRESS.toString()}`);
-                logDebug(`Current Cluster: ${currentCluster}`);
+                // --- NEW DEBUGGING LOGS (as suggested by Copilot) ---
+                console.log("--- Initiating Burn Transaction Debug ---");
+                console.log("Wallet PublicKey:", payerPublicKey.toString());
+                console.log("Token Mint:", TREP_MINT_ADDRESS.toString());
+                console.log("Burn Address:", TREP_BURN_ADDRESS.toString());
+                console.log("Current Cluster:", currentCluster);
                 // --- END NEW DEBUGGING LOGS ---
 
                 let userTokenAccountAddress;
@@ -1271,10 +1339,10 @@
                             TREP_MINT_ADDRESS,
                             payerPublicKey
                         );
-                        logDebug(`User Token Account: ${userTokenAccountAddress.toString()}`); // Debug log
+                        console.log("User Token Account:", userTokenAccountAddress.toString()); // Debug log
                         break; // If successful, break the loop
                     } catch (ataError) {
-                        logDebug(`⚠️ Attempt ${i + 1} to getAssociatedTokenAddress failed: ${ataError.message}`);
+                        console.warn(`Attempt ${i + 1} to getAssociatedTokenAddress failed:`, ataError);
                         if (i < MAX_RETRIES - 1) {
                             await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
                         } else {
@@ -1287,11 +1355,11 @@
                 // Fetch the latest balance right before the burn attempt
                 const balanceInfo = await connection.getTokenAccountBalance(userTokenAccountAddress);
                 const currentWalletTREP = balanceInfo.value.uiAmount;
-                logDebug(`TREP Balance (live): ${currentWalletTREP}`); // Debug log
+                console.log("TREP Balance (live):", currentWalletTREP); // Debug log
 
                 if (currentWalletTREP < TREP_FULL_ACCESS_COST) {
                     showCustomAlert(translations[currentLanguage].insufficientFunds.replace('{amount}', TREP_FULL_ACCESS_COST.toLocaleString())); // Replaced Telegram.WebApp.showAlert
-                    logDebug("❌ Burn failed: Insufficient funds.");
+                    console.error("Burn failed: Insufficient funds.");
                     return; // Stop the burn process
                 }
                 // --- END NEW: Balance Check ---
@@ -1310,25 +1378,18 @@
                     splToken.TOKEN_PROGRAM_ID // SPL Token Program ID
                 );
                 burnTransaction.add(instruction);
-                logDebug("Transaction instruction created.");
 
                 // Get the latest blockhash for the transaction
                 const { blockhash } = await connection.getLatestBlockhash();
                 burnTransaction.recentBlockhash = blockhash;
                 burnTransaction.feePayer = payerPublicKey;
-                logDebug(`Recent Blockhash: ${blockhash}`);
 
                 // Sign and send the transaction
-                logDebug("Signing transaction...");
                 const signedTransaction = await solanaWallet.signTransaction(burnTransaction);
-                logDebug("Sending raw transaction...");
                 const signature = await connection.sendRawTransaction(signedTransaction.serialize());
-                logDebug(`Transaction sent. Signature: ${signature}`);
 
                 // Confirm the transaction
-                logDebug("Confirming transaction...");
                 await connection.confirmTransaction(signature, 'confirmed');
-                logDebug(`✅ Transaction confirmed! Signature: ${signature}`);
 
                 Telegram.WebApp.showNotification({
                     message: translations[currentLanguage].burnConfirmed,
@@ -1364,14 +1425,7 @@
                 // Fetch live balance after successful burn to reflect the change
                 await fetchTREPBalance(payerPublicKey);
 
-                // Optional: Auto-hide debug overlay after successful burn
-                setTimeout(() => {
-                    document.getElementById('debug-overlay').style.display = 'none';
-                    document.getElementById('debug-overlay').innerHTML = ''; // Clear content
-                }, 10000); // Hide after 10 seconds
-
             } catch (err) {
-                logDebug(`❌ Burn failed: ${err.message}`);
                 console.error("Burn failed:", err);
                 // Provide more specific error message if possible
                 let errorMessage = translations[currentLanguage].burnFailed;
@@ -1478,6 +1532,7 @@
                     { id: 'diff1', x: 65, y: 10, width: 25, height: 20, found: false },
                     // Example of another conceptual difference (e.g., a missing 'tree')
                     { id: 'diff2', x: 10, y: 70, width: 15, height: 20, found: false },
+                    // Example of another conceptual difference (e.g., an added 'rock')
                     { id: 'diff3', x: 40, y: 45, width: 18, height: 15, found: false }
                 ],
                 requiresSubscription: false // This puzzle is free
@@ -1679,7 +1734,6 @@
                     hotspotDiv.addEventListener('click', handleDifferenceClick);
                 });
             }).catch(error => {
-                logDebug(`❌ Error loading puzzle images: ${error.message}`);
                 console.error("Error loading puzzle images:", error);
                 puzzleFeedback.textContent = "Error loading puzzle images. Please try again.";
             });
@@ -1706,14 +1760,11 @@
                         type: "success"
                     });
                     nextPuzzleButton.classList.remove('hidden');
-                    logDebug(`✅ Puzzle solved! Earned ${reward.toLocaleString()} TREP.`);
                 } else {
                     puzzleFeedback.textContent = `Keep going! ${remainingDifferences} differences left.`;
-                    logDebug(`Difference found. ${remainingDifferences} remaining.`);
                 }
             } else {
                 puzzleFeedback.textContent = translations[currentLanguage].tryAgain || "You already found this one or that's not a difference. Try again!";
-                logDebug("⚠️ Already found or not a difference.");
             }
         }
 
@@ -1733,7 +1784,6 @@
             nextPuzzleButton.classList.add('hidden');
             modifiedImageWrapper.querySelectorAll('.difference-hotspot').forEach(hotspot => hotspot.remove()); // Clear hotspots
             subscriptionRequiredDiv.classList.add('hidden'); // Ensure subscription message is hidden on reset
-            logDebug("Spot the Difference game reset.");
         }
 
         // --- Subscription Logic for Games ---
@@ -1743,15 +1793,12 @@
             try {
                 if (!solanaWallet || !solanaWallet.publicKey) {
                     showCustomAlert(translations[currentLanguage].walletNotFound); // Replaced Telegram.WebApp.showAlert
-                    logDebug("❌ Subscription failed: Wallet not connected.");
                     return;
                 }
                 const burnAmountInSmallestUnits = TREP_SUBSCRIPTION_COST * (10 ** TREP_DECIMALS);
-                logDebug(`Attempting to subscribe by burning ${TREP_SUBSCRIPTION_COST} TREP.`);
                 await burnTREP(solanaWallet.publicKey, burnAmountInSmallestUnits);
                 // If burnTREP succeeds, isGameSubscribed will be true and UI updated
             } catch (error) {
-                logDebug(`❌ Subscription via burn failed: ${error.message}`);
                 console.error("Subscription via burn failed:", error);
                 // Error message already handled by burnTREP's catch block
             }
@@ -1770,7 +1817,6 @@
                     message: translations[currentLanguage].fearlessFlyDeactivated,
                     type: "info"
                 });
-                logDebug("Fearless Fly Mode Deactivated.");
             } else {
                 // Activate Fearless Fly Mode
                 if (currentTREPBalance >= FEARLESS_FLY_ACTIVATION_COST) {
@@ -1785,10 +1831,8 @@
                         message: translations[currentLanguage].fearlessFlyActivated,
                         type: "success"
                     });
-                    logDebug(`Fearless Fly Mode Activated! Cost: ${FEARLESS_FLY_ACTIVATION_COST} TREP.`);
                 } else {
                     showCustomAlert(translations[currentLanguage].fearlessFlyCost.replace('{cost}', FEARLESS_FLY_ACTIVATION_COST.toLocaleString())); // Replaced Telegram.WebApp.showAlert
-                    logDebug(`❌ Insufficient funds to activate Fearless Fly Mode. Needed: ${FEARLESS_FLY_ACTIVATION_COST} TREP.`);
                 }
             }
         });
@@ -1802,105 +1846,17 @@
 
             if (isGameSubscribed) {
                 premiumElements.forEach(el => el.classList.remove('disabled-tab'));
-                logDebug("Premium content enabled.");
             } else {
                 premiumElements.forEach(el => el.classList.add('disabled-tab'));
-                logDebug("Premium content disabled.");
             }
         }
 
         // --- Event Listeners for Game Tab and Game Elements ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Assign imported modules to local variables after DOM is ready
-            solanaWeb3 = window.appModules.solanaWeb3;
-            splToken = window.appModules.splToken;
-
-            // Now that solanaWeb3 is defined, initialize connection and other constants
-            // Re-define TREP constants using the now available solanaWeb3.PublicKey
-            // This needs to be done AFTER solanaWeb3 is assigned.
-            TREP_MINT_ADDRESS = new solanaWeb3.PublicKey("Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka");
-            TREP_BURN_ADDRESS = new solanaWeb3.PublicKey("8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF");
-
-            updateSolanaConnection(); // Initialize Solana connection based on saved cluster
-
-
-            // Wallet detection and initial balance fetch (delayed to give wallets time to inject)
-            setTimeout(() => {
-                if (window.solana && window.solana.isPhantom) {
-                    solanaWallet = window.solana;
-                    logDebug("Phantom wallet detected.");
-                } else if (window.backpack) {
-                    solanaWallet = window.backpack;
-                    logDebug("Backpack wallet detected.");
-                } else if (window.solana && window.solana.isBraveWallet) {
-                    solanaWallet = window.solana;
-                    logDebug("Brave Wallet detected.");
-                } else {
-                    logDebug("⚠️ No compatible Solana wallet detected in WebView.");
-                }
-
-                // If a wallet is detected, try to connect silently if already authorized, or prompt if not
-                if (solanaWallet) {
-                    solanaWallet.connect({ onlyIfTrusted: true })
-                        .then(response => {
-                            const publicKey = response.publicKey;
-                            walletStatus.textContent = translations[currentLanguage].connectedToWallet.replace('{publicKey}', publicKey.toString());
-                            walletStatus.style.color = "green";
-                            fetchTREPBalance(publicKey);
-                            logDebug(`Silent wallet connection successful: ${publicKey.toString()}`);
-                        })
-                        .catch(err => {
-                            logDebug(`⚠️ Silent wallet connection failed (user not pre-authorized or rejected): ${err.message}`);
-                            console.warn("Silent wallet connection failed (user not pre-authorized or rejected):", err);
-                            walletStatus.textContent = translations[currentLanguage].walletStatus; // Reset to "Wallet not connected"
-                            walletStatus.style.color = ""; // Reset color
-                        });
-                }
-            }, 500); // Small delay to allow wallets to inject themselves
-
-
-            // Add event listeners to buttons
-            tabButtons.forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const tabId = button.id.replace('Button', 'Content');
-                    showTab(tabId);
-                    localStorage.setItem('activeTab', tabId);
-                });
-            });
-
-            // Quick links functionality
-            document.querySelectorAll('.quick-link-button').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const tabId = button.dataset.tabId;
-                    showTab(tabId);
-                    localStorage.setItem('activeTab', tabId);
-                });
-            });
-
-            startJourneyButton.addEventListener('click', () => {
-                onboardingScreen.classList.add('hidden');
-                appContainerMain.classList.remove('hidden');
-                localStorage.setItem('hasVisitedApp', 'true');
-                showTab('overviewTabContent'); // Default to overview after onboarding
-                logDebug("Onboarding completed. Showing overview tab.");
-            });
-
-            if (!hasVisited) {
-                onboardingScreen.classList.remove('hidden');
-                appContainerMain.classList.add('hidden'); // Ensure app container is hidden during onboarding
-                logDebug("First visit detected. Showing onboarding screen.");
-            } else {
-                onboardingScreen.classList.add('hidden');
-                appContainerMain.classList.remove('hidden'); // Ensure app container is visible if already visited
-                showTab(initialTabId); // Show the last active tab if already visited
-                logDebug(`Returning user. Showing last active tab: ${initialTabId}`);
-            }
-
             // Add event listener to the "Game" tab button to show the game UI
             gameTabButton.addEventListener('click', () => {
                 showTab('gameTabContent');
                 showZoneSelection(); // Ensure zone selection is shown when game tab is opened
-                logDebug("Game tab activated. Showing zone selection.");
             });
 
             // Event listener for the new "Play Now" button in Premium Games tab
@@ -1908,7 +1864,6 @@
                 // Assuming the premium spot the difference puzzle is at index 1
                 currentSpotTheDifferencePuzzleIndex = 1; // Set to the premium puzzle index
                 startSpotTheDifferenceGame();
-                logDebug("Starting Premium Spot the Difference game.");
             });
 
 
@@ -1917,15 +1872,11 @@
                 card.addEventListener('click', () => {
                     const zoneKey = card.dataset.zone;
                     startZoneExploration(zoneKey);
-                    logDebug(`Starting zone exploration: ${zoneKey}`);
                 });
             });
 
             // Add event listener for back button in main game play area
-            backToZonesButton.addEventListener('click', () => {
-                showZoneSelection();
-                logDebug("Returning to zone selection.");
-            });
+            backToZonesButton.addEventListener('click', showZoneSelection);
 
             // Add event listener for back button from puzzle game
             backToGameFromPuzzleButton.addEventListener('click', () => {
@@ -1933,10 +1884,8 @@
                 // Decide where to go back: if from premium game, go to premium games tab, else to main game
                 if (currentPuzzle && currentPuzzle.requiresSubscription) {
                     showTab('premiumGamesTabContent');
-                    logDebug("Returning from puzzle to Premium Games tab.");
                 } else {
                     gamePlayArea.classList.remove('hidden'); // Go back to the zone exploration screen
-                    logDebug("Returning from puzzle to main game area.");
                 }
                 resetSpotTheDifferenceGame(); // Reset puzzle state (but not index)
             });
@@ -1946,14 +1895,12 @@
                 currentSpotTheDifferencePuzzleIndex++;
                 if (currentSpotTheDifferencePuzzleIndex < spotTheDifferencePuzzles.length) {
                     startSpotTheDifferenceGame(); // Load next puzzle
-                    logDebug(`Loading next puzzle: Index ${currentSpotTheDifferencePuzzleIndex}`);
                 } else {
                     puzzleFeedback.textContent = translations[currentLanguage].allPuzzlesCompleted || "You've completed all available puzzles! More coming soon!";
                     Telegram.WebApp.showNotification({
                         message: translations[currentLanguage].allPuzzlesCompleted || "All puzzles completed! Great job!",
                         type: "success"
                     });
-                    logDebug("All puzzles completed.");
                     setTimeout(() => {
                         // After completing all puzzles, if the last one was premium, go back to premium games tab
                         if (currentPuzzle && currentPuzzle.requiresSubscription) {
@@ -1962,7 +1909,6 @@
                             showZoneSelection(); // Go back to zones after a delay
                         }
                         currentSpotTheDifferencePuzzleIndex = 0; // Reset for next time user plays
-                        logDebug("Resetting puzzle index and navigating after all puzzles completed.");
                     }, 2000);
                 }
             });
@@ -1970,10 +1916,11 @@
             // Initial update of TREP balance when app loads (or when game tab is first shown)
             updateTREPBalanceUI();
             updateContent(); // Initial content update based on default/saved language
-            // languageToggleButton.textContent = currentLanguage.toUpperCase(); // This line is removed as the button is gone
+            languageToggleButton.textContent = currentLanguage.toUpperCase(); // Ensure language button shows correct initial state
             updatePremiumTabVisibility(); // Call this on load to set initial visibility
-            // updateSolanaConnection(); // This is now called after solanaWeb3 is assigned
+            updateSolanaConnection(); // Initialize Solana connection based on saved cluster
         });
     </script>
 </body>
 </html>
+ 
