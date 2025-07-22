@@ -864,7 +864,7 @@
                 connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
                 walletStatus: "Wallet not connected",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
-                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)",
+                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: <span class=\"font-mono text-gray-800 dark:text-gray-300\">8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF</span>)",
                 moreHeading: "More Crypto Info",
                 moreDescription: "Explore trending cryptocurrencies and market insights.",
                 trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel",
@@ -1054,7 +1054,7 @@
                 document.body.classList.add('dark-mode');
                 // Updated logo for dark mode
                 appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true";
-                themeToggleButton.textContent = '🌙';
+                themeToggleButton.textContent = '�';
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
@@ -1248,27 +1248,69 @@
          */
         async function fetchTREPBalance(publicKey) {
             trepBalanceDisplay.textContent = "Loading..."; // Show loading state
+            console.log("--- Fetching TREP Balance Debug ---");
+            console.log("Fetching balance for PublicKey:", publicKey.toString());
+            console.log("Using Token Mint Address:", TREP_MINT_ADDRESS.toString());
+            console.log("Current Cluster for Connection:", currentCluster); // Crucial for network mismatch diagnosis
+
             try {
-                const userTokenAccountAddress = await splToken.getAssociatedTokenAddress(
-                    TREP_MINT_ADDRESS,
-                    publicKey
-                );
+                let userTokenAccountAddress;
+                try {
+                    // First, try to get the Associated Token Account (ATA) address
+                    userTokenAccountAddress = await splToken.getAssociatedTokenAddress(
+                        TREP_MINT_ADDRESS,
+                        publicKey
+                    );
+                    console.log("Derived User Token Account Address (ATA):", userTokenAccountAddress.toString());
 
-                const tokenAccountInfo = await connection.getTokenAccountBalance(userTokenAccountAddress);
+                    // Then, try to get the balance of this specific ATA
+                    const tokenAccountInfo = await connection.getTokenAccountBalance(userTokenAccountAddress);
 
-                if (tokenAccountInfo && tokenAccountInfo.value && tokenAccountInfo.value.uiAmount !== undefined) {
-                    currentTREPBalance = tokenAccountInfo.value.uiAmount; // Update simulated balance with actual UI amount
-                    updateTREPBalanceUI();
-                } else {
-                    console.warn("Could not fetch TREP balance or token account not found.");
-                    currentTREPBalance = 0; // Set to 0 if not found
-                    updateTREPBalanceUI();
+                    if (tokenAccountInfo && tokenAccountInfo.value && tokenAccountInfo.value.uiAmount !== undefined) {
+                        currentTREPBalance = tokenAccountInfo.value.uiAmount;
+                        console.log("Successfully fetched TREP Balance via ATA:", currentTREPBalance);
+                    } else {
+                        // If ATA exists but balance is 0 or unreadable (e.g., empty account)
+                        console.warn("Derived ATA found, but balance is 0 or could not be read:", tokenAccountInfo);
+                        currentTREPBalance = 0;
+                    }
+                } catch (ataError) {
+                    // This catch handles if getAssociatedTokenAddress itself fails (less common)
+                    // or if getTokenAccountBalance throws an error like "Account not found"
+                    console.warn("Error with primary ATA lookup/balance fetch. Attempting fallback:", ataError);
+
+                    // Fallback: Use getParsedTokenAccountsByOwner to find any existing token account for the mint
+                    const accounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+                        mint: TREP_MINT_ADDRESS
+                    });
+
+                    if (accounts.value.length > 0) {
+                        // Found an account, use the first one
+                        userTokenAccountAddress = accounts.value[0].pubkey;
+                        console.log("Found TREP Token Account via fallback:", userTokenAccountAddress.toString());
+                        const tokenAccountInfo = await connection.getTokenAccountBalance(userTokenAccountAddress);
+                        if (tokenAccountInfo && tokenAccountInfo.value && tokenAccountInfo.value.uiAmount !== undefined) {
+                            currentTREPBalance = tokenAccountInfo.value.uiAmount;
+                            console.log("Successfully fetched TREP Balance via fallback:", currentTREPBalance);
+                        } else {
+                            console.warn("Fallback account found, but balance is 0 or could not be read:", tokenAccountInfo);
+                            currentTREPBalance = 0;
+                        }
+                    } else {
+                        // No token account found even with fallback
+                        console.warn("No TREP token account found for this wallet on the current cluster, assuming 0 balance.");
+                        currentTREPBalance = 0;
+                    }
                 }
-            } catch (error) {
-                console.error("Error fetching TREP balance:", error);
-                currentTREPBalance = 0; // Assume 0 on error
+
                 updateTREPBalanceUI();
-                showCustomAlert("Failed to fetch TREP balance. Please try again."); // Replaced Telegram.WebApp.showAlert
+
+            } catch (error) {
+                // This outer catch block catches any unexpected errors during the entire process
+                console.error("Critical error during TREP balance fetch:", error);
+                currentTREPBalance = 0;
+                updateTREPBalanceUI();
+                showCustomAlert("Failed to fetch TREP balance. Please check your network connection, wallet, and ensure you are on the correct Solana cluster (Mainnet/Devnet).");
             }
         }
 
@@ -1881,3 +1923,4 @@
     </script>
 </body>
 </html>
+�
