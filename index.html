@@ -10,16 +10,16 @@
     <!-- IMPORTANT: Using module type for better import control and to avoid global conflicts -->
     <script type="module">
         // Explicitly import from the Solana Web3.js and SPL Token libraries using +esm for better module resolution
+        // These are imported into this module's scope.
         import * as solanaWeb3 from 'https://cdn.jsdelivr.net/npm/@solana/web3.js/+esm';
         import * as splToken from 'https://cdn.jsdelivr.net/npm/@solana/spl-token/+esm';
 
-        // Make them globally accessible for the rest of the script if needed, or pass them
-        // For simplicity in this single-file app, we'll attach them to window.
-        window.solanaWeb3 = solanaWeb3;
-        window.splToken = splToken;
-
-        // The rest of your script will go here, inside the module scope or after these are attached to window
-        // (The main script block below will now have access to window.solanaWeb3 and window.splToken)
+        // Attach them to a global property (e.g., window.appModules) so the main script can access them.
+        // This is a safer way than directly attaching to window.solanaWeb3, which might conflict.
+        window.appModules = {
+            solanaWeb3: solanaWeb3,
+            splToken: splToken
+        };
     </script>
     <style>
         /* Custom CSS Variables for App Theme */
@@ -437,10 +437,12 @@
 
         <!-- Top Right Buttons Container -->
         <div class="absolute top-4 right-4 flex space-x-2">
-            <!-- Language Toggle Button -->
-            <button id="languageToggleButton" class="toggle-button">
-                ES
-            </button>
+            <!-- Language Toggle Button (Removed ES, now only EN is supported) -->
+            <!-- The button is removed as there's only one language. If you wish to re-add it for future languages,
+                 you can uncomment and modify the language toggle logic. -->
+            <!-- <button id="languageToggleButton" class="toggle-button">
+                EN
+            </button> -->
             <!-- Theme Toggle Button -->
             <button id="themeToggleButton" class="toggle-button text-2xl">
                 ☀️
@@ -822,22 +824,10 @@
         customModalOkButton.addEventListener('click', hideCustomAlert);
         // --- End Custom Modal Functions ---
 
-
-        // --- Solana Wallet Detection ---
-        // Check if wallet object exists in the window (for Solana-compatible wallets like Phantom or Backpack)
-        let solanaWallet;
-        if (window.solana && window.solana.isPhantom) {
-            solanaWallet = window.solana;
-            console.log("Phantom wallet detected");
-        } else if (window.backpack) {
-            solanaWallet = window.backpack;
-            console.log("Backpack wallet detected");
-        } else if (window.solana && window.solana.isBraveWallet) { // NEW: Brave Wallet Detection
-            solanaWallet = window.solana;
-            console.log("Brave Wallet detected");
-        } else {
-            console.warn("No compatible Solana wallet detected in WebView.");
-        }
+        // Declare solanaWeb3 and splToken here, to be assigned later
+        let solanaWeb3;
+        let splToken;
+        let solanaWallet; // Declare solanaWallet here
 
         // --- Language Data ---
         const translations = {
@@ -945,91 +935,10 @@
                 devnetMode: "Devnet Mode: ON",
                 mainnetMode: "Devnet Mode: OFF",
                 burnToastMessage: "🔥 Burned {amount} TREP — Welcome to the Fearless Fly League!"
-            },
-            es: {
-                appTitle: "TREP Mini Aplicación",
-                onboardingWelcome: "¡Bienvenido a la Mini Aplicación TREP!",
-                onboardingDescription: "Tu compañero definitivo para ofertas exclusivas, información de mercado en tiempo real y conexiones comunitarias dentro del ecosistema TREP.",
-                startJourneyButton: "Comenzar tu Viaje",
-                mainWelcome: "¡Bienvenido a la Mini Aplicación TREP!",
-                mainDescription: "Tu puerta de entrada a ofertas exclusivas, estadísticas en tiempo real y acceso a la comunidad.",
-                overviewTab: "Resumen",
-                trenksTab: "Trenks",
-                dealsTab: "Ofertas",
-                accessTab: "Acceso",
-                moreTab: "Más",
-                premiumGamesTab: "Juegos Premium",
-                gameTab: "Juego",
-                overviewHeading: "Resumen",
-                overviewContent: "TREP es un token impulsado por la comunidad con utilidad real en el Descubrimiento de Ofertas y Señales de Mercado. Quema TREP para acceder a listados tempranos, análisis de inversores y paneles premium. Impulsado por bots, datos y una leal comunidad de Telegram — únete al futuro de la caza de alfa.",
-                overviewLearnMore: "Aprende más sobre nuestra misión y características.",
-                trenksHeading: "Trenks",
-                trenksDescription: "Aquí encontrarás enlaces importantes relacionados con los tokens TREP, la comunidad y las redes sociales.",
-                checkTrepOn: "Consulta TREP en:",
-                joinSocials: "Únete a nuestras Redes Sociales:",
-                officialWebsite: "Sitio Web Oficial:",
-                publicDealsHeading: "Ofertas Públicas",
-                publicDealsDescription: "Descuento exclusivo en gadgets tecnológicos y más.",
-                dealItemHeading: "¡Desbloquea Ofertas Exclusivas Dentro: Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!",
-                dealItemDescription: "Ofertas dentro: ¡Tecnología, Estilo, Viajes, Cursos—Todo con Descuento Solo para Ti!",
-                visitPublicDealFinder: "Visitar Buscador de Ofertas Públicas",
-                communityChannelHeading: "Canal de la Comunidad: Intrepid Public",
-                communityChannelDescription: "Únete a nuestro canal público para actualizaciones y discusiones.",
-                joinIntrepidPublicChannel: "Unirse al Canal Público Intrepid",
-                accessHeading: "Obtener Acceso Completo",
-                accessDescription1: "Obtén acceso de por vida al canal 'TREP Deal Finder - Acceso Completo' quemando 1 USD en tokens $TREP. Encontrarás ofertas exclusivas, ropa, gadgets, aceites y remedios, PDFs, noticias, videos, música y mucho más.",
-                accessDescription2: "Conecta tu billetera de Solana para proceder con el pago.",
-                earlyHolderAccessHeading: "Early Holder Access",
-                earlyHolderAccessDescription: "Tu puerta de entrada a la información de tokens, herramientas comunitarias y acceso exclusivo.",
-                connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
-                walletStatus: "Billetera no conectada",
-                walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
-                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: <span class=\"font-mono text-gray-800 dark:text-gray-300\">8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF</span>)",
-                moreHeading: "Más Información Cripto",
-                moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
-                trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel",
-                trepDealFinderFullAccessDescription: "Accede a ofertas y contenido exclusivos para suscriptores.",
-                visitTrepDealFinderFullAccess: "Visitar TREP Deal Finder - Acceso Completo",
-                dexscreenerGainersHeading: "Dexscreener Gainers",
-                dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
-                visitDexscreenerGainers: "Visit Dexscreener Gainers",
-                lowestFeesCryptoHeading: "Monedas Cripto con Tarifas Más Bajas",
-                lowestFeesCryptoDescription: "Find cryptocurrencies with the lowest transaction fees.",
-                visitLowestFeesCrypto: "View Lowest Fees Crypto List",
-                coinsTokensHeading: "Aprender Monedas vs Tokens",
-                coinsTokensDescription: "Learn the fundamental differences between cryptocurrencies and tokens.",
-                visitCoinsTokens: "Learn more about Coins vs Tokens",
-                dexscreenerNewPairsHeading: "Nuevos Pares de Dexscreener",
-                dexscreenerNewPairsDescription: "Explore recently listed cryptocurrency pairs on Dexscreener.",
-                visitDexscreenerNewPairs: "View Dexscreener New Pairs",
-                premiumGamesHeading: "Juegos Premium",
-                premiumGamesDescription: "¡Desbloquea modos de juego y desafíos exclusivos al convertirte en miembro premium!",
-                spotTheDifferencePremiumHeading: "Encuentra las Diferencias: Puzzles Premium",
-                spotTheDifferencePremiumDescription: "¡Accede a puzzles más desafiantes y gana mayores recompensas!",
-                playNow: "Jugar Ahora",
-                premiumGamesNote: "¡Más juegos premium próximamente!",
-                helloUser: "¡Hola, Usuario!",
-                userDataNotAvailable: "Datos de usuario no disponibles para mostrar.",
-                yourLanguage: "Tu idioma:",
-                fearlessFlyModeButton: "Activar Modo Fearless Fly 🦸‍♂️",
-                fearlessFlyActivated: "¡Modo Fearless Fly Activado! ¡Reembolsos de TREP dobles!",
-                fearlessFlyDeactivated: "Modo Fearless Fly Desactivado.",
-                fearlessFlyCost: "Activar el Modo Fearless Fly cuesta {cost} TREP. ¡Fondos insuficientes!",
-                premiumContentLocked: "Este contenido es para usuarios premium. ¡Suscríbete en la pestaña 'Acceso' para desbloquear!",
-                // New wallet-related translations
-                walletNotFound: "No wallet found. Please install Phantom or Backpack.",
-                walletConnectionFailed: "Wallet connection failed.",
-                connectedToWallet: "Conectado a la billetera: {publicKey}",
-                burnConfirmed: "🎉 Burn confirmed! Premium access granted.",
-                burnFailed: "Burn failed. Please try again.",
-                viewTransaction: "View transaction: ",
-                devnetMode: "Devnet Mode: ON",
-                mainnetMode: "Devnet Mode: OFF",
-                burnToastMessage: "🔥 Burned {amount} TREP — Welcome to the Fearless Fly League!"
             }
         };
 
-        let currentLanguage = localStorage.getItem('app_language') || 'en'; // Default to English
+        let currentLanguage = 'en'; // Default to English, as ES is removed
 
         function updateContent() {
             document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -1058,7 +967,7 @@
 
         // --- Theme and Language Toggles ---
         const themeToggleButton = document.getElementById('themeToggleButton');
-        const languageToggleButton = document.getElementById('languageToggleButton');
+        // const languageToggleButton = document.getElementById('languageToggleButton'); // Removed as only EN is supported
         const devnetToggleButton = document.getElementById('devnetToggleButton'); // New: Devnet toggle button
         const appContainer = document.getElementById('app-container');
         const appLogo = document.getElementById('appLogo');
@@ -1069,7 +978,7 @@
                 document.body.classList.add('dark-mode');
                 // Updated logo for dark mode
                 appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true";
-                themeToggleButton.textContent = '🌙';
+                themeToggleButton.textContent = '�';
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
@@ -1091,23 +1000,27 @@
             applyTheme(currentTheme === 'light' ? 'dark' : 'light');
         });
 
+        // Language toggle button is removed, so this listener is no longer needed
+        /*
         languageToggleButton.addEventListener('click', () => {
             currentLanguage = currentLanguage === 'en' ? 'es' : 'en';
             localStorage.setItem('app_language', currentLanguage);
             languageToggleButton.textContent = currentLanguage.toUpperCase();
             updateContent();
         });
+        */
 
         // --- Devnet/Mainnet Toggle Logic ---
         let currentCluster = localStorage.getItem('solana_cluster') || 'mainnet-beta'; // Default to mainnet-beta
         let isDevnetMode = currentCluster === 'devnet';
-        // Use a more robust RPC endpoint
-        let connection = new solanaWeb3.Connection(
-            isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://rpc.ankr.com/solana', // Updated RPC to Ankr
-            'confirmed'
-        );
+        let connection; // Declare connection here, assign later
 
         function updateSolanaConnection() {
+            // Ensure solanaWeb3 is defined before using it
+            if (!solanaWeb3) {
+                console.error("solanaWeb3 is not defined. Cannot update Solana connection.");
+                return;
+            }
             connection = new solanaWeb3.Connection(
                 isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://rpc.ankr.com/solana', // Updated RPC to Ankr
                 'confirmed'
@@ -1177,23 +1090,6 @@
         let initialTabId = localStorage.getItem('activeTab') || 'overviewTabContent';
         // showTab(initialTabId); // This will be called after onboarding check
 
-        tabButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const tabId = button.id.replace('Button', 'Content');
-                showTab(tabId);
-                localStorage.setItem('activeTab', tabId);
-            });
-        });
-
-        // Quick links functionality
-        document.querySelectorAll('.quick-link-button').forEach(button => {
-            button.addEventListener('click', (event) => {
-                const tabId = button.dataset.tabId;
-                showTab(tabId);
-                localStorage.setItem('activeTab', tabId);
-            });
-        });
-
         // Onboarding logic
         const onboardingScreen = document.getElementById('onboardingScreen');
         const startJourneyButton = document.getElementById('startJourneyButton');
@@ -1201,32 +1097,14 @@
 
         const hasVisited = localStorage.getItem('hasVisitedApp');
 
-        if (!hasVisited) {
-            onboardingScreen.classList.remove('hidden');
-            appContainerMain.classList.add('hidden'); // Ensure app container is hidden during onboarding
-        } else {
-            onboardingScreen.classList.add('hidden');
-            appContainerMain.classList.remove('hidden'); // Ensure app container is visible if already visited
-            showTab(initialTabId); // Show the last active tab if already visited
-        }
-
-        startJourneyButton.addEventListener('click', () => {
-            onboardingScreen.classList.add('hidden');
-            appContainerMain.classList.remove('hidden');
-            localStorage.setItem('hasVisitedApp', 'true');
-            showTab('overviewTabContent'); // Default to overview after onboarding
-        });
-
         // --- Wallet Connection & Burn Logic ---
         const connectWalletButton = document.getElementById('connectWalletButton');
         const walletStatus = document.getElementById('walletStatus');
 
         // Define your TREP token's mint address and the burn address
-        // IMPORTANT: These are now the actual addresses provided by the user.
-        // For Devnet testing, you would need to deploy your TREP token on Devnet
-        // and update these addresses accordingly for Devnet mode.
-        const TREP_MINT_ADDRESS = new solanaWeb3.PublicKey("Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka");
-        const TREP_BURN_ADDRESS = new solanaWeb3.PublicKey("8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF");
+        // These will be initialized after solanaWeb3 is available
+        let TREP_MINT_ADDRESS;
+        let TREP_BURN_ADDRESS;
         const TREP_DECIMALS = 9; // Confirmed by user
         const TREP_FULL_ACCESS_COST = 100000; // Cost in raw token units (e.g., 100,000 TREP)
 
@@ -1874,6 +1752,86 @@
 
         // --- Event Listeners for Game Tab and Game Elements ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Assign imported modules to local variables after DOM is ready
+            solanaWeb3 = window.appModules.solanaWeb3;
+            splToken = window.appModules.splToken;
+
+            // Now that solanaWeb3 is defined, initialize connection and other constants
+            // Re-define TREP constants using the now available solanaWeb3.PublicKey
+            // This needs to be done AFTER solanaWeb3 is assigned.
+            TREP_MINT_ADDRESS = new solanaWeb3.PublicKey("Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka");
+            TREP_BURN_ADDRESS = new solanaWeb3.PublicKey("8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF");
+
+            updateSolanaConnection(); // Initialize Solana connection based on saved cluster
+
+
+            // Wallet detection and initial balance fetch (delayed to give wallets time to inject)
+            setTimeout(() => {
+                if (window.solana && window.solana.isPhantom) {
+                    solanaWallet = window.solana;
+                    console.log("Phantom wallet detected");
+                } else if (window.backpack) {
+                    solanaWallet = window.backpack;
+                    console.log("Backpack wallet detected");
+                } else if (window.solana && window.solana.isBraveWallet) {
+                    solanaWallet = window.solana;
+                    console.log("Brave Wallet detected");
+                } else {
+                    console.warn("No compatible Solana wallet detected in WebView.");
+                }
+
+                // If a wallet is detected, try to connect silently if already authorized, or prompt if not
+                if (solanaWallet) {
+                    solanaWallet.connect({ onlyIfTrusted: true })
+                        .then(response => {
+                            const publicKey = response.publicKey;
+                            walletStatus.textContent = translations[currentLanguage].connectedToWallet.replace('{publicKey}', publicKey.toString());
+                            walletStatus.style.color = "green";
+                            fetchTREPBalance(publicKey);
+                        })
+                        .catch(err => {
+                            console.warn("Silent wallet connection failed (user not pre-authorized or rejected):", err);
+                            walletStatus.textContent = translations[currentLanguage].walletStatus; // Reset to "Wallet not connected"
+                            walletStatus.style.color = ""; // Reset color
+                        });
+                }
+            }, 500); // Small delay to allow wallets to inject themselves
+
+
+            // Add event listeners to buttons
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const tabId = button.id.replace('Button', 'Content');
+                    showTab(tabId);
+                    localStorage.setItem('activeTab', tabId);
+                });
+            });
+
+            // Quick links functionality
+            document.querySelectorAll('.quick-link-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const tabId = button.dataset.tabId;
+                    showTab(tabId);
+                    localStorage.setItem('activeTab', tabId);
+                });
+            });
+
+            startJourneyButton.addEventListener('click', () => {
+                onboardingScreen.classList.add('hidden');
+                appContainerMain.classList.remove('hidden');
+                localStorage.setItem('hasVisitedApp', 'true');
+                showTab('overviewTabContent'); // Default to overview after onboarding
+            });
+
+            if (!hasVisited) {
+                onboardingScreen.classList.remove('hidden');
+                appContainerMain.classList.add('hidden'); // Ensure app container is hidden during onboarding
+            } else {
+                onboardingScreen.classList.add('hidden');
+                appContainerMain.classList.remove('hidden'); // Ensure app container is visible if already visited
+                showTab(initialTabId); // Show the last active tab if already visited
+            }
+
             // Add event listener to the "Game" tab button to show the game UI
             gameTabButton.addEventListener('click', () => {
                 showTab('gameTabContent');
@@ -1937,10 +1895,11 @@
             // Initial update of TREP balance when app loads (or when game tab is first shown)
             updateTREPBalanceUI();
             updateContent(); // Initial content update based on default/saved language
-            languageToggleButton.textContent = currentLanguage.toUpperCase(); // Ensure language button shows correct initial state
+            // languageToggleButton.textContent = currentLanguage.toUpperCase(); // This line is removed as the button is gone
             updatePremiumTabVisibility(); // Call this on load to set initial visibility
-            updateSolanaConnection(); // Initialize Solana connection based on saved cluster
+            // updateSolanaConnection(); // This is now called after solanaWeb3 is assigned
         });
     </script>
 </body>
 </html>
+�
