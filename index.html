@@ -4,827 +4,714 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="appTitle">TREP Mini App</title>
-    <!-- Tailwind CSS CDN for easy styling and responsiveness -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Solana Web3.js and SPL Token Library CDNs -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/lib/index.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.3.8/lib/index.iife.min.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-phantom@0.9.20/dist/solana-wallet-adapter-phantom.min.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-backpack@0.1.0/dist/solana-wallet-adapter-backpack.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom CSS Variables for App Theme */
         :root {
-            --app-main-bg: #FFFFFF; /* Light mode main background */
-            --app-secondary-bg: #F9F9F9; /* Light mode secondary background (for statsDisplay, deal-item) */
-            --app-text-color: #333333; /* Light mode general text color */
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-text-color: #000000;
+            --tg-theme-hint-color: #888888;
+            --tg-theme-link-color: #2481cc;
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #f0f0f0;
+            --app-text-color: var(--tg-theme-text-color);
+            --app-bg-color: var(--tg-theme-bg-color);
+            --app-secondary-bg: var(--tg-theme-secondary-bg-color);
+            --app-button-color: var(--tg-theme-button-color);
+            --app-button-text-color: var(--tg-theme-button-text-color);
+            --app-link-color: var(--tg-theme-link-color);
+            --app-hint-color: var(--tg-theme-hint-color);
         }
 
-        /* Dark Mode overrides */
-        body.dark-mode {
-            --app-main-bg: #2C2C2C; /* Dark mode main background */
-            --app-secondary-bg: #3A3A3A; /* Dark mode secondary background */
-            --app-text-color: #E0E0E0; /* Dark mode general text color */
-        }
-
-        /* General Body Setup */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--tg-theme-bg-color, #FF8C69); /* Fallback background set to pink-orange */
-            color: var(--tg-theme-text-color, white); /* Fallback text color for contrast */
-            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transitions */
+            font-family: 'Arial', sans-serif;
+            background-color: var(--app-bg-color);
+            color: var(--app-text-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* Main App Container background and text now use custom variables */
-        #app-container {
-            background-color: var(--app-main-bg) !important; /* Use custom variable */
-            color: var(--app-text-color); /* Use custom variable */
-            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease; /* Added border transition */
-            border: 1px solid rgba(255,255,255,0.15); /* Glassy border */
+        body.dark-mode {
+            --tg-theme-bg-color: #212121;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-hint-color: #aaaaaa;
+            --tg-theme-link-color: #61affe;
+            --tg-theme-button-color: #61affe;
+            --tg-theme-button-text-color: #212121;
         }
 
-        /* Tab Content backgrounds */
-        .tab-content p, .tab-content h2 {
-            color: var(--app-text-color); /* Ensure text color adapts */
-        }
-        #statsDisplay, .deal-item, .game-area, #spotTheDifferenceGame {
-            background-color: var(--app-secondary-bg) !important; /* Use custom variable */
-            color: var(--app-text-color) !important; /* Use custom variable */
-            border: 1px solid rgba(255,255,255,0.15); /* Glassy border */
-            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease; /* Added border transition */
-        }
-        /* Specific styling for zone cards within game-area */
-        .zone-card {
-            background-color: var(--app-main-bg) !important; /* Lighter background for cards */
-            color: var(--app-text-color) !important;
-            border: 1px solid rgba(255,255,255,0.1);
+        .container {
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Specific styles for tab buttons to handle active/inactive states */
-        .tab-button {
-            /* Default background and text color for inactive tabs, adapting to app theme */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--app-secondary-bg);
+            border-bottom: 1px solid var(--app-hint-color);
+        }
+
+        .header img {
+            height: 40px;
+        }
+
+        .header-buttons button {
+            background-color: var(--app-button-color);
+            color: var(--app-button-text-color);
+            border: none;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .header-buttons button:hover {
+            opacity: 0.9;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--app-secondary-bg);
+            padding: 0.5rem 0;
+            border-top: 1px solid var(--app-hint-color);
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-bar button {
+            background: none;
+            border: none;
+            color: var(--app-hint-color);
+            padding: 0.7rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .nav-bar button.active {
+            color: var(--app-button-color);
+        }
+
+        .nav-bar button:hover:not(.active) {
+            color: var(--app-text-color);
+        }
+
+        .nav-bar button i {
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .tab-content {
+            flex-grow: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .card {
+            background-color: var(--app-secondary-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary {
+            background-color: var(--app-button-color);
+            color: var(--app-button-text-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .link-button {
+            color: var(--app-link-color);
+            text-decoration: none;
+            display: block;
+            margin-top: 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .quick-link-button {
             background-color: var(--app-secondary-bg);
             color: var(--app-text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid var(--app-hint-color);
+            transition: background-color 0.2s, border-color 0.2s;
         }
 
-        .tab-button.active {
-            /* Active tab uses Telegram's button colors for strong contrast */
-            background-color: var(--tg-theme-button-color, #0088cc) !important;
-            color: var(--tg-theme-button-text-color, white) !important;
+        .quick-link-button.active,
+        .quick-link-button:hover {
+            background-color: var(--app-button-color);
+            color: var(--app-button-text-color);
+            border-color: var(--app-button-color);
         }
 
-        /* Onboarding screen styles */
-        .onboarding-overlay {
+        /* Onboarding specific styles */
+        #onboardingScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            flex-grow: 1;
+        }
+
+        #onboardingScreen img {
+            max-width: 80%;
+            height: auto;
+            margin-bottom: 2rem;
+        }
+
+        #onboardingScreen h1 {
+            font-size: 2rem;
+            color: var(--app-text-color);
+            margin-bottom: 1rem;
+        }
+
+        #onboardingScreen p {
+            font-size: 1rem;
+            color: var(--app-hint-color);
+            margin-bottom: 2rem;
+        }
+
+        /* Custom Alert */
+        .custom-alert-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #E0FFFF; /* Light Cyan background for the onboarding screen */
+            background-color: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000; /* Ensure it's on top */
-            flex-direction: column;
-            padding: 1rem;
+            z-index: 10000;
+        }
+
+        .custom-alert-box {
+            background-color: var(--app-bg-color);
+            color: var(--app-text-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
-        }
-        .onboarding-content {
-            background: var(--tg-theme-secondary-bg-color, white);
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            max-width: 90%;
-            width: 500px;
-            color: var(--tg-theme-text-color, #333);
-            border: 1px solid rgba(255,255,255,0.15); /* Glassy border */
-            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease; /* Added border transition */
-        }
-        .onboarding-button {
-            background-color: var(--tg-theme-button-color, #0088cc);
-            color: var(--tg-theme-button-text-color, white);
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 1.5rem;
-        }
-        .onboarding-button:hover {
-            filter: brightness(90%);
+            max-width: 80%;
+            min-width: 250px;
         }
 
-        /* Quick links styling */
-        .quick-link-button {
-            background-color: var(--tg-theme-button-color, #0088cc);
-            color: var(--tg-theme-button-text-color, white);
-            width: 48px; /* Fixed width for icon-like appearance */
-            height: 48px; /* Fixed height for icon-like appearance */
-            border-radius: 50%; /* Make it circular */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.8rem; /* Smaller font for text labels */
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        .quick-link-button:hover {
-            filter: brightness(90%);
-            transform: translateY(-2px); /* Slight lift on hover */
-        }
-        .quick-link-button.active {
-            background-color: var(--tg-theme-link-color, #0088cc) !important; /* Active quick link color */
-            animation: pop 0.3s ease-out forwards; /* Apply pop animation */
-        }
-
-        /* Fade-in animation for tab content */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in-tab {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        /* Pop animation for active quick links */
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1.1); } /* End slightly larger than normal */
-        }
-
-        /* Toggle Button Styling (Theme & Language) */
-        .toggle-button {
-            background-color: var(--tg-theme-secondary-bg-color, #e0e0e0);
-            color: var(--tg-theme-text-color, #333);
+        .custom-alert-box button {
+            background-color: var(--app-button-color);
+            color: var(--app-button-text-color);
             border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            padding: 0.5rem 0.75rem; /* Adjusted padding */
-            border-radius: 0.5rem; /* Rounded corners */
-            font-size: 1rem; /* Standard font size */
-            font-weight: bold;
-        }
-        .toggle-button:hover {
-            filter: brightness(90%);
+            margin-top: 15px;
         }
 
-        /* New style for navy blue text */
-        .text-navy-blue {
-            color: #000080; /* Navy Blue */
-        }
-
-        /* Hotspot specific styles for main game */
-        .hotspot {
-            background-color: rgba(255, 255, 0, 0.6); /* Semi-transparent yellow */
-            border: 2px solid rgba(255, 255, 0, 0.8);
-        }
-        .hotspot.animate-pulse {
-            animation: pulse-glow 1.5s infinite ease-in-out;
-        }
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 0px 0px rgba(255, 255, 0, 0.7); opacity: 0.8; }
-            50% { box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.9); opacity: 1; }
-            100% { box-shadow: 0 0 0px 0px rgba(255, 255, 0, 0.7); opacity: 0.8; }
-        }
-
-        /* Spot the Difference Game Styles */
-        #spotTheDifferenceGame {
+        /* Game specific styles */
+        #gamePlayArea {
+            position: relative;
             width: 100%;
-            max-width: 600px; /* Limit width for better display of two images */
-            margin: 0 auto;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 1rem;
         }
 
-        .puzzle-images-container {
+        #zoneImageContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hotspot {
+            background-color: rgba(255, 255, 0, 0.7); /* Yellow with transparency */
+            border: 2px solid yellow;
+            box-shadow: 0 0 10px yellow;
+        }
+
+        .fearless-fly-active .hotspot {
+            background-color: rgba(100, 100, 255, 0.7); /* Blue with transparency */
+            border: 2px solid blue;
+            box-shadow: 0 0 10px blue;
+        }
+
+        .zone-card {
+            border: 1px solid var(--app-hint-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .zone-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Spot the Difference Game styles */
+        .puzzle-images {
             display: flex;
-            flex-wrap: wrap; /* Allow wrapping on small screens */
-            justify-content: center;
             gap: 1rem;
-            margin-bottom: 1rem;
-            position: relative; /* For absolute positioning of hotspots */
+            margin-top: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .puzzle-image-wrapper {
             position: relative;
-            width: 100%; /* Full width on small screens */
-            max-width: 280px; /* Max width for each image in a pair */
-            aspect-ratio: 16 / 9; /* Maintain aspect ratio */
+            width: 100%; /* Adjust for responsiveness */
+            max-width: 400px;
+            border: 1px solid var(--app-hint-color);
+            border-radius: 8px;
             overflow: hidden;
-            border-radius: 0.5rem;
-            border: 2px solid var(--app-text-color);
-            min-height: 150px; /* Ensure a minimum visible area */
         }
+
         .puzzle-image-wrapper img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
             display: block;
         }
 
         .difference-hotspot {
             position: absolute;
-            background-color: rgba(255, 0, 0, 0.0); /* Completely transparent initially */
-            border: 2px dashed transparent; /* Invisible border */
+            /* background-color: rgba(255, 0, 0, 0.3); /* Red overlay for differences */
             cursor: pointer;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+            border: 2px solid transparent; /* Invisible by default */
         }
+
         .difference-hotspot:hover {
-            background-color: rgba(255, 255, 0, 0.2); /* Light yellow on hover */
-            border-color: rgba(255, 255, 0, 0.5); /* Yellow border on hover */
+            border-color: rgba(255, 255, 0, 0.7); /* Yellow on hover */
         }
+
         .difference-hotspot.found {
-            background-color: rgba(0, 255, 0, 0.3); /* Green when found */
-            border-color: rgba(0, 255, 0, 0.7); /* Solid green border when found */
+            background-color: rgba(0, 255, 0, 0.5); /* Green when found */
+            border-color: green;
             cursor: default;
             pointer-events: none; /* Disable further clicks */
         }
-        .difference-hotspot.found::after {
-            content: '✅'; /* Checkmark emoji */
-            display: block;
-        }
 
-        @media (min-width: 640px) { /* Tailwind's sm breakpoint */
-            .puzzle-image-wrapper {
-                width: calc(50% - 0.5rem); /* Two images side-by-side with gap */
-            }
-        }
-
-        /* Flex container for Deals tab item with image */
-        .deal-item.with-image {
-            display: flex;
-            flex-direction: column; /* Default to column on small screens */
-            align-items: center;
-            gap: 1rem;
-        }
-
-        @media (min-width: 640px) { /* On larger screens, arrange side-by-side */
-            .deal-item.with-image {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: flex-start; /* Align text to top */
-            }
-            .deal-item.with-image .deal-text-content {
-                flex: 1; /* Take remaining space */
-                text-align: left;
-            }
-            .deal-item.with-image img {
-                width: 40%; /* Adjust image width */
-                max-width: 200px; /* Max width for image */
-                margin-left: 1rem; /* Space between text and image */
-            }
-        }
-
-        /* Fearless Fly Mode Styling */
-        .fearless-fly-active {
-            box-shadow: 0 0 15px 5px rgba(0, 255, 0, 0.5) !important; /* Green glow */
-            border-color: rgba(0, 255, 0, 0.7) !important;
-        }
-        .fearless-fly-button.active {
-            background-color: #4CAF50 !important; /* Green for active button */
-            color: white !important;
-            box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
-        }
-
-        /* New: Disabled tab styling */
-        .disabled-tab {
-            opacity: 0.5; /* Visually dim the tab */
-            cursor: not-allowed; /* Indicate it's not clickable */
-            pointer-events: none; /* Prevent all click events */
-        }
-
-        /* Burn spark effect */
+        /* Burn animation and toast */
         .burn-sparkle {
             position: fixed;
             top: 50%;
             left: 50%;
-            width: 200px;
-            height: 200px;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(circle, #ffcc00, #ff6600, transparent);
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,165,0,0.5) 70%, rgba(255,0,0,0) 100%);
             border-radius: 50%;
-            animation: sparkleFade 1.2s ease-out forwards;
-            z-index: 9999;
-            pointer-events: none;
+            transform: translate(-50%, -50%) scale(0);
+            animation: sparkle-grow 1.5s forwards ease-out;
+            z-index: 1000;
         }
 
-        @keyframes sparkleFade {
-            0% { opacity: 1; transform: scale(1); }
-            60% { opacity: 0.8; transform: scale(1.5); }
-            100% { opacity: 0; transform: scale(2); }
+        @keyframes sparkle-grow {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
         }
 
-        /* Toast message */
         .burn-toast {
             position: fixed;
-            top: 30%;
+            bottom: 80px; /* Above the nav bar */
             left: 50%;
             transform: translateX(-50%);
-            background: #222;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 16px;
-            font-size: 18px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.4);
-            z-index: 9999;
-            animation: toastSlide 2.5s ease-out forwards;
-        }
-
-        @keyframes toastSlide {
-            0% { transform: translate(-50%, -150%); opacity: 0; }
-            30% { transform: translate(-50%, 0); opacity: 1; }
-            100% { transform: translate(-50%, 100%); opacity: 0; }
-        }
-
-        /* Custom Modal Styles */
-        .custom-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000; /* Higher than other elements */
-        }
-
-        .custom-modal-content {
-            background: var(--app-main-bg);
-            color: var(--app-text-color);
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            max-width: 90%;
-            width: 400px;
-            text-align: center;
-            position: relative;
-        }
-
-        .custom-modal-close {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--app-text-color);
-        }
-
-        .custom-modal-button {
             background-color: var(--tg-theme-button-color, #0088cc);
             color: var(--tg-theme-button-text-color, white);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 1rem;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            animation: toast-fade-in-out 2.5s forwards ease-in-out;
+            z-index: 1001;
+            white-space: nowrap; /* Prevent text wrap */
         }
-        .custom-modal-button:hover {
-            filter: brightness(90%);
+
+        @keyframes toast-fade-in-out {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
+
+        .disabled-tab {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none; /* Disable click */
+        }
+
+        .tab-button.disabled-tab.active {
+            color: var(--app-button-color) !important; /* Keep active color if it's the current tab */
+        }
+
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
-
-    <!-- Custom Modal Structure -->
-    <div id="customModalOverlay" class="custom-modal-overlay hidden">
-        <div class="custom-modal-content">
-            <button id="customModalCloseButton" class="custom-modal-close">×</button>
-            <p id="customModalMessage" class="text-lg font-semibold"></p>
-            <button id="customModalOkButton" class="custom-modal-button">OK</button>
-        </div>
+<body>
+    <div id="onboardingScreen" class="hidden">
+        <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP Logo" class="w-48 mb-8">
+        <h1 class="text-3xl font-bold mb-4" data-i18n="onboardingWelcome">Welcome to TREP Mini App!</h1>
+        <p class="text-gray-600 mb-8" data-i18n="onboardingDescription">Your ultimate companion for exclusive deals, real-time market insights, and community connections within the TREP ecosystem.</p>
+        <button id="startJourneyButton" class="btn-primary w-full max-w-xs" data-i18n="startJourneyButton">Start Your Journey</button>
     </div>
 
-    <!-- Onboarding Screen -->
-    <div id="onboardingScreen" class="onboarding-overlay hidden">
-        <div class="onboarding-content">
-            <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover mx-auto">
-            <h2 class="text-2xl font-bold mb-3" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="onboardingWelcome">Welcome to TREP Mini App!</h2>
-            <p class="mb-6" style="color: var(--tg-theme-text-color, #333);" data-i18n="onboardingDescription">
-                Your ultimate companion for exclusive deals, real-time market insights, and community connections within the TREP ecosystem.
-            </p>
-            <button id="startJourneyButton" class="onboarding-button" data-i18n="startJourneyButton">
-                Start Your Journey
+    <div id="app-container" class="container hidden">
+        <div class="header">
+            <img id="appLogo" src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP Logo">
+            <div class="header-buttons">
+                <button id="devnetToggleButton" class="bg-gray-500 text-white px-3 py-1 rounded-md text-sm" data-i18n="mainnetMode">Devnet Mode: OFF</button>
+                <button id="languageToggleButton">EN</button>
+                <button id="themeToggleButton">☀️</button>
+            </div>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-4">
+            <p id="infoText" class="text-center text-sm text-gray-500 mb-4"></p>
+
+            <div id="overviewTabContent" class="tab-content">
+                <h2 class="text-2xl font-bold mb-4" data-i18n="overviewHeading">Overview</h2>
+                <div class="card">
+                    <p class="mb-4" data-i18n="overviewContent">TREP is a community-driven token with real utility in Deal Discovery & Market Signals. Burn TREP to access early listings, investor insights, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.</p>
+                    <a href="https://trep.com/mission" target="_blank" class="link-button" data-i18n="overviewLearnMore">Learn more about our mission and features.</a>
+                </div>
+            </div>
+
+            <div id="trenksTabContent" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-4" data-i18n="trenksHeading">Trenks</h2>
+                <div class="card">
+                    <p class="mb-4" data-i18n="trenksDescription">Here you'll find important links related to TREP tokens, community, and social media.</p>
+
+                    <h3 class="font-semibold text-lg mt-4 mb-2" data-i18n="checkTrepOn">Check TREP on:</h3>
+                    <ul class="list-disc list-inside mb-4 ml-4">
+                        <li><a href="https://dexscreener.com/solana/treptokenaddress" target="_blank" class="text-blue-500">Dexscreener</a></li>
+                        <li><a href="https://birdeye.so/token/treptokenaddress" target="_blank" class="text-blue-500">BirdEye</a></li>
+                    </ul>
+
+                    <h3 class="font-semibold text-lg mt-4 mb-2" data-i18n="joinSocials">Join our Socials:</h3>
+                    <ul class="list-disc list-inside mb-4 ml-4">
+                        <li><a href="https://t.me/TREPCommunity" target="_blank" class="text-blue-500">Telegram Community</a></li>
+                        <li><a href="https://twitter.com/TREPOfficial" target="_blank" class="text-blue-500">Twitter</a></li>
+                    </ul>
+
+                    <h3 class="font-semibold text-lg mt-4 mb-2" data-i18n="officialWebsite">Official Website:</h3>
+                    <a href="https://trep.com" target="_blank" class="link-button">trep.com</a>
+                </div>
+            </div>
+
+            <div id="dealsTabContent" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-4" data-i18n="dealsTab">Deals</h2>
+
+                <div class="card">
+                    <h3 class="font-semibold text-xl mb-2" data-i18n="publicDealsHeading">Public Deals</h3>
+                    <p class="mb-4" data-i18n="publicDealsDescription">Exclusive discount on tech gadgets and more.</p>
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
+                        <h4 class="font-bold text-lg" data-i18n="dealItemHeading">Unlock Exclusive Deals Inside: Tech, Style, Travel, Courses—All Discounted Just For You!</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="dealItemDescription">Deals inside: Tech, Style, Travel, Courses—All Discounted Just For You!</p>
+                    </div>
+                    <a href="https://t.me/TREPPublic" target="_blank" class="btn-primary w-full" data-i18n="visitPublicDealFinder">Visit Public Deal Finder</a>
+                </div>
+
+                <div class="card mt-6">
+                    <h3 class="font-semibold text-xl mb-2" data-i18n="communityChannelHeading">Community Channel: Intrepid Public</h3>
+                    <p class="mb-4" data-i18n="communityChannelDescription">Join our public channel for updates and discussions.</p>
+                    <a href="https://t.me/TREPPublic" target="_blank" class="btn-primary w-full" data-i18n="joinIntrepidPublicChannel">Join Intrepid Public Channel</a>
+                </div>
+            </div>
+
+            <div id="accessTabContent" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-4" data-i18n="accessHeading">Get Full Access</h2>
+                <div class="card">
+                    <p class="mb-4" data-i18n="accessDescription1">Get lifetime access to the 'TREP Deal Finder - Full Access' channel by burning 1 USD worth of $TREP tokens. You'll find exclusive deals, clothing, gadgets, oils and remedies, PDFs, news, videos, music and much more.</p>
+                    <p class="mb-4" data-i18n="accessDescription2">Connect your Solana wallet to proceed with payment.</p>
+
+                    <h3 class="font-semibold text-xl mb-2" data-i18n="earlyHolderAccessHeading">Early Holder Access</h3>
+                    <p class="mb-4" data-i18n="earlyHolderAccessDescription">Your gateway to token insights, community tools, and exclusive access.</p>
+
+                    <button id="connectWalletButton" class="btn-primary w-full mb-4" data-i18n="connectWalletButton">Connect Wallet and Burn 100,000 TREP</button>
+                    <p id="walletStatus" class="text-center text-sm text-gray-500" data-i18n="walletStatus">Wallet not connected</p>
+                    <p class="text-center text-xs text-gray-400 mt-2" data-i18n="walletNote">(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)</p>
+                    <p class="text-center text-xs text-gray-400 mt-2" data-i18n="burnAddressNote">(Note: All burned tokens are sent to a verifiable burn address: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)</p>
+                </div>
+            </div>
+
+            <div id="moreTabContent" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-4" data-i18n="moreHeading">More Crypto Info</h2>
+                <div class="card">
+                    <p class="mb-4" data-i18n="moreDescription">Explore trending cryptocurrencies and market insights.</p>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-lg mb-2" data-i18n="trepDealFinderFullAccessHeading">TREP Deal Finder - Full Access Channel</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2" data-i18n="trepDealFinderFullAccessDescription">Access exclusive deals and content for subscribers.</p>
+                        <a href="https://t.me/TREPDealFinder" target="_blank" class="btn-primary w-full text-center text-sm" data-i18n="visitTrepDealFinderFullAccess">Visit TREP Deal Finder - Full Access</a>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-lg mb-2" data-i18n="dexscreenerGainersHeading">Dexscreener Gainers</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2" data-i18n="dexscreenerGainersDescription">View the top gaining cryptocurrencies on Dexscreener.</p>
+                        <a href="https://dexscreener.com/gainers" target="_blank" class="btn-primary w-full text-center text-sm" data-i18n="visitDexscreenerGainers">Visit Dexscreener Gainers</a>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-lg mb-2" data-i18n="lowestFeesCryptoHeading">Lowest Fees Crypto Coins</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2" data-i18n="lowestFeesCryptoDescription">Find cryptocurrencies with the lowest transaction fees.</p>
+                        <a href="https://www.google.com/search?q=crypto+with+lowest+fees" target="_blank" class="btn-primary w-full text-center text-sm" data-i18n="visitLowestFeesCrypto">View Lowest Fees Crypto List</a>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-lg mb-2" data-i18n="coinsTokensHeading">Learn Coins vs Tokens</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2" data-i18n="coinsTokensDescription">Learn the fundamental differences between cryptocurrencies and tokens.</p>
+                        <a href="https://www.investopedia.com/coins-vs-tokens-5204481" target="_blank" class="btn-primary w-full text-center text-sm" data-i18n="visitCoinsTokens">Learn more about Coins vs Tokens</a>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-lg mb-2" data-i18n="dexscreenerNewPairsHeading">Dexscreener New Pairs</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2" data-i18n="dexscreenerNewPairsDescription">Explore newly listed crypto pairs on Dexscreener.</p>
+                        <a href="https://dexscreener.com/new-pairs" target="_blank" class="btn-primary w-full text-center text-sm" data-i18n="visitDexscreenerNewPairs">View Dexscreener New Pairs</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="premiumGamesTabContent" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-4" data-i18n="premiumGamesHeading">Premium Games</h2>
+                <div class="card">
+                    <p class="mb-4" data-i18n="premiumGamesDescription">Unlock exclusive game modes and challenges by becoming a premium member!</p>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-lg mb-2" data-i18n="spotTheDifferencePremiumHeading">Spot the Difference: Premium Puzzles</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2" data-i18n="spotTheDifferencePremiumDescription">Access more challenging puzzles and earn greater rewards!</p>
+                        <button id="playPremiumSpotTheDifference" class="btn-primary w-full text-center text-sm" data-i18n="playNow">Play Now</button>
+                    </div>
+
+                    <p class="text-center text-sm text-gray-500 mt-4" data-i18n="premiumGamesNote">More premium games coming soon!</p>
+                </div>
+            </div>
+
+
+            <div id="gameTabContent" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-4" data-i18n="gameTab">Game</h2>
+                <div class="card mb-4">
+                    <p class="text-lg font-bold" data-i18n="yourBalance">Your TREP Balance: <span id="trepBalance">0 TREP</span></p>
+                    <button id="fearlessFlyToggleButton" class="btn-primary mt-2 w-full text-sm">Activate Fearless Fly Mode 🦸‍♂️</button>
+                </div>
+
+                <div id="gameZoneSelection">
+                    <h3 class="text-xl font-bold mb-4" data-i18n="selectZone">Select a Zone to Explore:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="zone-card card cursor-pointer p-4 text-center" data-zone="jungle">
+                            <h4 class="font-semibold text-lg">TREP Jungle</h4>
+                            <p class="text-sm text-gray-500">Explore dense foliage for hidden treasures.</p>
+                        </div>
+                        <div class="zone-card card cursor-pointer p-4 text-center" data-zone="island">
+                            <h4 class="font-semibold text-lg">TREP Island</h4>
+                            <p class="text-sm text-gray-500">Search the sandy shores and ancient ruins.</p>
+                        </div>
+                        <div class="zone-card card cursor-pointer p-4 text-center" data-zone="labyrinth">
+                            <h4 class="font-semibold text-lg">TREP Labyrinth</h4>
+                            <p class="text-sm text-gray-500">Navigate the maze for elusive rewards.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="gamePlayArea" class="hidden">
+                    <h3 id="currentZoneTitle" class="text-xl font-bold mb-4 text-center"></h3>
+                    <div id="zoneImageContainer" class="relative w-full bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden h-64 mb-4">
+                        </div>
+                    <p id="gamePrompt" class="text-center text-gray-600 dark:text-gray-400 mb-2" data-i18n="tapHotspot">Tap on a sparkling hotspot to search for TREP!</p>
+                    <p id="gameFeedback" class="text-center font-semibold text-lg mb-2"></p>
+                    <p id="rewardDisplay" class="text-center font-bold text-lg p-2 rounded-lg hidden"></p>
+                    <button id="backToZonesButton" class="btn-primary w-full mt-4" data-i18n="backToZones">Back to Zones</button>
+                </div>
+
+                <div id="spotTheDifferenceGame" class="hidden">
+                    <h3 class="text-xl font-bold mb-4 text-center" data-i18n="spotTheDifferenceGame">Spot the Difference Puzzle</h3>
+                    <div id="subscriptionRequired" class="card bg-red-100 text-red-800 p-4 mb-4 hidden">
+                        <p class="text-center font-bold" data-i18n="premiumContentLocked">This content is for premium users. Subscribe in the 'Access' tab to unlock!</p>
+                        <button id="subscribeToGamesButton" class="btn-primary w-full mt-4" data-i18n="subscribeNow">Subscribe Now!</button>
+                    </div>
+
+                    <div class="puzzle-images">
+                        <div class="puzzle-image-wrapper">
+                            <h4 class="text-center font-semibold mb-2" data-i18n="originalImage">Original Image</h4>
+                            <img id="originalImage" src="" alt="Original Image">
+                        </div>
+                        <div class="puzzle-image-wrapper">
+                            <h4 class="text-center font-semibold mb-2" data-i18n="modifiedImage">Modified Image</h4>
+                            <img id="modifiedImage" src="" alt="Modified Image">
+                            </div>
+                    </div>
+                    <p class="text-center mt-4 text-lg">
+                        <span data-i18n="differencesFound">Differences Found:</span> <span id="differencesFoundDisplay">0</span> / <span id="totalDifferences">0</span>
+                    </p>
+                    <p id="puzzleFeedback" class="text-center font-semibold text-md mt-2"></p>
+                    <button id="nextPuzzleButton" class="btn-primary w-full mt-4 hidden" data-i18n="nextPuzzle">Next Puzzle</button>
+                    <button id="backToGameFromPuzzleButton" class="btn-primary w-full mt-2" data-i18n="backToGame">Back to Game</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-bar">
+            <button id="overviewTabButton" class="tab-button active">
+                <i class="fas fa-home"></i>
+                <span data-i18n="overviewTab">Overview</span>
+            </button>
+            <button id="trenksTabButton" class="tab-button">
+                <i class="fas fa-coins"></i>
+                <span data-i18n="trenksTab">Trenks</span>
+            </button>
+            <button id="dealsTabButton" class="tab-button">
+                <i class="fas fa-tags"></i>
+                <span data-i18n="dealsTab">Deals</span>
+            </button>
+            <button id="accessTabButton" class="tab-button">
+                <i class="fas fa-key"></i>
+                <span data-i18n="accessTab">Access</span>
+            </button>
+            <button id="gameTabButton" class="tab-button">
+                <i class="fas fa-gamepad"></i>
+                <span data-i18n="gameTab">Game</span>
+            </button>
+            <button id="premiumGamesTabButton" class="tab-button">
+                <i class="fas fa-star"></i>
+                <span data-i18n="premiumGamesTab">Premium</span>
+            </button>
+            <button id="moreTabButton" class="tab-button">
+                <i class="fas fa-ellipsis-h"></i>
+                <span data-i18n="moreTab">More</span>
             </button>
         </div>
     </div>
-
-    <!-- Main App Container -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-2xl flex flex-col items-center relative"
-         id="app-container">
-
-        <!-- Top Right Buttons Container -->
-        <div class="absolute top-4 right-4 flex space-x-2">
-            <!-- Language Toggle Button -->
-            <button id="languageToggleButton" class="toggle-button">
-                ES
-            </button>
-            <!-- Theme Toggle Button -->
-            <button id="themeToggleButton" class="toggle-button text-2xl">
-                ☀️
-            </button>
-            <!-- Devnet Toggle Button -->
-            <button id="devnetToggleButton" class="toggle-button text-sm">
-                Devnet
-            </button>
-        </div>
-
-        <!-- Logo -->
-        <img id="appLogo" src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo.png?raw=true" alt="TREP App Logo" class="w-24 h-24 rounded-full mb-4 object-cover">
-
-        <!-- Welcome Message -->
-        <h1 class="text-3xl font-bold mb-3 text-center"
-            style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="mainWelcome">
-            Welcome to TREP Mini App!
-        </h1>
-        <p class="text-center mb-6" style="color: var(--app-text-color);" data-i18n="mainDescription">
-            Your gateway to exclusive deals, real-time stats, and community access.
-        </p>
-
-        <!-- Tab Navigation - Main Row -->
-        <div class="flex justify-center flex-wrap mb-2 w-full space-x-2">
-            <button id="overviewTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    data-i18n="overviewTab">
-                Overview
-            </button>
-            <button id="statsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    data-i18n="trenksTab">
-                Trenks
-            </button>
-            <button id="dealsTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    data-i18n="dealsTab">
-                Deals
-            </button>
-            <button id="gameTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    data-i18n="gameTab">
-                Game
-            </button>
-            <!-- Access tab is always visible -->
-            <button id="accessTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200"
-                    data-i18n="accessTab">
-                Access
-            </button>
-            <!-- More tab is visible but disabled by default -->
-            <button id="moreTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 disabled-tab"
-                    data-i18n="moreTab">
-                More
-            </button>
-        </div>
-
-        <!-- Tab Navigation - Premium Games (separated and centered) -->
-        <div class="flex justify-center w-full mt-4 mb-6">
-            <button id="premiumGamesTabButton" class="tab-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 disabled-tab"
-                    data-i18n="premiumGamesTab">
-                Premium Games
-            </button>
-        </div>
-
-        <!-- Tab Content: Overview -->
-        <div id="overviewTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="overviewHeading">Overview</h2>
-            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="overviewContent">
-                TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Burn TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.<br><br>Join our community!
-            </p>
-            <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Overview.png?raw=true" alt="TREP Ecosystem Overview" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
-            <p class="text-sm" style="color: var(--tg-theme-hint-color, #666);" data-i18n="overviewLearnMore">
-                Learn more about our mission and features.
-            </p>
-        </div>
-
-        <!-- Tab Content: Trenks (formerly Real-time Stats) -->
-        <div id="statsTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="trenksHeading">Trenks</h2>
-            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="trenksDescription">
-                Here you will find important links related to TREP tokens, community, and social media.
-            </p>
-            <div id="statsDisplay" class="bg-gray-100 p-4 rounded-lg text-left flex flex-wrap justify-center items-start gap-4">
-                <div class="flex-1 min-w-[200px]">
-                    <p data-i18n="checkTrepOn"><strong>Check TREP on:</strong></p>
-                    <ul class="list-disc list-inside ml-4 mb-4">
-                        <li><a href="https://dexscreener.com/solana/a6fmyrfluwn8xvfsnyqtsd2kpxht2b4lq4l8lkp11nnm" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dexscreener</a></li>
-                        <li><a href="https://www.geckoterminal.com/solana/pools/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?utm_source=coingecko&utm_medium=referral&utm_campaign=searchresults" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">GeckoTerminal (CoinGecko)</a></li>
-                        <li><a href="https://www.dextools.io/app/en/solana/pair-explorer/A6FMyRFLuwN8xvFSNYqtsd2KPxht2B4LQ4L8LkP11NnM?t=1753065837128" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Dextools</a></li>
-                        <li><a href="https://solscan.io/token/Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Solscan</a></li>
-                        <!-- NEW: CoinMarketCap Link -->
-                        <li><a href="https://dex.coinmarketcap.com/token/solana/Cf7r9JE9HcHSe1EN3hm6kEjGCyQuV3p6CjuwRx919Tka/" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">CoinMarketCap (Dex)</a></li>
-                    </ul>
-
-                    <p data-i18n="joinSocials"><strong>Join our Socials:</strong></p>
-                    <ul class="list-disc list-inside ml-4 mb-4">
-                        <li><a href="https://www.youtube.com/@Intrepid-TREPofficial" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">YouTube</a></li>
-                        <li><a href="https://x.com/OffcialTrep" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">X (Twitter)</a></li>
-                    </ul>
-                    <p data-i18n="officialWebsite"><strong>Official Website:</strong></p>
-                    <ul class="list-disc list-inside ml-4">
-                        <li><a href="https://sites.google.com/view/intrepid-trep/home" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);">Intrepid TREP Website</a></li>
-                    </ul>
-                </div>
-                <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Real-time%20stats.png?raw=true" alt="Trenks Visual" class="w-64 h-auto rounded-lg my-2 object-cover">
-            </div>
-        </div>
-
-        <!-- Tab Content: Deals -->
-        <div id="dealsTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="publicDealsHeading">Public Deals</h2>
-            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="publicDealsDescription">
-                Exclusive Discount on Tech Gadgets and more.
-            </p>
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3 with-image">
-                <div class="deal-text-content">
-                    <h3 class="font-semibold text-lg" data-i18n="dealItemHeading">Unlock Exclusive Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!</h3>
-                    <a href="https://t.me/theTREPstore" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitPublicDealFinder">
-                        Visit Public Deal Finder
-                    </a>
-                </div>
-                <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Unlock%20exclusive%20deals.png?raw=true" alt="Unlock Exclusive Deals" class="w-64 h-auto rounded-lg my-2 object-cover">
-            </div>
-            <div class="deal-item bg-gray-100 p-4 rounded-lg">
-                <h3 class="font-semibold text-lg" data-i18n="communityChannelHeading">Community Channel: Intrepid Public</h3>
-                <p class="text-sm" data-i18n="communityChannelDescription">Join our public channel for updates and discussions.</p>
-                <a href="https://t.me/+1eLqv6wlVhZmMjUx" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="joinIntrepidPublicChannel">
-                    Join Intrepid Public Channel
-                </a>
-            </div>
-        </div>
-
-        <!-- Tab Content: Access -->
-        <div id="accessTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="accessHeading">Gain Full Access</h2>
-            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="accessDescription1">
-                Gain lifetime access to the 'TREP Deal Finder - Full Access' channel by burning 1 USD in $TREP tokens. You'll find exclusive deals, clothes, gadgets, oils & remedies, PDFs, news, videos, music, and much more.
-            </p>
-            <p class="mb-4 text-green-500 font-bold" data-i18n="accessDescription2">
-                Connect your Solana wallet to proceed with payment.
-            </p>
-            <div class="bg-gray-100 p-4 rounded-lg mb-4 text-left">
-                <h3 class="font-semibold text-lg text-navy-blue" data-i18n="earlyHolderAccessHeading">Early Holder Access</h3>
-                <!-- NEW: Changed text color to black for better visibility in dark mode -->
-                <p class="text-sm" style="color: #000000;" data-i18n="earlyHolderAccessDescription">Your gateway to token insights, community tools, and exclusive access.</p>
-            </div>
-            <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="Access Tab Visual" class="w-64 h-auto rounded-lg mb-4 object-cover block mx-auto">
-            <button id="connectWalletButton"
-                    class="w-full py-3 rounded-lg font-bold transition-colors duration-200 mb-4"
-                    style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="connectWalletButton">
-                Connect Wallet & Burn 100,000 TREP
-            </button>
-            <!-- NEW: Changed text color to green for better visibility -->
-            <p id="walletStatus" class="text-sm text-center text-green-500 font-bold" data-i18n="walletStatus">
-                Wallet not connected
-            </p>
-            <!-- NEW: Burn Address Note -->
-            <p class="text-xs mt-2 text-center" style="color: var(--tg-theme-hint-color, #666);" data-i18n="burnAddressNote">
-                (Note: All burned tokens are sent to a verifiable burn address: <span class="font-mono text-gray-800 dark:text-gray-300">8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF</span>)
-            </p>
-            <p class="text-xs mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="walletNote">
-                (Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)
-            </p>
-        </div>
-
-        <!-- New Tab Content: More -->
-        <div id="moreTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="moreHeading">More Crypto Info</h2>
-            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="moreDescription">
-                Explore trending cryptocurrencies and market insights.
-            </p>
-            <!-- NEW: Trep Deal Finder - Full Access Channel Link -->
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
-                <h3 class="font-semibold text-lg" data-i18n="trepDealFinderFullAccessHeading">TREP Deal Finder - Full Access Channel</h3>
-                <p class="text-sm" data-i18n="trepDealFinderFullAccessDescription">Access exclusive deals and content for subscribers.</p>
-                <a href="https://t.me/+UxTGg9zNBzthYTUx" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitTrepDealFinderFullAccess">
-                    Visit TREP Deal Finder - Full Access
-                </a>
-            </div>
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
-                <h3 class="font-semibold text-lg" data-i18n="dexscreenerGainersHeading">Dexscreener Gainers</h3>
-                <p class="text-sm" data-i18n="dexscreenerGainersDescription">See the top gaining cryptocurrencies on Dexscreener.</p>
-                <a href="https://dexscreener.com/gainers" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitDexscreenerGainers">
-                    Visit Dexscreener Gainers
-                </a>
-            </div>
-            <!-- NEW: Added link for Lowest Fees Crypto Coins -->
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
-                <h3 class="font-semibold text-lg" data-i18n="lowestFeesCryptoHeading">Lowest Fees Crypto Coins</h3>
-                <p class="text-sm" data-i18n="lowestFeesCryptoDescription">Find cryptocurrencies with the lowest transaction fees.</p>
-                <a href="https://docs.google.com/document/d/1ib5zFEr3i0xjlJP5go51VOKB5zXmFMTywQugObuBYw8/edit?usp=sharing" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitLowestFeesCrypto">
-                    View Lowest Fees Crypto List
-                </a>
-            </div>
-            <!-- NEW: Added link for Learn the difference between coins and tokens -->
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
-                <h3 class="font-semibold text-lg" data-i18n="coinsTokensHeading">Learn Coins vs Tokens</h3>
-                <p class="text-sm" data-i18n="coinsTokensDescription">Learn the fundamental differences between cryptocurrencies and tokens.</p>
-                <a href="https://docs.google.com/document/d/1PcUShRk3M65nTnI400WsvCROLamLaADcEhbcz9WshWM/edit?usp=sharing" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitCoinsTokens">
-                    Learn more about Coins vs Tokens
-                </a>
-            </div>
-            <!-- NEW: Added link for Dexscreener New Pairs -->
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
-                <h3 class="font-semibold text-lg" data-i18n="dexscreenerNewPairsHeading">Dexscreener New Pairs</h3>
-                <p class="text-sm" data-i18n="dexscreenerNewPairsDescription">Explore recently listed cryptocurrency pairs on Dexscreener.</p>
-                <a href="https://dexscreener.com/new-pairs" target="_blank" class="text-blue-500 hover:underline" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="visitDexscreenerNewPairs">
-                    View Dexscreener New Pairs
-                </a>
-            </div>
-        </div>
-
-        <!-- New Tab Content: Premium Games -->
-        <div id="premiumGamesTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="premiumGamesHeading">Premium Games</h2>
-            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="premiumGamesDescription">
-                Unlock exclusive game modes and challenges by becoming a premium member!
-            </p>
-            <div class="deal-item bg-gray-100 p-4 rounded-lg mb-3">
-                <h3 class="font-semibold text-lg" data-i18n="spotTheDifferencePremiumHeading">Spot the Difference: Premium Puzzles</h3>
-                <p class="text-sm" data-i18n="spotTheDifferencePremiumDescription">Access more challenging puzzles and earn bigger rewards!</p>
-                <button id="playPremiumSpotTheDifference"
-                        class="w-full py-2 rounded-lg font-bold transition-colors duration-200 mt-2"
-                        style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="playNow">
-                    Play Now
-                </button>
-            </div>
-            <p class="text-sm mt-4" style="color: var(--tg-theme-hint-color, #666);" data-i18n="premiumGamesNote">
-                (More premium games coming soon!)
-            </p>
-        </div>
-
-        <!-- New Tab Content: Game (TREP Treasure) -->
-        <div id="gameTabContent" class="tab-content w-full hidden">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="gameHeading">TREP Treasure Game</h2>
-            <p class="mb-4" style="color: var(--app-text-color);" data-i18n="gameDescription">
-                Explore themed zones, discover hidden gems, and earn simulated TREP refunds!
-            </p>
-
-            <!-- Game Balance Display -->
-            <div class="flex justify-between items-center bg-gray-100 p-3 rounded-lg mb-4" style="background-color: var(--app-secondary-bg) !important; color: var(--app-text-color) !important; border: 1px solid rgba(255,255,255,0.15);">
-                <span class="font-semibold" data-i18n="yourTrepBalance">Your TREP:</span>
-                <span id="trepBalance" class="font-bold text-lg text-green-500">0 TREP</span> <!-- Initial Balance, updated by JS -->
-            </div>
-
-            <!-- Fearless Fly Mode Toggle -->
-            <button id="fearlessFlyToggleButton" class="toggle-button px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 mb-4"
-                    style="background-color: var(--app-secondary-bg); color: var(--app-text-color);" data-i18n="fearlessFlyModeButton">
-                Activate Fearless Fly Mode 🦸‍♂️
-            </button>
-
-
-            <!-- Game Zone Selection (Initially Visible, managed by JS) -->
-            <div id="gameZoneSelection" class="game-area p-4 rounded-lg text-center">
-                <p class="mb-4 text-xl font-semibold" data-i18n="selectZone">Choose your adventure zone:</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Zone 1: TREP Jungle -->
-                    <div class="zone-card p-3 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-200" data-zone="jungle">
-                        <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Overview.png?raw=true" alt="TREP Jungle" class="w-24 h-24 mx-auto mb-2 rounded-full object-cover">
-                        <h3 class="font-bold text-lg" data-i18n="zoneJungle">TREP Jungle</h3>
-                        <p class="text-sm text-gray-600" style="color: var(--app-text-color);" data-i18n="zoneJungleDesc">Discover ancient remedies and wild discoveries.</p>
-                    </div>
-                    <!-- Zone 2: TREP Island -->
-                    <div class="zone-card p-3 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-200" data-zone="island">
-                        <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Access%20tab.png?raw=true" alt="TREP Island" class="w-24 h-24 mx-auto mb-2 rounded-full object-cover">
-                        <h3 class="font-bold text-lg" data-i18n="zoneIsland">TREP Island</h3>
-                        <p class="text-sm text-gray-600" style="color: var(--app-text-color);" data-i18n="zoneIslandDesc">Sail to the sun-drenched island for exclusive merch.</p>
-                    </div>
-                    <!-- Zone 3: TREP Labyrinth -->
-                    <div class="zone-card p-3 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-200" data-zone="labyrinth">
-                        <img src="https://github.com/AllanTREP/my-telegram-mini-app/blob/main/Real-time%20stats.png?raw=true" alt="TREP Labyrinth" class="w-24 h-24 mx-auto mb-2 rounded-full object-cover">
-                        <h3 class="font-bold text-lg" data-i18n="zoneLabyrinth">TREP Labyrinth</h3>
-                        <p class="text-sm text-gray-600" style="color: var(--app-text-color);" data-i18n="zoneLabyrinthDesc">Navigate winding paths for cryptic clues.</p>
-                    </div>
-                </div>
-                <p id="gameMessage" class="mt-4 text-sm" style="color: var(--tg-theme-hint-color, #666);"></p>
-            </div>
-
-            <!-- Game Play Area (Initially Hidden, managed by JS) -->
-            <div id="gamePlayArea" class="game-area p-4 rounded-lg text-center relative hidden">
-                <button id="backToZonesButton" class="absolute top-3 left-3 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-md text-sm transition-colors duration-200" data-i18n="backToZones">
-                    ← Back to Zones
-                </button>
-                <h3 id="currentZoneTitle" class="text-xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);"></h3>
-                <div id="zoneImageContainer" class="relative w-full h-64 bg-cover bg-center rounded-lg mb-4 mx-auto" style="background-image: url('https://via.placeholder.com/400x256?text=Explore+Zone');">
-                    <!-- Hotspots will be dynamically added here by JavaScript -->
-                </div>
-                <p id="gamePrompt" class="text-base mb-4" data-i18n="gamePrompt">Tap on glowing areas to find treasure!</p>
-                <p id="gameFeedback" class="mt-4 text-base font-semibold" style="color: var(--tg-theme-hint-color, #666);"></p>
-                <div id="rewardDisplay" class="mt-4 p-3 bg-green-100 dark:bg-green-700 rounded-lg text-green-800 dark:text-green-100 font-bold hidden" style="background-color: var(--tg-theme-secondary-bg-color, #e0e0e0);"></div>
-            </div>
-
-            <!-- Spot the Difference Game (Initially Hidden) -->
-            <div id="spotTheDifferenceGame" class="hidden flex flex-col items-center p-4 rounded-lg text-center">
-                <button id="backToGameFromPuzzleButton" class="absolute top-3 left-3 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-md text-sm transition-colors duration-200" data-i18n="backToGame">
-                    ← Back to Game
-                </button>
-                <h3 class="text-xl font-bold mb-4" style="color: var(--tg-theme-link-color, #0088cc);" data-i18n="spotTheDifferenceTitle">Spot the Difference!</h3>
-                <p class="mb-2" data-i18n="differencesFound">Differences Found: <span id="differencesFoundDisplay">0</span>/<span id="totalDifferences">0</span></p>
-
-                <div class="puzzle-images-container w-full">
-                    <div class="puzzle-image-wrapper">
-                        <!-- Updated placeholder image for original -->
-                        <img id="originalImage" src="https://placehold.co/400x225/ADD8E6/000000?text=Forest+Scene" alt="Original Image" onerror="this.src='https://placehold.co/400x225/FF0000/FFFFFF?text=Error'; console.error('Failed to load original image');">
-                    </div>
-                    <div class="puzzle-image-wrapper relative">
-                        <!-- Updated placeholder image for modified, implying a difference -->
-                        <img id="modifiedImage" src="https://placehold.co/400x225/ADD8E6/000000?text=Forest+Scene+with+Bird" alt="Modified Image" onerror="this.src='https://placehold.co/400x225/FF0000/FFFFFF?text=Error'; console.error('Failed to load modified image');">
-                        <!-- Difference hotspots will be injected here by JS -->
-                    </div>
-                </div>
-                <p id="puzzleFeedback" class="mt-2 text-base font-semibold" style="color: var(--tg-theme-hint-color, #666);"></p>
-                <button id="nextPuzzleButton" class="py-3 px-6 rounded-lg font-bold text-white transition-colors duration-200 mt-4 hidden" style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="nextPuzzle">
-                    Next Puzzle
-                </button>
-                <!-- Subscription Message and Button -->
-                <div id="subscriptionRequired" class="mt-4 p-4 bg-red-100 dark:bg-red-700 text-red-800 dark:text-red-100 rounded-lg hidden">
-                    <p class="font-bold mb-2" data-i18n="subscribeToPlay"></p>
-                    <button id="subscribeToGamesButton" class="py-2 px-4 rounded-lg font-bold text-white transition-colors duration-200" style="background-color: var(--tg-theme-button-color, #0088cc); color: var(--tg-theme-button-text-color, white);" data-i18n="subscribeNow">
-                        Subscribe Now (Burn 100,000 TREP)
-                    </button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- General Info Text at the bottom of the main container -->
-        <p id="infoText" class="mt-6 text-sm text-gray-600 text-center w-full"
-           style="color: var(--tg-theme-hint-color, #666);">
-            Hello, User!
-        </p>
-
-        <!-- Quick Links (Icons) Navigation -->
-        <div class="flex justify-around items-center w-full mt-6 p-3 bg-gray-100 rounded-lg shadow-inner"
-             style="background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);">
-            <button id="quickOverview" class="quick-link-button" data-tab-id="overviewTabContent">
-                🏠
-            </button>
-            <button id="quickTrenks" class="quick-link-button" data-tab-id="statsTabContent">
-                🔗
-            </button>
-            <button id="quickDeals" class="quick-link-button" data-tab-id="dealsTabContent">
-                💰
-            </button>
-            <button id="quickGame" class="quick-link-button" data-tab-id="gameTabContent">
-                🎮
-            </button>
-            <button id="quickAccess" class="quick-link-button" data-tab-id="accessTabContent">
-                🔑
-            </button>
-            <button id="quickMore" class="quick-link-button disabled-tab" data-tab-id="moreTabContent">
-                💡
-            </button>
-            <button id="quickPremiumGames" class="quick-link-button disabled-tab" data-tab-id="premiumGamesTabContent">
-                💎
-            </button>
-        </div>
-
-    </div>
-
-    <!-- Telegram Mini Apps SDK Script -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <script>
         Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
 
-        // --- Custom Modal Functions (Replaces Telegram.WebApp.showAlert) ---
-        const customModalOverlay = document.getElementById('customModalOverlay');
-        const customModalMessage = document.getElementById('customModalMessage');
-        const customModalCloseButton = document.getElementById('customModalCloseButton');
-        const customModalOkButton = document.getElementById('customModalOkButton');
+        // Load Font Awesome (for icons) - ensure this is loaded for the icons to show
+        const fontAwesomeLink = document.createElement('link');
+        fontAwesomeLink.rel = 'stylesheet';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css';
+        document.head.appendChild(fontAwesomeLink);
 
+        // Map the wallet adapters
+        const solanaWallets = {
+            Phantom: new PhantomWalletAdapter.PhantomWalletAdapter(),
+            Backpack: new BackpackWalletAdapter.BackpackWalletAdapter()
+        };
+
+        let solanaWallet = null;
+
+        // Try to connect to a preferred wallet, or Phantom by default
+        async function initializeWallet() {
+            const preferredWallet = localStorage.getItem('preferredWallet') || 'Phantom';
+            if (solanaWallets[preferredWallet]) {
+                solanaWallet = solanaWallets[preferredWallet];
+            } else {
+                solanaWallet = solanaWallets.Phantom; // Fallback to Phantom
+            }
+
+            // Attempt to auto-connect if already authorized
+            try {
+                if (solanaWallet && solanaWallet.readyState === 'Installed') {
+                    await solanaWallet.connect({ onlyIfTrusted: true });
+                    if (solanaWallet.publicKey) {
+                        walletStatus.textContent = translations[currentLanguage].connectedToWallet.replace('{publicKey}', solanaWallet.publicKey.toString());
+                        walletStatus.style.color = "green";
+                        fetchTREPBalance(solanaWallet.publicKey);
+                        // No need for Telegram.WebApp.showAlert here, it's an auto-connect
+                    }
+                }
+            } catch (error) {
+                console.log("Auto-connect failed or not authorized:", error);
+                walletStatus.textContent = translations[currentLanguage].walletStatus;
+                walletStatus.style.color = "red";
+            }
+        }
+
+        // Custom Alert Function (replaces Telegram.WebApp.showAlert for consistency)
         function showCustomAlert(message) {
-            customModalMessage.textContent = message;
-            customModalOverlay.classList.remove('hidden');
+            const existingAlert = document.querySelector('.custom-alert-overlay');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'custom-alert-overlay';
+            overlay.innerHTML = `
+                <div class="custom-alert-box">
+                    <p>${message}</p>
+                    <button>OK</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('button').addEventListener('click', () => {
+                overlay.remove();
+            });
         }
 
-        function hideCustomAlert() {
-            customModalOverlay.classList.add('hidden');
-        }
-
-        customModalCloseButton.addEventListener('click', hideCustomAlert);
-        customModalOkButton.addEventListener('click', hideCustomAlert);
-        // --- End Custom Modal Functions ---
-
-
-        // --- Solana Wallet Detection ---
-        // Check if wallet object exists in the window (for Solana-compatible wallets like Phantom or Backpack)
-        let solanaWallet;
-        if (window.solana && window.solana.isPhantom) {
-            solanaWallet = window.solana;
-            console.log("Phantom wallet detected");
-        } else if (window.backpack) {
-            solanaWallet = window.backpack;
-            console.log("Backpack wallet detected");
-        } else {
-            console.warn("No compatible Solana wallet detected in WebView.");
-        }
-
-        // --- Language Data ---
+        // Global translations object
         const translations = {
             en: {
                 appTitle: "TREP Mini App",
@@ -832,7 +719,7 @@
                 onboardingDescription: "Your ultimate companion for exclusive deals, real-time market insights, and community connections within the TREP ecosystem.",
                 startJourneyButton: "Start Your Journey",
                 mainWelcome: "Welcome to TREP Mini App!",
-                mainDescription: "Your gateway to exclusive deals, real-time stats, and community access.",
+                mainDescription: "Your gateway to exclusive deals, real-time insights, and community access.",
                 overviewTab: "Overview",
                 trenksTab: "Trenks",
                 dealsTab: "Deals",
@@ -841,37 +728,37 @@
                 premiumGamesTab: "Premium Games",
                 gameTab: "Game",
                 overviewHeading: "Overview",
-                overviewContent: "TREP is a community-powered token with real utility in Deal Discovery and Market Signals. Burn TREP to access early listings, investor analytics, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.<br><br>Join our community!",
+                overviewContent: "TREP is a community-driven token with real utility in Deal Discovery & Market Signals. Burn TREP to access early listings, investor insights, and premium dashboards. Powered by bots, data, and a loyal Telegram community — join the future of alpha hunting.",
                 overviewLearnMore: "Learn more about our mission and features.",
                 trenksHeading: "Trenks",
-                trenksDescription: "Here you will find important links related to TREP tokens, community, and social media.",
+                trenksDescription: "Here you'll find important links related to TREP tokens, community, and social media.",
                 checkTrepOn: "Check TREP on:",
                 joinSocials: "Join our Socials:",
                 officialWebsite: "Official Website:",
                 publicDealsHeading: "Public Deals",
-                publicDealsDescription: "Exclusive Discount on Tech Gadgets and more.",
-                dealItemHeading: "Unlock Exclusive Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!",
-                dealItemDescription: "Deals Inside: Tech, Style, Trips, Courses—All Discounted Just for You!",
+                publicDealsDescription: "Exclusive discount on tech gadgets and more.",
+                dealItemHeading: "Unlock Exclusive Deals Inside: Tech, Style, Travel, Courses—All Discounted Just For You!",
+                dealItemDescription: "Deals inside: Tech, Style, Travel, Courses—All Discounted Just For You!",
                 visitPublicDealFinder: "Visit Public Deal Finder",
                 communityChannelHeading: "Community Channel: Intrepid Public",
                 communityChannelDescription: "Join our public channel for updates and discussions.",
                 joinIntrepidPublicChannel: "Join Intrepid Public Channel",
-                accessHeading: "Gain Full Access",
-                accessDescription1: "Gain lifetime access to the 'TREP Deal Finder - Full Access' channel by burning 1 USD in $TREP tokens. You'll find exclusive deals, clothes, gadgets, oils & remedies, PDFs, news, videos, music, and much more.",
+                accessHeading: "Get Full Access",
+                accessDescription1: "Get lifetime access to the 'TREP Deal Finder - Full Access' channel by burning 1 USD worth of $TREP tokens. You'll find exclusive deals, clothing, gadgets, oils and remedies, PDFs, news, videos, music and much more.",
                 accessDescription2: "Connect your Solana wallet to proceed with payment.",
                 earlyHolderAccessHeading: "Early Holder Access",
                 earlyHolderAccessDescription: "Your gateway to token insights, community tools, and exclusive access.",
-                connectWalletButton: "Connect Wallet & Burn 100,000 TREP",
+                connectWalletButton: "Connect Wallet and Burn 100,000 TREP",
                 walletStatus: "Wallet not connected",
                 walletNote: "(Note: Wallet connection and token burning require integration with a blockchain library and a smart contract.)",
-                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: <span class=\"font-mono text-gray-800 dark:text-gray-300\">8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF</span>)",
+                burnAddressNote: "(Note: All burned tokens are sent to a verifiable burn address: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)",
                 moreHeading: "More Crypto Info",
                 moreDescription: "Explore trending cryptocurrencies and market insights.",
                 trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel",
                 trepDealFinderFullAccessDescription: "Access exclusive deals and content for subscribers.",
                 visitTrepDealFinderFullAccess: "Visit TREP Deal Finder - Full Access",
                 dexscreenerGainersHeading: "Dexscreener Gainers",
-                dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
+                dexscreenerGainersDescription: "View the top gaining cryptocurrencies on Dexscreener.",
                 visitDexscreenerGainers: "Visit Dexscreener Gainers",
                 lowestFeesCryptoHeading: "Lowest Fees Crypto Coins",
                 lowestFeesCryptoDescription: "Find cryptocurrencies with the lowest transaction fees.",
@@ -880,46 +767,22 @@
                 coinsTokensDescription: "Learn the fundamental differences between cryptocurrencies and tokens.",
                 visitCoinsTokens: "Learn more about Coins vs Tokens",
                 dexscreenerNewPairsHeading: "Dexscreener New Pairs",
-                dexscreenerNewPairsDescription: "Explore recently listed cryptocurrency pairs on Dexscreener.",
+                dexscreenerNewPairsDescription: "Explore newly listed crypto pairs on Dexscreener.",
                 visitDexscreenerNewPairs: "View Dexscreener New Pairs",
                 premiumGamesHeading: "Premium Games",
                 premiumGamesDescription: "Unlock exclusive game modes and challenges by becoming a premium member!",
                 spotTheDifferencePremiumHeading: "Spot the Difference: Premium Puzzles",
-                spotTheDifferencePremiumDescription: "Access more challenging puzzles and earn bigger rewards!",
+                spotTheDifferencePremiumDescription: "Access more challenging puzzles and earn greater rewards!",
                 playNow: "Play Now",
-                premiumGamesNote: "(More premium games coming soon!)",
-                // Game specific translations
-                gameHeading: "TREP Treasure Game",
-                gameDescription: "Explore themed zones, discover hidden gems, and earn simulated TREP refunds!",
-                yourTrepBalance: "Your TREP:",
-                selectZone: "Choose your adventure zone:",
-                zoneJungle: "TREP Jungle",
-                zoneJungleDesc: "Discover ancient remedies and wild discoveries.",
-                zoneIsland: "TREP Island",
-                zoneIslandDesc: "Sail to the sun-drenched island for exclusive merch.",
-                zoneLabyrinth: "TREP Labyrinth",
-                zoneLabyrinthDesc: "Navigate winding paths for cryptic clues.",
-                backToZones: "← Back to Zones",
-                gamePrompt: "Tap on glowing areas to find treasure!",
-                findTreasure: "Find Treasure",
-                spotTheDifferenceTitle: "Spot the Difference!",
-                differencesFound: "Differences Found: ",
-                puzzleSolved: "Puzzle Solved!",
-                tryAgain: "You already found this one or that's not a difference. Try again!",
-                nextPuzzle: "Next Puzzle",
-                backToGame: "← Back to Game",
-                subscribeToPlay: "This puzzle requires a subscription to play!",
-                subscribeNow: "Subscribe Now (Burn 100,000 TREP)",
-                insufficientFunds: "Insufficient TREP to subscribe. You need {amount} TREP.", // Added placeholder
-                subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!",
+                premiumGamesNote: "More premium games coming soon!",
+                helloUser: "Hello, User!",
+                userDataNotAvailable: "User data not available to display.",
+                yourLanguage: "Your language:",
                 fearlessFlyModeButton: "Activate Fearless Fly Mode 🦸‍♂️",
                 fearlessFlyActivated: "Fearless Fly Mode Activated! Double TREP refunds!",
                 fearlessFlyDeactivated: "Fearless Fly Mode Deactivated.",
                 fearlessFlyCost: "Activating Fearless Fly Mode costs {cost} TREP. Insufficient funds!",
-                premiumContentLocked: "This content is for premium users. Please subscribe in the 'Access' tab to unlock!",
-                helloUser: "Hello, User!",
-                userDataNotAvailable: "User data not available for display.",
-                yourLanguage: "Your language:",
+                premiumContentLocked: "This content is for premium users. Subscribe in the 'Access' tab to unlock!",
                 // New wallet-related translations
                 walletNotFound: "No wallet found. Please install Phantom or Backpack.",
                 walletConnectionFailed: "Wallet connection failed.",
@@ -929,7 +792,23 @@
                 viewTransaction: "View transaction: ",
                 devnetMode: "Devnet Mode: ON",
                 mainnetMode: "Devnet Mode: OFF",
-                burnToastMessage: "🔥 Burned {amount} TREP — Welcome to the Fearless Fly League!"
+                burnToastMessage: "🔥 Burned {amount} TREP — Welcome to the Fearless Fly League!",
+                yourBalance: "Your TREP Balance:",
+                selectZone: "Select a Zone to Explore:",
+                tapHotspot: "Tap on a sparkling hotspot to search for TREP!",
+                backToZones: "Back to Zones",
+                spotTheDifferenceGame: "Spot the Difference Puzzle",
+                originalImage: "Original Image",
+                modifiedImage: "Modified Image",
+                differencesFound: "Differences Found:",
+                subscribeToPlay: "This puzzle requires a premium subscription.",
+                subscribeNow: "Subscribe Now!",
+                puzzleSolved: "Puzzle Solved!",
+                tryAgain: "You already found this one or that's not a difference. Try again!",
+                nextPuzzle: "Next Puzzle",
+                allPuzzlesCompleted: "You've completed all available puzzles! More coming soon!",
+                backToGame: "Back to Game",
+                insufficientFunds: "Insufficient TREP. You need {amount} TREP to perform this action."
             },
             es: {
                 appTitle: "TREP Mini Aplicación",
@@ -1010,7 +889,23 @@
                 viewTransaction: "Ver transacción: ",
                 devnetMode: "Modo Devnet: ENCENDIDO",
                 mainnetMode: "Modo Devnet: APAGADO",
-                burnToastMessage: "🔥 Quemados {amount} TREP — ¡Bienvenido a la Liga Fearless Fly!"
+                burnToastMessage: "🔥 Quemados {amount} TREP — ¡Bienvenido a la Liga Fearless Fly!",
+                yourBalance: "Tu Saldo TREP:",
+                selectZone: "Selecciona una Zona para Explorar:",
+                tapHotspot: "¡Toca un punto brillante para buscar TREP!",
+                backToZones: "Volver a Zonas",
+                spotTheDifferenceGame: "Juego de Encuentra las Diferencias",
+                originalImage: "Imagen Original",
+                modifiedImage: "Imagen Modificada",
+                differencesFound: "Diferencias Encontradas:",
+                subscribeToPlay: "Este puzzle requiere una suscripción premium.",
+                subscribeNow: "¡Suscribirse Ahora!",
+                puzzleSolved: "¡Puzzle Resuelto!",
+                tryAgain: "Ya encontraste esta o eso no es una diferencia. ¡Intenta de nuevo!",
+                nextPuzzle: "Siguiente Puzzle",
+                allPuzzlesCompleted: "¡Has completado todos los puzzles disponibles! ¡Pronto habrá más!",
+                backToGame: "Volver al Juego",
+                insufficientFunds: "TREP insuficiente. Necesitas {amount} TREP para realizar esta acción."
             }
         };
 
@@ -1314,7 +1209,6 @@
             }
         }
 
-
         /**
          * Initiates a Solana SPL token burn transaction.
          * @param {solanaWeb3.PublicKey} payerPublicKey - The public key of the wallet initiating the burn.
@@ -1371,10 +1265,10 @@
                 // Sending to a known burn address is a common way to "burn" by removing from circulation.
                 const instruction = splToken.createTransferInstruction(
                     userTokenAccountAddress, // Source (user's TREP token account)
-                    TREP_BURN_ADDRESS,       // Destination (the burn address)
-                    payerPublicKey,          // Owner of the source account
-                    amountInSmallestUnits,   // Amount to transfer/burn
-                    [],                      // Signers (empty as payer will sign)
+                    TREP_BURN_ADDRESS,      // Destination (the burn address)
+                    payerPublicKey,         // Owner of the source account
+                    amountInSmallestUnits,  // Amount to transfer/burn
+                    [],                     // Signers (empty as payer will sign)
                     splToken.TOKEN_PROGRAM_ID // SPL Token Program ID
                 );
                 burnTransaction.add(instruction);
@@ -1550,7 +1444,6 @@
             }
         ];
         let currentSpotTheDifferencePuzzleIndex = 0;
-
 
         // Update TREP balance display
         function updateTREPBalanceUI() {
@@ -1919,8 +1812,8 @@
             languageToggleButton.textContent = currentLanguage.toUpperCase(); // Ensure language button shows correct initial state
             updatePremiumTabVisibility(); // Call this on load to set initial visibility
             updateSolanaConnection(); // Initialize Solana connection based on saved cluster
+            initializeWallet(); // Initialize wallet connection on load
         });
     </script>
 </body>
 </html>
- 
