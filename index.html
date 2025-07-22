@@ -7,8 +7,20 @@
     <!-- Tailwind CSS CDN for easy styling and responsiveness -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Solana Web3.js and SPL Token Library CDNs -->
-    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/lib/index.iife.min.js"></script>
+    <!-- IMPORTANT: Using module type for better import control and to avoid global conflicts -->
+    <script type="module">
+        // Explicitly import from the Solana Web3.js and SPL Token libraries
+        import * as solanaWeb3 from 'https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js';
+        import * as splToken from 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/lib/index.iife.min.js';
+
+        // Make them globally accessible for the rest of the script if needed, or pass them
+        // For simplicity in this single-file app, we'll attach them to window.
+        window.solanaWeb3 = solanaWeb3;
+        window.splToken = splToken;
+
+        // The rest of your script will go here, inside the module scope or after these are attached to window
+        // (The main script block below will now have access to window.solanaWeb3 and window.splToken)
+    </script>
     <style>
         /* Custom CSS Variables for App Theme */
         :root {
@@ -820,6 +832,9 @@
         } else if (window.backpack) {
             solanaWallet = window.backpack;
             console.log("Backpack wallet detected");
+        } else if (window.solana && window.solana.isBraveWallet) { // NEW: Brave Wallet Detection
+            solanaWallet = window.solana;
+            console.log("Brave Wallet detected");
         } else {
             console.warn("No compatible Solana wallet detected in WebView.");
         }
@@ -964,29 +979,29 @@
                 accessHeading: "Obtener Acceso Completo",
                 accessDescription1: "Obtén acceso de por vida al canal 'TREP Deal Finder - Acceso Completo' quemando 1 USD en tokens $TREP. Encontrarás ofertas exclusivas, ropa, gadgets, aceites y remedios, PDFs, noticias, videos, música y mucho más.",
                 accessDescription2: "Conecta tu billetera de Solana para proceder con el pago.",
-                earlyHolderAccessHeading: "Acceso Anticipado para Titulares",
+                earlyHolderAccessHeading: "Early Holder Access",
                 earlyHolderAccessDescription: "Tu puerta de entrada a la información de tokens, herramientas comunitarias y acceso exclusivo.",
                 connectWalletButton: "Conectar Billetera y Quemar 100,000 TREP",
                 walletStatus: "Billetera no conectada",
                 walletNote: "(Nota: La conexión de la billetera y la quema de tokens requieren integración con una biblioteca de blockchain y un contrato inteligente.)",
-                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: 8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF)",
+                burnAddressNote: "(Nota: Todos los tokens quemados se envían a una dirección de quema verificable: <span class=\"font-mono text-gray-800 dark:text-gray-300\">8LnWsg2pycEZHgvRFF91YrVVv3LDpuxU1i7ECATD9bxF</span>)",
                 moreHeading: "Más Información Cripto",
                 moreDescription: "Explora las criptomonedas de moda y los conocimientos del mercado.",
-                trepDealFinderFullAccessHeading: "Canal TREP Deal Finder - Acceso Completo",
+                trepDealFinderFullAccessHeading: "TREP Deal Finder - Full Access Channel",
                 trepDealFinderFullAccessDescription: "Accede a ofertas y contenido exclusivos para suscriptores.",
                 visitTrepDealFinderFullAccess: "Visitar TREP Deal Finder - Acceso Completo",
-                dexscreenerGainersHeading: "Ganadores de Dexscreener",
-                dexscreenerGainersDescription: "Ver las criptomonedas con mayores ganancias en Dexscreener.",
-                visitDexscreenerGainers: "Visitar Ganadores de Dexscreener",
+                dexscreenerGainersHeading: "Dexscreener Gainers",
+                dexscreenerGainersDescription: "See the top gaining cryptocurrencies on Dexscreener.",
+                visitDexscreenerGainers: "Visit Dexscreener Gainers",
                 lowestFeesCryptoHeading: "Monedas Cripto con Tarifas Más Bajas",
-                lowestFeesCryptoDescription: "Encuentra criptomonedas con las tarifas de transacción más bajas.",
-                visitLowestFeesCrypto: "Ver Lista de Monedas Cripto con Tarifas Más Bajas",
+                lowestFeesCryptoDescription: "Find cryptocurrencies with the lowest transaction fees.",
+                visitLowestFeesCrypto: "View Lowest Fees Crypto List",
                 coinsTokensHeading: "Aprender Monedas vs Tokens",
-                coinsTokensDescription: "Aprende las diferencias fundamentales entre criptomonedas y tokens.",
-                visitCoinsTokens: "Aprender más sobre Monedas vs Tokens",
+                coinsTokensDescription: "Learn the fundamental differences between cryptocurrencies and tokens.",
+                visitCoinsTokens: "Learn more about Coins vs Tokens",
                 dexscreenerNewPairsHeading: "Nuevos Pares de Dexscreener",
-                dexscreenerNewPairsDescription: "Explora los pares de criptomonedas recién listados en Dexscreener.",
-                visitDexscreenerNewPairs: "Ver Nuevos Pares de Dexscreener",
+                dexscreenerNewPairsDescription: "Explore recently listed cryptocurrency pairs on Dexscreener.",
+                visitDexscreenerNewPairs: "View Dexscreener New Pairs",
                 premiumGamesHeading: "Juegos Premium",
                 premiumGamesDescription: "¡Desbloquea modos de juego y desafíos exclusivos al convertirte en miembro premium!",
                 spotTheDifferencePremiumHeading: "Encuentra las Diferencias: Puzzles Premium",
@@ -1002,15 +1017,15 @@
                 fearlessFlyCost: "Activar el Modo Fearless Fly cuesta {cost} TREP. ¡Fondos insuficientes!",
                 premiumContentLocked: "Este contenido es para usuarios premium. ¡Suscríbete en la pestaña 'Acceso' para desbloquear!",
                 // New wallet-related translations
-                walletNotFound: "No se encontró ninguna billetera. Por favor, instala Phantom o Backpack.",
-                walletConnectionFailed: "Fallo la conexión de la billetera.",
+                walletNotFound: "No wallet found. Please install Phantom or Backpack.",
+                walletConnectionFailed: "Wallet connection failed.",
                 connectedToWallet: "Conectado a la billetera: {publicKey}",
-                burnConfirmed: "🎉 ¡Quema confirmada! Acceso premium concedido.",
-                burnFailed: "Fallo la quema. Por favor, intenta de nuevo.",
-                viewTransaction: "Ver transacción: ",
-                devnetMode: "Modo Devnet: ENCENDIDO",
-                mainnetMode: "Modo Devnet: APAGADO",
-                burnToastMessage: "🔥 Quemados {amount} TREP — ¡Bienvenido a la Liga Fearless Fly!"
+                burnConfirmed: "🎉 Burn confirmed! Premium access granted.",
+                burnFailed: "Burn failed. Please try again.",
+                viewTransaction: "View transaction: ",
+                devnetMode: "Devnet Mode: ON",
+                mainnetMode: "Devnet Mode: OFF",
+                burnToastMessage: "🔥 Burned {amount} TREP — Welcome to the Fearless Fly League!"
             }
         };
 
@@ -1054,7 +1069,7 @@
                 document.body.classList.add('dark-mode');
                 // Updated logo for dark mode
                 appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true";
-                themeToggleButton.textContent = '�';
+                themeToggleButton.textContent = '🌙';
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
@@ -1086,10 +1101,17 @@
         // --- Devnet/Mainnet Toggle Logic ---
         let currentCluster = localStorage.getItem('solana_cluster') || 'mainnet-beta'; // Default to mainnet-beta
         let isDevnetMode = currentCluster === 'devnet';
-        let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl(currentCluster)); // Initialize connection
+        // Use a more robust RPC endpoint
+        let connection = new solanaWeb3.Connection(
+            isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://api.mainnet-beta.solana.com', // Updated RPC
+            'confirmed'
+        );
 
         function updateSolanaConnection() {
-            connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl(currentCluster));
+            connection = new solanaWeb3.Connection(
+                isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://api.mainnet-beta.solana.com', // Updated RPC
+                'confirmed'
+            );
             console.log(`Solana connection switched to: ${currentCluster}`);
             // After switching, if a wallet is connected, try to fetch its balance on the new network
             if (solanaWallet && solanaWallet.publicKey) {
@@ -1256,7 +1278,7 @@
             try {
                 let userTokenAccountAddress;
                 try {
-                    // First, try to get the Associated Token Account (ATA) address
+                    // Primary method: Get the Associated Token Account (ATA) address
                     userTokenAccountAddress = await splToken.getAssociatedTokenAddress(
                         TREP_MINT_ADDRESS,
                         publicKey
@@ -1322,7 +1344,7 @@
          */
         async function burnTREP(payerPublicKey, amountInSmallestUnits) {
             try {
-                // --- NEW DEBUGGING LOGS (as suggested by Copilot) ---
+                // --- NEW DEBUGGING LOGS ---
                 console.log("--- Initiating Burn Transaction Debug ---");
                 console.log("Wallet PublicKey:", payerPublicKey.toString());
                 console.log("Token Mint:", TREP_MINT_ADDRESS.toString());
@@ -1532,7 +1554,6 @@
                     { id: 'diff1', x: 65, y: 10, width: 25, height: 20, found: false },
                     // Example of another conceptual difference (e.g., a missing 'tree')
                     { id: 'diff2', x: 10, y: 70, width: 15, height: 20, found: false },
-                    // Example of another conceptual difference (e.g., an added 'rock')
                     { id: 'diff3', x: 40, y: 45, width: 18, height: 15, found: false }
                 ],
                 requiresSubscription: false // This puzzle is free
@@ -1923,4 +1944,3 @@
     </script>
 </body>
 </html>
-�
