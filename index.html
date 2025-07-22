@@ -830,7 +830,7 @@
                 backToGame: "← Back to Game",
                 subscribeToPlay: "This puzzle requires a subscription to play!",
                 subscribeNow: "Subscribe Now (Burn 100,000 TREP)",
-                insufficientFunds: "Insufficient TREP to subscribe. You need 100,000 TREP.",
+                insufficientFunds: "Insufficient TREP to subscribe. You need {amount} TREP.", // Added placeholder
                 subscriptionSuccess: "Subscription successful! You now have access to all puzzles and TREP Deal Finder - Full Access!",
                 fearlessFlyModeButton: "Activate Fearless Fly Mode 🦸‍♂️",
                 fearlessFlyActivated: "Fearless Fly Mode Activated! Double TREP refunds!",
@@ -974,7 +974,7 @@
                 document.body.classList.add('dark-mode');
                 // Updated logo for dark mode
                 appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true";
-                themeToggleButton.textContent = '🌙';
+                themeToggleButton.textContent = '�';
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
@@ -1200,6 +1200,14 @@
          */
         async function burnTREP(payerPublicKey, amountInSmallestUnits) {
             try {
+                // --- NEW DEBUGGING LOGS (as suggested by Copilot) ---
+                console.log("--- Initiating Burn Transaction Debug ---");
+                console.log("Wallet PublicKey:", payerPublicKey.toString());
+                console.log("Token Mint:", TREP_MINT_ADDRESS.toString());
+                console.log("Burn Address:", TREP_BURN_ADDRESS.toString());
+                console.log("Current Cluster:", currentCluster);
+                // --- END NEW DEBUGGING LOGS ---
+
                 let userTokenAccountAddress;
                 const MAX_RETRIES = 3;
                 for (let i = 0; i < MAX_RETRIES; i++) {
@@ -1209,6 +1217,7 @@
                             TREP_MINT_ADDRESS,
                             payerPublicKey
                         );
+                        console.log("User Token Account:", userTokenAccountAddress.toString()); // Debug log
                         break; // If successful, break the loop
                     } catch (ataError) {
                         console.warn(`Attempt ${i + 1} to getAssociatedTokenAddress failed:`, ataError);
@@ -1219,6 +1228,19 @@
                         }
                     }
                 }
+
+                // --- NEW: Balance Check before attempting burn ---
+                // Fetch the latest balance right before the burn attempt
+                const balanceInfo = await connection.getTokenAccountBalance(userTokenAccountAddress);
+                const currentWalletTREP = balanceInfo.value.uiAmount;
+                console.log("TREP Balance (live):", currentWalletTREP); // Debug log
+
+                if (currentWalletTREP < TREP_FULL_ACCESS_COST) {
+                    Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds.replace('{amount}', TREP_FULL_ACCESS_COST.toLocaleString()));
+                    console.error("Burn failed: Insufficient funds.");
+                    return; // Stop the burn process
+                }
+                // --- END NEW: Balance Check ---
 
                 // Create a new transaction
                 const burnTransaction = new solanaWeb3.Transaction();
@@ -1283,7 +1305,14 @@
 
             } catch (err) {
                 console.error("Burn failed:", err);
-                Telegram.WebApp.showAlert(translations[currentLanguage].burnFailed);
+                // Provide more specific error message if possible
+                let errorMessage = translations[currentLanguage].burnFailed;
+                if (err.message.includes("0x1771")) { // Common Solana error code for insufficient funds
+                    errorMessage = translations[currentLanguage].insufficientFunds.replace('{amount}', TREP_FULL_ACCESS_COST.toLocaleString());
+                } else if (err.message.includes("custom program error: 0x")) {
+                    errorMessage += ` (Error Code: ${err.message.split("custom program error: ")[1]})`;
+                }
+                Telegram.WebApp.showAlert(errorMessage);
             }
         }
 
@@ -1772,3 +1801,4 @@
     </script>
 </body>
 </html>
+�
