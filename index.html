@@ -9,9 +9,9 @@
     <!-- Solana Web3.js and SPL Token Library CDNs -->
     <!-- IMPORTANT: Using module type for better import control and to avoid global conflicts -->
     <script type="module">
-        // Explicitly import from the Solana Web3.js and SPL Token libraries
-        import * as solanaWeb3 from 'https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js';
-        import * as splToken from 'https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/lib/index.iife.min.js';
+        // Explicitly import from the Solana Web3.js and SPL Token libraries using +esm for better module resolution
+        import * as solanaWeb3 from 'https://cdn.jsdelivr.net/npm/@solana/web3.js/+esm';
+        import * as splToken from 'https://cdn.jsdelivr.net/npm/@solana/spl-token/+esm';
 
         // Make them globally accessible for the rest of the script if needed, or pass them
         // For simplicity in this single-file app, we'll attach them to window.
@@ -1103,13 +1103,13 @@
         let isDevnetMode = currentCluster === 'devnet';
         // Use a more robust RPC endpoint
         let connection = new solanaWeb3.Connection(
-            isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://api.mainnet-beta.solana.com', // Updated RPC
+            isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://rpc.ankr.com/solana', // Updated RPC to Ankr
             'confirmed'
         );
 
         function updateSolanaConnection() {
             connection = new solanaWeb3.Connection(
-                isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://api.mainnet-beta.solana.com', // Updated RPC
+                isDevnetMode ? solanaWeb3.clusterApiUrl('devnet') : 'https://rpc.ankr.com/solana', // Updated RPC to Ankr
                 'confirmed'
             );
             console.log(`Solana connection switched to: ${currentCluster}`);
