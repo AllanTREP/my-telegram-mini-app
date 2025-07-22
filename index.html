@@ -341,9 +341,69 @@
             30% { transform: translate(-50%, 0); opacity: 1; }
             100% { transform: translate(-50%, 100%); opacity: 0; }
         }
+
+        /* Custom Modal Styles */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000; /* Higher than other elements */
+        }
+
+        .custom-modal-content {
+            background: var(--app-main-bg);
+            color: var(--app-text-color);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .custom-modal-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--app-text-color);
+        }
+
+        .custom-modal-button {
+            background-color: var(--tg-theme-button-color, #0088cc);
+            color: var(--tg-theme-button-text-color, white);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 1rem;
+        }
+        .custom-modal-button:hover {
+            filter: brightness(90%);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Custom Modal Structure -->
+    <div id="customModalOverlay" class="custom-modal-overlay hidden">
+        <div class="custom-modal-content">
+            <button id="customModalCloseButton" class="custom-modal-close">×</button>
+            <p id="customModalMessage" class="text-lg font-semibold"></p>
+            <button id="customModalOkButton" class="custom-modal-button">OK</button>
+        </div>
+    </div>
 
     <!-- Onboarding Screen -->
     <div id="onboardingScreen" class="onboarding-overlay hidden">
@@ -731,6 +791,26 @@
     <script>
         Telegram.WebApp.ready();
 
+        // --- Custom Modal Functions (Replaces Telegram.WebApp.showAlert) ---
+        const customModalOverlay = document.getElementById('customModalOverlay');
+        const customModalMessage = document.getElementById('customModalMessage');
+        const customModalCloseButton = document.getElementById('customModalCloseButton');
+        const customModalOkButton = document.getElementById('customModalOkButton');
+
+        function showCustomAlert(message) {
+            customModalMessage.textContent = message;
+            customModalOverlay.classList.remove('hidden');
+        }
+
+        function hideCustomAlert() {
+            customModalOverlay.classList.add('hidden');
+        }
+
+        customModalCloseButton.addEventListener('click', hideCustomAlert);
+        customModalOkButton.addEventListener('click', hideCustomAlert);
+        // --- End Custom Modal Functions ---
+
+
         // --- Solana Wallet Detection ---
         // Check if wallet object exists in the window (for Solana-compatible wallets like Phantom or Backpack)
         let solanaWallet;
@@ -974,7 +1054,7 @@
                 document.body.classList.add('dark-mode');
                 // Updated logo for dark mode
                 appLogo.src = "https://github.com/AllanTREP/my-telegram-mini-app/blob/main/logo-dark.png?raw=true";
-                themeToggleButton.textContent = '�';
+                themeToggleButton.textContent = '🌙';
                 localStorage.setItem('app_theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
@@ -1034,7 +1114,7 @@
             // Check if the tab is disabled before switching
             const clickedButton = document.querySelector(`[id="${tabId.replace('Content', 'Button')}"]`);
             if (clickedButton && clickedButton.classList.contains('disabled-tab')) {
-                Telegram.WebApp.showAlert(translations[currentLanguage].premiumContentLocked);
+                showCustomAlert(translations[currentLanguage].premiumContentLocked); // Replaced Telegram.WebApp.showAlert
                 showTab('accessTabContent'); // Redirect to Access tab
                 return; // Prevent further execution
             }
@@ -1131,7 +1211,7 @@
         connectWalletButton.addEventListener('click', async () => {
             try {
                 if (!solanaWallet) {
-                    Telegram.WebApp.showAlert(translations[currentLanguage].walletNotFound);
+                    showCustomAlert(translations[currentLanguage].walletNotFound); // Replaced Telegram.WebApp.showAlert
                     return;
                 }
 
@@ -1141,7 +1221,7 @@
                 const response = await solanaWallet.connect();
                 const publicKey = response.publicKey; // publicKey is already a PublicKey object
 
-                Telegram.WebApp.showAlert(translations[currentLanguage].connectedToWallet.replace('{publicKey}', publicKey.toString()));
+                showCustomAlert(translations[currentLanguage].connectedToWallet.replace('{publicKey}', publicKey.toString())); // Replaced Telegram.WebApp.showAlert
 
                 walletStatus.textContent = "Wallet Connected";
                 walletStatus.style.color = "green";
@@ -1158,7 +1238,7 @@
                 console.error("Wallet connection failed:", err);
                 walletStatus.textContent = translations[currentLanguage].walletConnectionFailed;
                 walletStatus.style.color = "red";
-                Telegram.WebApp.showAlert(translations[currentLanguage].walletConnectionFailed);
+                showCustomAlert(translations[currentLanguage].walletConnectionFailed); // Replaced Telegram.WebApp.showAlert
             }
         });
 
@@ -1188,7 +1268,7 @@
                 console.error("Error fetching TREP balance:", error);
                 currentTREPBalance = 0; // Assume 0 on error
                 updateTREPBalanceUI();
-                Telegram.WebApp.showAlert("Failed to fetch TREP balance. Please try again.");
+                showCustomAlert("Failed to fetch TREP balance. Please try again."); // Replaced Telegram.WebApp.showAlert
             }
         }
 
@@ -1236,7 +1316,7 @@
                 console.log("TREP Balance (live):", currentWalletTREP); // Debug log
 
                 if (currentWalletTREP < TREP_FULL_ACCESS_COST) {
-                    Telegram.WebApp.showAlert(translations[currentLanguage].insufficientFunds.replace('{amount}', TREP_FULL_ACCESS_COST.toLocaleString()));
+                    showCustomAlert(translations[currentLanguage].insufficientFunds.replace('{amount}', TREP_FULL_ACCESS_COST.toLocaleString())); // Replaced Telegram.WebApp.showAlert
                     console.error("Burn failed: Insufficient funds.");
                     return; // Stop the burn process
                 }
@@ -1275,7 +1355,7 @@
                 });
 
                 // Show verifiable transaction explorer link
-                Telegram.WebApp.showAlert(`${translations[currentLanguage].viewTransaction} https://solscan.io/tx/${signature}`);
+                showCustomAlert(`${translations[currentLanguage].viewTransaction} https://solscan.io/tx/${signature}`); // Replaced Telegram.WebApp.showAlert
 
                 // --- NEW: Burn Animation and Toast ---
                 // Show sparkle effect
@@ -1312,7 +1392,7 @@
                 } else if (err.message.includes("custom program error: 0x")) {
                     errorMessage += ` (Error Code: ${err.message.split("custom program error: ")[1]})`;
                 }
-                Telegram.WebApp.showAlert(errorMessage);
+                showCustomAlert(errorMessage); // Replaced Telegram.WebApp.showAlert
             }
         }
 
@@ -1670,7 +1750,7 @@
             // The cost is handled by burnTREP, which will then set isGameSubscribed
             try {
                 if (!solanaWallet || !solanaWallet.publicKey) {
-                    Telegram.WebApp.showAlert(translations[currentLanguage].walletNotFound);
+                    showCustomAlert(translations[currentLanguage].walletNotFound); // Replaced Telegram.WebApp.showAlert
                     return;
                 }
                 const burnAmountInSmallestUnits = TREP_SUBSCRIPTION_COST * (10 ** TREP_DECIMALS);
@@ -1710,7 +1790,7 @@
                         type: "success"
                     });
                 } else {
-                    Telegram.WebApp.showAlert(translations[currentLanguage].fearlessFlyCost.replace('{cost}', FEARLESS_FLY_ACTIVATION_COST.toLocaleString()));
+                    showCustomAlert(translations[currentLanguage].fearlessFlyCost.replace('{cost}', FEARLESS_FLY_ACTIVATION_COST.toLocaleString())); // Replaced Telegram.WebApp.showAlert
                 }
             }
         });
@@ -1801,4 +1881,3 @@
     </script>
 </body>
 </html>
-�
